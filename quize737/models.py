@@ -17,7 +17,7 @@ class QuestionSet(models.Model):
         ordering = ['-them_name']
 
     def __str__(self):
-        return self.them_name, self.question
+         return f'{self.them_name}, {self.question}'
 
 
 class QuizeSet(models.Model):
