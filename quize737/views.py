@@ -30,17 +30,31 @@ def start(request):
             q_sequence_num=thems_num * int(request.POST.get("q_num"))  # Вычисляем общее количество вопросов
         ).save()
 
-        q_amount = QuizeSet.objects.filter(quize_name=str(request.POST.get("user_name") + request.POST.get("q_num")).replace(' ', '')).values('q_sequence_num')
+        # Имя теста конкретного пользователя
+        user_set_name = str(request.POST.get("user_name") + request.POST.get("q_num")).replace(' ', '')
+        # Выясняем количество сгенерированных вопросов
+        q_amount = QuizeSet.objects.filter(quize_name=user_set_name).values('q_sequence_num')
+        q_num_list = QuizeSet.objects.filter(quize_name=user_set_name).values('questions_ids')
+        # Создаём список со сгенерированными вопросами
+        q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
         user_quize = QuizeSet.objects.all().values
-        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name"), 'user_quize': user_quize, 'q_amount': q_amount}
+        # Достаём из базы вопросов первый вопрос с конца
+        question_pisition = q_num_list[int(q_amount[0][
+                                               'q_sequence_num']) - 2]  # Номер позиции вопроса в списке вопросов пользователя (первый разот вычитаем 2 т.е. нумерация в списке начинается с 0)
+        question = QuestionSet.objects.filter(id=question_pisition).values()
+        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name"), 'user_quize': user_quize,
+                   'q_amount': q_amount, 'q_num_list': q_num_list, 'question': question}
+        # Обновляем количество оставшихся вопросов
+        QuizeSet.objects.filter(quize_name=user_set_name).update(q_sequence_num=question_pisition)
 
-        return render(request, 'all_them_set.html', context=context)
+        return render(request, 'start_test.html', context=context)
 
     else:
         return render(request, 'start.html')
 
 
-def start_test(request):
+def next_question(request):
+
     context = {'post_data': request.POST}
     return render(request, 'start_test.html', context=context)
 
