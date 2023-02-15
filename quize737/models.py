@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils.timezone import now
 
 class Thems(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название Темы")
@@ -27,10 +27,15 @@ class QuestionSet(models.Model):
         return f'{self.them_name}, {self.question}'
 
 # Сгенерированнный Тест для конекретного пользователя
-class QuizeSet(QuestionSet):
+class QuizeSet(models.Model):
+
     """Варианты тестов"""
-    quize_name = models.CharField(max_length=200, verbose_name='Название теста', help_text='Вид Тест + кол-во вопросов')
+    quize_name = models.CharField(max_length=200, verbose_name='Название теста', help_text='Вид Теста + кол-во вопросов')
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя')
+    timestamp = models.DateTimeField(default=now)
+    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True)
+    q_sequence_num = models.IntegerField(default=0, verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
 
     def __str__(self):
         return self.quize_name
+

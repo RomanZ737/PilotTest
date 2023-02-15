@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login,logout,authenticate
+from django.contrib.auth import login, logout, authenticate
+from django.utils.timezone import now
+
 from .models import QuestionSet, QuizeSet
 from django.http import HttpResponse
 from .forms import *
@@ -11,24 +13,33 @@ def start(request):
     if request.method == 'POST':
         # Формируем тест на основании заданных параметров, из каждой темы по N вопросов
         all_theme_set = []
+        particular_user_questions = []
+        thems_num = Thems.objects.all().count()  # Обзее количкство тем
+
         for theme in Thems.objects.all():
             quiz_set = QuestionSet.objects.filter(them_name=theme)
             quiz_set = random.sample(list(quiz_set), int(request.POST.get("q_num")))
-            # Сохраняем вопросы для пользователя в базу
-            QuizeSet.objects.bulk_create([QuizeSet(**{'batch_cola': m[0],
-                                                    'batch_colb': m[1],
-                                                    'batch_colc': m[2],
-                                                    'batch_cold': m[3],
-                                                    'batch_cole': m[4]})
-                                         for m in quiz_set])
-
             all_theme_set.append(quiz_set)
-        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name")}
+            # Сохраняем вопросы для пользователя в базу
+            for we in quiz_set:
+                particular_user_questions.append(str(we.id))
+        QuizeSet(
+            quize_name=str(request.POST.get("user_name") + request.POST.get("q_num")).replace(' ', ''),
+            user_under_test=request.POST.get("user_name"),
+            questions_ids=' '.join(particular_user_questions),
+            q_sequence_num=thems_num * int(request.POST.get("q_num"))  # Вычисляем общее количество вопросов
+        ).save()
+
+        user_quize = QuizeSet.objects.all().values
+        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name"), 'user_quize': user_quize}
 
         return render(request, 'all_them_set.html', context=context)
 
     else:
         return render(request, 'start.html')
+
+#def start_test(request):
+
 
 def index(request):
     if request.method == 'POST':
@@ -115,4 +126,3 @@ def loginPage(request):
 def logoutPage(request):
     logout(request)
     return redirect('/')
-

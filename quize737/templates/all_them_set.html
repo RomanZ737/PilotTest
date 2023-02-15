@@ -14,5 +14,17 @@
         <p>Вопрос: {{q.question}}</p>
         {% endfor %}
     {% endfor %}
+<br>
+Модуль: {{user_quize}}
+<p>Вопросы пользователя</p>
+
+{% for qu in user_quize %}
+    {{qu}}
+{% endfor %}
+
+{% csrf_token %}
+<form id="start_test" method='post' >{{user}}
+    <button type="submit" form="start_test">Пройти тест</button>
+</form>
 </body>
 </html>
