@@ -1,11 +1,18 @@
 from django.db import models
 
 
-class QuestionSet(models.Model):
-    # Задаём имена систем
-    them_names = [('Electrical', 'Electrical'), ('Engine', 'Engine'), ('Landin Gear', 'Landin Gear')]
+class Thems(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название Темы")
 
-    them_name = models.CharField(max_length=500, verbose_name='Тема Вопроса', choices=them_names)
+    def __str__(self):
+        return self.name
+
+# Вся база вопросов по всем темама
+class QuestionSet(models.Model):
+
+    # Имя темы связано с классом Nhem
+
+    them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
     question = models.CharField(max_length=500, verbose_name='Вопрос')
     option_1 = models.CharField(max_length=500, verbose_name='Вариант 1')
     option_2 = models.CharField(max_length=500, verbose_name='Вариант 2')
@@ -17,14 +24,13 @@ class QuestionSet(models.Model):
         ordering = ['-them_name']
 
     def __str__(self):
-         return f'{self.them_name}, {self.question}'
+        return f'{self.them_name}, {self.question}'
 
-
-class QuizeSet(models.Model):
-    """Варианты тестов стандарнтых тестов"""
-    quize_name = models.CharField(max_length=255, verbose_name='Название Теста')
+# Сгенерированнный Тест для конекретного пользователя
+class QuizeSet(QuestionSet):
+    """Варианты тестов"""
+    quize_name = models.CharField(max_length=200, verbose_name='Название теста', help_text='Вид Тест + кол-во вопросов')
+    user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя')
 
     def __str__(self):
         return self.quize_name
-
-

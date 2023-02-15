@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', index, name='index'),
+    path('', start, name='start'),
     path('addQuestion/', addQuestion, name='addQuestion'),
     path('login/', loginPage, name='login'),
     path('logout/', logoutPage, name='logout'),

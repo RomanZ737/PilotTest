@@ -3,9 +3,32 @@ from django.contrib.auth import login,logout,authenticate
 from .models import QuestionSet, QuizeSet
 from django.http import HttpResponse
 from .forms import *
+import random
 
 
 # Create your views here.
+def start(request):
+    if request.method == 'POST':
+        # Формируем тест на основании заданных параметров, из каждой темы по N вопросов
+        all_theme_set = []
+        for theme in Thems.objects.all():
+            quiz_set = QuestionSet.objects.filter(them_name=theme)
+            quiz_set = random.sample(list(quiz_set), int(request.POST.get("q_num")))
+            # Сохраняем вопросы для пользователя в базу
+            QuizeSet.objects.bulk_create([QuizeSet(**{'batch_cola': m[0],
+                                                    'batch_colb': m[1],
+                                                    'batch_colc': m[2],
+                                                    'batch_cold': m[3],
+                                                    'batch_cole': m[4]})
+                                         for m in quiz_set])
+
+            all_theme_set.append(quiz_set)
+        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name")}
+
+        return render(request, 'all_them_set.html', context=context)
+
+    else:
+        return render(request, 'start.html')
 
 def index(request):
     if request.method == 'POST':

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Start Page</title>
+
+</head>
+<form method='post' id="initial">
+    {% csrf_token %}
+    <p>ФИО Тестируемого</p>
+    <input name="user_name">
+
+  <p>Все темы по <input name="q_num"> вопросов <button type="submit" form="initial">Начать</button>
+</form>
+<body>
+
+</body>
+</html>
