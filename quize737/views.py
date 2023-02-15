@@ -30,15 +30,19 @@ def start(request):
             q_sequence_num=thems_num * int(request.POST.get("q_num"))  # Вычисляем общее количество вопросов
         ).save()
 
+        q_amount = QuizeSet.objects.filter(quize_name=str(request.POST.get("user_name") + request.POST.get("q_num")).replace(' ', '')).values('q_sequence_num')
         user_quize = QuizeSet.objects.all().values
-        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name"), 'user_quize': user_quize}
+        context = {'all_theme_set': all_theme_set, 'user': request.POST.get("user_name"), 'user_quize': user_quize, 'q_amount': q_amount}
 
         return render(request, 'all_them_set.html', context=context)
 
     else:
         return render(request, 'start.html')
 
-#def start_test(request):
+
+def start_test(request):
+    context = {'post_data': request.POST}
+    return render(request, 'start_test.html', context=context)
 
 
 def index(request):
