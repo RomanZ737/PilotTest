@@ -10,12 +10,14 @@
 <form method='post' action='{% url "next_question" %}'>
 
     <!--Скрытое поле с название теста пользователя -->
-        <input type="hidden" name="user_set_name" value="{{user_set_name}}">
+        <input type="hidden" name="user_set_id" value="{{user_set_id}}">
     <!--Скрытое поле id результатов теста пользователя -->
         <input type="hidden" name="results_object_id" value="{{results_object_id}}">
+    <!--Скрытое поле id результатов теста пользователя -->
+        <input type="hidden" name="user_name" value="{{user_name}}">
 
     <br>
-    <h3>Имя тестируемого: <b>{{user}}</b></h3>
+    <h3>Имя тестируемого: <b>{{user_name}}</b></h3>
     {% csrf_token %}
     {% for q in question%}
     <div class="form-group">

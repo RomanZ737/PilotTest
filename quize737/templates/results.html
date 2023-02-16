@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат</title>
+</head>
+<body>
+
+<h1>{{user_name}}</h1>
+<br>
+<h2>Общее количество вопросов: {{total_num_q}}</h2>
+<br>
+<h2>Количество правильных ответов: {{correct_q_num}}</h2>
+<br>
+<h2>Результать теста с учёов "веса" вопросов {{total_result}}%</h2>
+
+<br>
+<form method='get' action='{% url "start" %}'>
+<button type="submit">Вернуться</button>
+</form>
+</body>
+</html>

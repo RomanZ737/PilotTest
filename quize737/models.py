@@ -1,5 +1,6 @@
 from django.db import models
-from django.utils.timezone import now
+from datetime import datetime
+
 
 
 class Thems(models.Model):
@@ -39,10 +40,11 @@ class QuizeSet(models.Model):
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                        help_text='Имя пользователя, который проходит тест')
-    timestamp = models.DateTimeField(default=now)
+    timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
     questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True, help_text='Сквозные Номера вопросов сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
+    max_score_amount = models.IntegerField(default=0, verbose_name='Максимальное кол-во баллов', help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
 
     def __str__(self):
         return self.quize_name
@@ -55,7 +57,7 @@ class QuizeResults(models.Model):
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     total_num_q = models.IntegerField(verbose_name='Количество вопросов', help_text='Общее количество вопросов в тесте')
-    timestamp = models.DateTimeField(default=now)
+    timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
     questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True)
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
     score_number = models.IntegerField(verbose_name='Количество баллов')
