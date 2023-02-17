@@ -18,6 +18,8 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf import settings
+from users import views as users_views
+from django.contrib.auth import views as auth_views
 
 
 
@@ -25,4 +27,11 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('quize737.urls')),
+    path('profile/', users_views.profile, name='profile'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
+    path('register/', users_views.register, name='register'),
+
+
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
