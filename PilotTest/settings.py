@@ -130,3 +130,5 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'static')
 
 LOGIN_REDIRECT_URL = 'start'
 LOGIN_URL = 'login'
+
+

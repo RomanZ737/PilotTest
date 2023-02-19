@@ -1,3 +1,25 @@
 body {
-  background-color: rgb(62, 62, 62); /* NWS Dark Gray
+  background-color: rgb(62, 62, 62);  /* Цвет NWS Dark Gray */
+}
+
+h1 {
+    font-family: HelveticaNeueCyr;
+    font-color: rgb(0, 255, 255);
+}
+
+nav {
+    position: absolute;
+    top: 80px;
+    right: 0;
+    width: 200px;
+    height: 100px;
+}
+
+div.form {
+    display: inline-block;
+    background-color: rgb(188, 189, 188); /* Цвет NWS Light Gray */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
