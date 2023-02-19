@@ -3,11 +3,11 @@ body {
 }
 
 h1 {
-    font-family: HelveticaNeueCyr;
+
     font-color: rgb(0, 255, 255);
 }
 
-nav {
+nav{
     position: absolute;
     top: 80px;
     right: 0;
@@ -15,22 +15,23 @@ nav {
     height: 100px;
 }
 
-div.form {
+aside {
     display: inline-block;
     background-color: rgb(128,128,128); /* Цвет NWS Light Gray */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
+    position: relative;
+    top: 10%;
+    left: 10%;
+
 }
 
-.button {
-    background-color: rgb(128,128,128); /* Цвет NWS Dark Gray */
-    text-align: center;
+
+main {
     display: inline-block;
-    font-size: 10px;
-    color: black;
-    width: 100%;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  background: lightblue;
 
 }
 

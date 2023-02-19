@@ -7,18 +7,46 @@
             {% csrf_token %}
             <fieldset>
                 <legend>Вход</legend>
-                <label for="id_username">Логин:</label>
-                {{ form.username }}
-                <br><br>
-                <label for="id_password">Пароль:</label>
-                {{form.password}}
+                    <div>
+                        <table style="width:100%">
+                            <tr>
+                                <th align="left">
+                                    <label for="id_username" style="font-size: 14px">Логин:</label>
+                                </th>
+                                <th align="right">
+                                    {{ form.username }}
+                            </th>
+                            </tr>
+                        </table>
+                    </div>
                 <br>
+                    <div>
+                        <table style="width:100%">
+                            <tr>
+                                <th align="left">
+                                    <label for="id_password" style="font-size: 14px">Пароль:</label>
+                                </th>
+                                <th align="right">
+                                    {{form.password}}
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
                 <br>
-                <button type="submit">Войти</button>
-            </fieldset>
-            <div>
+                    <div>
+                        <table style="width:100%">
+                            <tr>
+                                <th align="left" width="50%">
+                                    <button class="button" type="submit">Войти</button>
+                                </th>
 
-            </div>
+                                <th align="right">
+                                    <a href="{% url 'register' %}"><span>Регистрация</span></a>
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
+            </fieldset>
         </form>
     </div>
 <div>

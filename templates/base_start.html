@@ -1,10 +1,11 @@
 {% load static %}
 <html>
 <link href="https://fonts.cdnfonts.com/css/helveticaneuecyr-2" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'base_generic.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'base_start.css' %}" type="text/css">
     <head>
         <title>NWS Pilot Test</title>
     </head>
+
     <body>
     <header>
         <h1>
@@ -15,21 +16,17 @@
     <nav>
     {% if user.is_authenticated %}
             	<a href="{% url 'profile' %}">Профиль</a>
+                <span>|</span>
             	<a href="{% url 'logout' %}">Выход</a>
-
         {% endif %}
-
     </nav>
-        {% if messages %}
-        	{% for message in messages %}
-          	<div>
-            	{{ message }}
-          	</div>
-        	{% endfor %}
-        {% endif %}
+    <aside>
+    <p>Main Menu</p>
+    </aside>
+    <main>
     {% block content %}
         {% endblock %}
-        <br>
+    </main>
 
     </body>
 </html>
