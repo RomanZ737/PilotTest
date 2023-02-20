@@ -92,7 +92,7 @@ def start(request):
         return render(request, 'start_test.html', context=context)
 
     else:
-        return render(request, 'start.html')
+        return render(request, 'start_all_q.html')
 
 # Генерация последующих вопросов
 def next_question(request):

@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Результат</title>
-</head>
-<body>
+{% extends "base_test.html" %}
+
+{% block content %}
+<section>
 
 <h1>{{user_name}}</h1>
 <br>
@@ -12,11 +9,11 @@
 <br>
 <h2>Количество правильных ответов: {{correct_q_num}}</h2>
 <br>
-<h2>Результать теста с учёов "веса" вопросов {{total_result}}%</h2>
+<h2>Результать теста с учётом "веса" вопросов {{total_result}}%</h2>
 
 <br>
 <form method='get' action='{% url "start" %}'>
-<button type="submit">Вернуться</button>
+<button type="submit">На главную</button>
 </form>
-</body>
-</html>
+</section>
+{% endblock %}

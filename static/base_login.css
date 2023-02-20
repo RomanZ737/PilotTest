@@ -1,0 +1,42 @@
+body {
+    background-color: rgb(128,128,128); /* Цвет NWS Light Gray */
+}
+
+header {
+    position: relative;
+    height: 10%;
+}
+
+main {
+  position: relative;
+  height: 90%;
+}
+
+/* Форма и ёё положение */
+section {
+    position: absolute;
+    background-color: rgb(62, 62, 62);
+    top: 30%;
+    left: 35%;
+}
+
+/* Цвет и размер текста в форме */
+
+form, label {
+    color: rgb(209, 209,209);
+    font-size: 17px;
+}
+
+button {
+    background-color: rgb(128,128,128); /* Цвет NWS Dark Gray */
+    text-align: center;
+    display: inline-block;
+    font-size: 10px;
+    color: black;
+    width: 100%;
+}
+
+a {
+    text-decoration: none; /* Убирает подчеркивание для ссылок */
+    color: rgb(209, 209,209);
+}
