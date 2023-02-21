@@ -1,0 +1,26 @@
+{% extends "base_start.html" %}
+
+{% block content %}
+
+
+<div>
+    <fieldset>
+        <legend>По отдельной теме</legend>
+        <form  id="data" method='post'>
+        {% csrf_token %}
+            <p>ФИО Тестируемого:</p><input style="font-size: 25px;" type="text" id="fio" name="user_name" required minlength="4" maxlength="30" size="30" value="{{user.last_name}} {{ user.first_name }}">
+            <br>
+            <p>Выберите тему:</p>
+            <select style="font-size: 25px;" name="them_select">
+              {% for them in thems%}
+                <option value="{{them}}">{{them}}</option>
+              {% endfor%}
+            </select>
+            <p>Количство вопросов по теме:</p>
+            <p> <input style="font-size: 25px;" type="number" id="" name="q_num" required minlength="1" maxlength="2" size="2"></p>
+            <p><button type="submit" form="data">Начать Тестирование</button></p>
+        </form>
+    </fieldset>
+</div>
+
+{% endblock %}

@@ -5,8 +5,7 @@ from .models import QuestionSet, QuizeSet, Thems, QuizeResults
 from django.contrib.auth.decorators import login_required
 
 
-
-# Заглавная страница
+# Заглавная страница + вопросы по всем темам
 @login_required  # Только для зарегитсрированных пользователей
 def start(request):
     if request.method == 'POST':
@@ -31,13 +30,14 @@ def start(request):
                 else:
                     max_score_number = max_score_number + 1
 
-        #DEBUG PRINT
+        # DEBUG PRINT
         # print(f'int(thems_num): {int(thems_num)} * int(request.POST.get("q_num")): {int(request.POST.get("q_num"))} = {int(thems_num) * int(request.POST.get("q_num"))}')
 
         total_q_num_for_user = int(thems_num) * int(request.POST.get("q_num"))
 
         user_quize_set = QuizeSet.objects.create(
-            quize_name=str(request.POST.get("user_name") + "_All_Thems_For_" + request.POST.get("q_num")).replace(' ', '')+ 'q',
+            quize_name=str(request.POST.get("user_name") + "_All_Thems_For_" + request.POST.get("q_num")).replace(' ',
+                                                                                                                  '') + 'q',
             user_under_test=request.POST.get("user_name"),
             # Переводим список номеров вопросов в строку для хранения в поле базы данных
             questions_ids=' '.join(particular_user_questions),
@@ -48,7 +48,8 @@ def start(request):
         )
         # -------  В этом месте генерируем первый вопрос теста пользователя
         # Имя теста конкретного пользователя
-        user_set_name = str(request.POST.get('user_name') + "_All_Them_For_"+request.POST.get('q_num')).replace(' ', '') + 'q'
+        user_set_name = str(request.POST.get('user_name') + "_All_Them_For_" + request.POST.get('q_num')).replace(' ',
+                                                                                                                  '') + 'q'
 
         # Выясняем количество сгенерированных вопросов
         q_amount = QuizeSet.objects.filter(id=user_quize_set.id).values('q_sequence_num')
@@ -61,17 +62,16 @@ def start(request):
 
         # Достаём из базы вопросов первый вопрос с конца
         sequence_number = (int(q_amount[0][
-                 'q_sequence_num']) - 1)  # Номер вопроса в списке вопросв польхователя
+                                   'q_sequence_num']) - 1)  # Номер вопроса в списке вопросв польхователя
         question_pisition = q_num_list[sequence_number]  # Номер вопроса в списке вопросов пользователя
 
-        #DEBUG PRINT
+        # DEBUG PRINT
         print('question_pisition: ', question_pisition, 'sequence_number: ', sequence_number)
 
         # Достаём нужный вопрос из базы вопросов по сквозному номеру
         question = QuestionSet.objects.filter(id=question_pisition).values()
 
         # Формируем данные для отправки на страницу тестирования
-
 
         # Обновляем количество оставшихся вопросов
         QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
@@ -80,19 +80,21 @@ def start(request):
         result_obj = QuizeResults.objects.create(
             user_name=request.POST.get('user_name'),
             quize_name=user_set_name,
-            total_num_q=sequence_number+1,
-            questions_ids=', '.join(q_num_list), #[str(x) for x in q_num_list],
+            total_num_q=sequence_number + 1,
+            questions_ids=', '.join(q_num_list),  # [str(x) for x in q_num_list],
             correct_q_num=0,
             score_number=0
         )
 
-        #results_object_id = QuizeResults.objects.filter(user_name=request.POST.get('user_name')).values('id')
-        context = {'user_name': request.POST.get("user_name"), 'question': question, 'user_set_id': user_quize_set.id, 'results_object_id': result_obj.id}
+        # results_object_id = QuizeResults.objects.filter(user_name=request.POST.get('user_name')).values('id')
+        context = {'user_name': request.POST.get("user_name"), 'question': question, 'user_set_id': user_quize_set.id,
+                   'results_object_id': result_obj.id}
 
         return render(request, 'start_test.html', context=context)
 
     else:
         return render(request, 'start_all_q.html')
+
 
 # Генерация последующих вопросов
 def next_question(request):
@@ -110,11 +112,12 @@ def next_question(request):
         if request.POST.get('answer') == request.POST.get('user_answer'):
 
             # Вынимаем текущее количество правильных ответов и количество баллов пользователя
-            user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values('correct_q_num', 'score_number')
+            user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
+                'correct_q_num', 'score_number')
 
             # Увеличиваем количество правильных ответов на единицу и записыввем в базу
-            QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
-
+            QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
+                correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
             # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
             if int(request.POST.get('q_weight')) != 0:
@@ -124,7 +127,8 @@ def next_question(request):
                 updated_score_number = user_result_data[0]['score_number'] + 1
 
             # Обновляем количетво баллов
-            QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(score_number=updated_score_number)
+            QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
+                score_number=updated_score_number)
 
         # Количество оставшихся у пользователя вопросов
         q_amount = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('q_sequence_num')
@@ -154,16 +158,18 @@ def next_question(request):
 
         else:
             # Вынимаем количество правильных ответов, число вопросов и количество баллов
-            result_data = QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).values('correct_q_num', 'score_number', 'total_num_q')
+            result_data = QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).values(
+                'correct_q_num', 'score_number', 'total_num_q')
 
             # Вынимаем количество максимально возможных баллов
             max_score_num = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('max_score_amount')
 
             # Вычисляем процент прохождения теста и округляем результат до десятой
-            total_result = ('%.1f' % ((result_data[0]['score_number'] * 100)/max_score_num[0]['max_score_amount']))
+            total_result = ('%.1f' % ((result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
 
             # Формируем данные для отправки
-            context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'], 'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result}
+            context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                       'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result}
 
             # Удаляем тест пользователя их базы
             QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
@@ -171,5 +177,13 @@ def next_question(request):
             return render(request, 'results.html', context=context)
 
 
+def one_them_q(request):
+    if request.method == 'POST':
+        pass
+    else:
+        them_name = []
+        for them in Thems.objects.all():
+            them_name.append(them)
+        context = {'thems': them_name}
 
-
+        return render(request, 'one_them_q.html', context=context)
