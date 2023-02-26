@@ -1,0 +1,17 @@
+<!-- Детали конкретного отчёта -->
+
+{% extends "base_start.html" %}
+
+{% block content %}
+
+{% for i in result %}
+<p>Дата: {{i.timestamp|date:"d.m.Y H:i:s"}}</p>
+<p>ФИО: {{i.user_name}}</p>
+<p>Название теста: {{i.quize_name}}</p>
+<p>Количество вопросов: {{i.total_num_q}}</p>
+<p>Количество правильных ответов: {{i.correct_q_num}}</p>
+<p>Количество баллов: {{i.score_number}}</p>
+<p>Общий результат: {{i.total_result}}%</p>
+{% endfor %}
+
+{% endblock %}

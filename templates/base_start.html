@@ -15,7 +15,7 @@
             {% if user.is_authenticated %}
             	<a href="{% url 'profile' %}">Профиль</a>
                 <span>|</span>
-                <a href="{% url 'logout' %}?next=/login">Отчёты</a>
+                <a href="{% url 'tests_results_list' %}">Отчёты</a>
                 <span>|</span>
             	<a href="{% url 'logout' %}?next=/login">Выход</a>
                 {% endif %}

@@ -1,0 +1,11 @@
+<!-- Отчеты по результатам тестов -->
+
+{% extends "base_start.html" %}
+
+{% block content %}
+
+{% for i in results %}
+<p><a href="{{i.id}}">{{i}}</a></p>
+{% endfor %}
+
+{% endblock %}

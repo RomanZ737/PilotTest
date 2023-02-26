@@ -3,6 +3,7 @@ import random
 from django.shortcuts import render
 from .models import QuestionSet, QuizeSet, Thems, QuizeResults
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 
 # Заглавная страница + вопросы по всем темам
@@ -82,6 +83,7 @@ def start(request):
             quize_name=user_set_name,
             total_num_q=sequence_number + 1,
             questions_ids=', '.join(q_num_list),  # [str(x) for x in q_num_list],
+            #timestamp = datetime.now().strftime("%Y-%d-%m %H:%M:%S"),
             correct_q_num=0,
             score_number=0
         )
@@ -165,8 +167,10 @@ def next_question(request):
             max_score_num = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('max_score_amount')
 
             # Вычисляем процент прохождения теста и округляем результат до десятой
-            total_result = ('%.1f' % ((result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
+            total_result = ('%.0f' % ((result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
 
+            # Добавляем итоговый результать в отчёт по пользователю
+            QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(total_result=total_result)
             # Формируем данные для отправки
             context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
                        'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result}
@@ -187,3 +191,17 @@ def one_them_q(request):
         context = {'thems': them_name}
 
         return render(request, 'one_them_q.html', context=context)
+
+
+# Все результаты тестов
+def tests_results_list(request):
+    results_list = QuizeResults.objects.all()
+    context = {'results':results_list}
+    return render(request, 'tests_results_list.html', context=context)
+
+# Детали результатов теста
+def test_result_details(request, id):
+    result = QuizeResults.objects.filter(id=id).values()
+    print('Object: ', result)
+    context = {'result':result}
+    return render(request, 'test_result_details.html', context=context)

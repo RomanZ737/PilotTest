@@ -57,10 +57,12 @@ class QuizeResults(models.Model):
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     total_num_q = models.IntegerField(verbose_name='Количество вопросов', help_text='Общее количество вопросов в тесте')
-    timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=datetime.now)
     questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True)
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
     score_number = models.IntegerField(verbose_name='Количество баллов')
+    total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
 
     def __str__(self):
-        return f'{self.user_name} {self.timestamp}'
+        return f'{self.user_name} {self.timestamp.strftime("%d.%m.%Y %H:%M:%S")}'
+    #.strftime("%d.%m.%Y %H:%m:%S")
