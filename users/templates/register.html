@@ -1,21 +1,29 @@
 {% extends "base_login.html" %}
 {% block content %}
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Авторизация</legend>
-                {{ form }}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Регистрация</button>
-            </div>
-        </form>
-        <div class="border-top pt-3">
-            <small class="text-muted">
-                Уже есть аккаунт? <a href="{% url 'login' %}" >Вход</a>
-            </small>
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Регистрация</legend>
+<!--            {{form_user}}-->
+            <p>Логин: </p><p>{{ form_user.username }}</p>
+            <p>Пароль: </p><p>{{form_user.password1}}</p>
+            <p>Пароль повторно: </p><p>{{ form_user.password2 }}</p>
+            <p>Email: </p><p>{{form_user.email}}</p>
+            <p>Фамилия: </p><p>{{ form_profile.family_name }}</p>
+            <p>Имя: </p><p>{{ form_profile.first_name }}</p>
+            <p>Отчество: </p><p>{{ form_profile.middle_name }}</p>
+            <p>Должность: </p><p>{{ form_profile.position }}</p>
+        </fieldset>
+        <div>
+            <button type="submit">Регистрация</button>
         </div>
+    </form>
+    <div>
+        <small>
+            Уже есть аккаунт? <a href="{% url 'login' %}">Вход</a>
+        </small>
     </div>
+</div>
 
 {% endblock content %}
