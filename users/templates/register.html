@@ -3,11 +3,16 @@
 <div>
     <form method="POST">
         {% csrf_token %}
+        {% if err_list %}
+            {% for err in err_list %}
+                <p>{{err}}</p>
+            {% endfor %}
+        {%endif%}
         <fieldset>
             <legend>Регистрация</legend>
-<!--            {{form_user}}-->
             <p>Логин: </p><p>{{ form_user.username }}</p>
             <p>Пароль: </p><p>{{form_user.password1}}</p>
+            <p>Минимальная длина пароля 3 символа</p>
             <p>Пароль повторно: </p><p>{{ form_user.password2 }}</p>
             <p>Email: </p><p>{{form_user.email}}</p>
             <p>Фамилия: </p><p>{{ form_profile.family_name }}</p>
