@@ -11,6 +11,8 @@
         <input type="hidden" name="results_object_id" value="{{results_object_id}}">
     <!--Скрытое поле id результатов теста пользователя -->
         <input type="hidden" name="user_name" value="{{user_name}}">
+    <!--    Скрытое поле с видом вопроса-->
+        <input type="hidden" name="q_kind" value="{{q_kind}}">
 
     {% csrf_token %}
     {% for q in question%}
@@ -58,6 +60,16 @@
                 <input type="radio" name="user_answer" id="4" value="4">
                 <label class="option" for="4">
                     {{q.option_4}}
+                </label>
+            </div>
+        {% endif %}
+
+        {% if q.option_5 %}
+            <br>
+            <div class="radiobuttons">
+                <input type="radio" name="user_answer" id="5" value="5">
+                <label class="option" for="5">
+                    {{q.option_5}}
                 </label>
             </div>
         {% endif %}

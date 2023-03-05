@@ -20,11 +20,13 @@ class QuestionSet(models.Model):
     option_2 = models.CharField(max_length=500, verbose_name='Вариант 2')
     option_3 = models.CharField(max_length=500, verbose_name='Вариант 3', blank=True, null=True)
     option_4 = models.CharField(max_length=500, verbose_name='Вариант 4', blank=True, null=True)
-    q_kind = models.BooleanField(verbose_name='Вид вопроса', default=False,
-                                 help_text='Подразумевает ли вопрос множественные ответы')
+    option_5 = models.CharField(max_length=500, verbose_name='Вариант 5', blank=True, null=True)
+    q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
+                                 help_text='Если вопрос подразумевает несколько правильных ответов')
     q_weight = models.IntegerField(verbose_name='"Вес вопроса"', default=0,
                                    help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
-    answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа')
+    answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа', help_text='Поле используется если вопрос подразумевает один ответ', blank=True, null=True)
+    answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос', help_text='Поле используется если вопрос подразумевает несколько правильных ответов', blank=True, null=True)
 
     class Meta:
         ordering = ['-them_name']
@@ -41,7 +43,7 @@ class QuizeSet(models.Model):
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                        help_text='Имя пользователя, который проходит тест')
     timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
-    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True, help_text='Сквозные Номера вопросов сгенерированные пользователю')
+    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True, help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
     max_score_amount = models.IntegerField(default=0, verbose_name='Максимальное кол-во баллов', help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
