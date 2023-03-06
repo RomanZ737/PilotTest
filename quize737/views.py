@@ -1,18 +1,50 @@
 import random
 
+from django.core.exceptions import PermissionDenied
+from django.utils import six
 from django.shortcuts import render
 from .models import QuestionSet, QuizeSet, Thems, QuizeResults
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
+
+
+# Декоратор проверки группы пользователя для доступа
+def group_required(group, login_url=None, raise_exception=False):
+    """
+    Decorator for views that checks whether a user has a group permission,
+    redirecting to the log-in page if necessary.
+    If the raise_exception parameter is given the PermissionDenied exception
+    is raised.
+    """
+
+    def check_perms(user):
+        if isinstance(group, six.string_types):
+            groups = (group, )
+        else:
+            groups = group
+        # First check if the user has the permission (even anon users)
+
+        if user.groups.filter(name__in=groups).exists() | user.is_superuser:
+            return True
+        # In case the 403 handler should be called raise the exception
+        if raise_exception:
+            raise PermissionDenied
+        # As the last resort, show the login form
+        return False
+
+    return user_passes_test(check_perms, login_url=login_url)
+
 
 # Формироваине теста с вопросами из всех тем
 def all_them_q_set():
     pass
 
+
 # Заглавная страница + вопросы по всем темам
 @login_required  # Только для зарегитсрированных пользователей
 def start(request):
     if request.method == 'POST':
+
         # Формируем тест на основании заданных параметров, из каждой темы по N вопросов
         all_theme_set = []
         particular_user_questions = []
@@ -37,8 +69,7 @@ def start(request):
         total_q_num_for_user = int(thems_num) * int(request.POST.get("q_num"))
 
         user_quize_set = QuizeSet.objects.create(
-            quize_name=str(request.POST.get("user_name") + " Все Темы " + request.POST.get("q_num")).replace(' ',
-                                                                                                           '') + ' Вопроса(ов)',
+            quize_name="Все Темы " + request.POST.get("q_num") + ' Вопроса(ов)',
             user_under_test=request.POST.get("user_name"),
             # Переводим список номеров вопросов в строку для хранения в поле базы данных
             questions_ids=' '.join(particular_user_questions),
@@ -50,8 +81,7 @@ def start(request):
 
         # -------  В этом месте генерируем первый вопрос теста пользователя
         # Имя теста конкретного пользователя
-        user_set_name = str(request.POST.get('user_name') + " Все Темы " + request.POST.get('q_num')).replace(' ',
-                                                                                                              '') + ' Вопроса(ов)'
+        user_set_name = "Все Темы " + request.POST.get("q_num") + ' Вопроса(ов)'
 
         # Выясняем количество сгенерированных вопросов
         q_amount = QuizeSet.objects.filter(id=user_quize_set.id).values('q_sequence_num')
@@ -110,32 +140,30 @@ def next_question(request):
     if request.method == 'POST':
 
         # Сравниваем результат ответа
-        print("POST: ", request.POST)
-        print('Q Kind: ', request.POST.get('q_kind'))
-        print('user_set_id: ', request.POST.get('user_set_id'))
-        print('correct_answers: ', request.POST.get('answers'), 'type: ', type(request.POST.get('answers')))
-        print('user_answer:', request.POST.get('user_answer'))
-        print('results_object_id:', request.POST.get('results_object_id'))
-        print('q_weight: ', request.POST.get('q_weight'))
+        # print("POST: ", request.POST)
+        # print('Q Kind: ', request.POST.get('q_kind'))
+        # print('user_set_id: ', request.POST.get('user_set_id'))
+        # print('correct_answers: ', request.POST.get('answers'), 'type: ', type(request.POST.get('answers')))
+        # print('user_answer:', request.POST.get('user_answer'))
+        # print('results_object_id:', request.POST.get('results_object_id'))
+        # print('q_weight: ', request.POST.get('q_weight'))
 
         # Проверяем вид вопроса
         if request.POST.get('q_kind') == 'True':
 
-            #DEBUG PRINT
+            # DEBUG PRINT
             print('МУЛЬТИОТВЕТНЫЙ ВОПРОС')
 
             user_answers_list = []
             for a in request.POST.keys():
                 if 'user_answer' in a:
                     user_answers_list.append(request.POST[a][0])
-            #DEBUG PRINT
-            print('user_answers_list: ', user_answers_list, 'list: ', ','.join(user_answers_list))
 
             # Если ответ пользователя правильный
             if request.POST.get('answers') == ','.join(user_answers_list):
 
-                #DEBUG PRINT
-                print('User has correct answered')
+                # DEBUG PRINT
+                print('Привильный ответ')
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                 user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
@@ -156,14 +184,18 @@ def next_question(request):
                 QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
                     score_number=updated_score_number)
             else:
-                print('USER FAIL')
+                print('Не правильный ответ')
 
 
         else:
-            #DEBUG PRINT
+            # DEBUG PRINT
             print('ОБЫЧНЫЙ ВОПРОС')
+
             # Если пользователь правильно ответил на вопрос:
             if request.POST.get('answer') == request.POST.get('user_answer'):
+
+                # DEBUG PRINT
+                print('Правильный ответ')
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                 user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
@@ -183,6 +215,8 @@ def next_question(request):
                 # Обновляем количетво баллов
                 QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
                     score_number=updated_score_number)
+            else:
+                print('Не правильный ответ')
 
         # Количество оставшихся у пользователя вопросов
         q_amount = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('q_sequence_num')
@@ -252,6 +286,8 @@ def one_them_q(request):
         return render(request, 'one_them_q.html', context=context)
 
 
+@login_required
+@group_required('krs')
 # Все результаты тестов
 def tests_results_list(request):
     results_list = QuizeResults.objects.all()
@@ -259,6 +295,8 @@ def tests_results_list(request):
     return render(request, 'tests_results_list.html', context=context)
 
 
+@login_required
+@group_required('krs')
 # Детали результатов теста
 def test_result_details(request, id):
     result = QuizeResults.objects.filter(id=id).values()

@@ -65,6 +65,9 @@ class QuizeResults(models.Model):
     score_number = models.IntegerField(verbose_name='Количество баллов')
     total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
 
+    class Meta:
+        ordering = ['-timestamp']
+
     def __str__(self):
         return f'{self.user_name} {self.timestamp.strftime("%d.%m.%Y %H:%M:%S")}'
     #.strftime("%d.%m.%Y %H:%m:%S")
