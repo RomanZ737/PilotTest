@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 
 import os
 
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%ql#=awy!d7h-h@#6nevaq*_f7rvhjc(0l%_@$^04rhq$m$z(9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -79,10 +80,20 @@ WSGI_APPLICATION = 'PilotTest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+db_adress = config('ip_mysql', default='')
+db_name = config('SQL_DB', default='')
+db_user = config('SQL_usrID', default='')
+db_pass = config('SQL_password', default='')
+db_port = config('db_port', default='')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': db_name,
+        'USER': db_user,
+        'PASSWORD': db_pass,
+        'HOST': db_adress,
+        'PORT': db_port,
     }
 }
 

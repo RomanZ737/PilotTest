@@ -23,7 +23,7 @@ class QuestionSet(models.Model):
     option_5 = models.CharField(max_length=500, verbose_name='Вариант 5', blank=True, null=True)
     q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
                                  help_text='Если вопрос подразумевает несколько правильных ответов')
-    q_weight = models.IntegerField(verbose_name='"Вес вопроса"', default=0,
+    q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0,
                                    help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
     answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа', help_text='Поле используется если вопрос подразумевает один ответ', blank=True, null=True)
     answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос', help_text='Поле используется если вопрос подразумевает несколько правильных ответов', blank=True, null=True)
