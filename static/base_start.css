@@ -13,7 +13,7 @@ header {
 
 nav{
     position: absolute;
-    left: 70%;
+    left: 65%;
     top: 50%;
     font-size: 17px;
 }
@@ -21,20 +21,20 @@ nav{
 main {
   position: relative;
   height: 90%;
-  font-size: 30px;
+  font-size: 20px;
 }
 
 aside {
     position: absolute;
     left: 1%;
     top: 5%;
-    font-size: 25px;
+    font-size: 17px;
 
 }
 
 section {
     position: absolute;
-    left: 30%;
+    left: 21%;
     top: 5%;
 
 }
@@ -43,7 +43,7 @@ button {
     background-color: rgb(209, 209,209); /* Цвет NWS Dark Gray */
     text-align: center;
     display: inline-block;
-    font-size: 15px;
+    font-size: 13px;
     color: black;
 }
 
@@ -56,6 +56,13 @@ a {
     color: rgb(209, 209,209);
 }
 
-theme_color {
+span.theme_color {
     color: rgb(170, 39, 47);
+    font-size: 15px;
+}
+
+span.a_list {
+    text-decoration: none; /* Убирает подчеркивание для ссылок */
+    color: rgb(209, 209,209);
+    font-size: 15px;
 }

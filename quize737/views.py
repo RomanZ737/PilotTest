@@ -2,11 +2,12 @@ import random
 
 from django.core.exceptions import PermissionDenied
 from django.utils import six
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import QuestionSet, QuizeSet, Thems, QuizeResults
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
 from .forms import QuestionSetForm
+from django.http import HttpResponse
 
 
 # Декоратор проверки группы пользователя для доступа
@@ -20,7 +21,7 @@ def group_required(group, login_url=None, raise_exception=False):
 
     def check_perms(user):
         if isinstance(group, six.string_types):
-            groups = (group, )
+            groups = (group,)
         else:
             groups = group
         # First check if the user has the permission (even anon users)
@@ -305,7 +306,7 @@ def test_result_details(request, id):
     return render(request, 'test_result_details.html', context=context)
 
 
-#Список вопросов из базы
+# Список вопросов из базы
 @login_required
 @group_required('krs')
 def question_list(request):
@@ -316,18 +317,22 @@ def question_list(request):
 
 # Редактирование конкретно взятого вопроса
 def question_list_details(request, id):
+    #  Если пользователь нажал 'соъхранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
-        question_form = QuestionSetForm(request.POST)
+        #   Выясняем id вопроса для его обновления
+        a = QuestionSet.objects.get(id=id)
+        question_form = QuestionSetForm(request.POST, instance=a)
+
+        if question_form.is_valid():
+            question_form.save()
+            return redirect('question_list')
+
     else:
-        result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind', 'q_weight', 'answer', 'answers')
-
-        #DEBUG PRINT
-        print('result: ',  result)
-
+        result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
+                                                          'option_4', 'option_5', 'q_kind', 'q_weight', 'answer',
+                                                          'answers')
         question_form = QuestionSetForm(result[0])
 
-        # DEBUG PRINT
-        #print('question_form:', question_form)
-
         context = {'question_form': question_form}
-    return render(request, 'question_list_details.html', context=context)
+
+        return render(request, 'question_list_details.html', context=context)

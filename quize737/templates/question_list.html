@@ -3,9 +3,18 @@
 {% extends "base_start.html" %}
 
 {% block content %}
-
+<div>
 {% for i in questions %}
-<p><a href="{{i.id}}"><span class="">{{i.them_name}}</span> -> {{i.question}}</a></p>
+<p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span> -> <span class="a_list">{{i.question}}</span></a></p>
 {% endfor %}
+</div>
 
+<div>
+    <fieldset>
+        <legend>Добавить/Скачать</legend>
+        <form  id="data" method='post'>
+            <button>Нажать</button>
+        </form>
+    </fieldset>
+</div>
 {% endblock %}

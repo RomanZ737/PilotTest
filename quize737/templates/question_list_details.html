@@ -8,6 +8,7 @@
 <fieldset>
         <legend>Редактировать вопрос</legend>
         <form id="question_data" method='post'>
+            {% csrf_token %}
             <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
             <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="q_field" name="question">{{question_form.question.value}}</textarea></p>
             <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
@@ -21,19 +22,18 @@
             <p>{{question_form.answers.label}}: <input type="text" value=" {{question_form.answers.value}}"></p>
             <button type="submit" >Сохранить</button>
         </form>
-    <form method='get' action='{% url "question_list" %}'>
-<button type="submit" >Вернуться</button>
-</form>
 </fieldset>
+        <form method='get' action='{% url "question_list" %}'>
+            <button type="submit" >Вернуться</button>
+        </form>
 
 
 <p id="demo"></p>
+
 <script type="text/javascript">
 
 var q_text_Length = "{{question_form.question.value}}".length;
-
 var q_rows_length = 1
-
 if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
                               q_text_Length = 100 };
 
