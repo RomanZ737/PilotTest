@@ -15,13 +15,19 @@
             <nav>
 
                 {% if user.is_authenticated %}
+                    <span>|</span>
+                    <a href="{% url 'start' %}">Главная</a>
+                    <span>|</span>
                     <a href="{% url 'profile' %}">Профиль</a>
                             {% if request.user|has_group:'krs' or user.is_superuser %}
                                 <span>|</span>
                                 <a href="{% url 'tests_results_list' %}">Отчёты</a>
+                                <span>|</span>
+                                <a href="{% url 'question_list' %}">База вопросов</a>
                             {% endif %}
                 <span>|</span>
             	<a href="{% url 'logout' %}?next=/login">Выход</a>
+                <span>|</span>
                 {% endif %}
             </nav>
         </header>

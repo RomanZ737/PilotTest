@@ -1,0 +1,24 @@
+<!-- Форма редактирования конкретного вопроса -->
+
+{% extends "base_start.html" %}
+
+{% block content %}
+<fieldset>
+        <legend>Редактировать вопрос</legend>
+        <form  id="question_data" method='post'>
+            <p>Тема: {{question_form.them_name}}</p>
+            <p>Вопрос: {{question_form.question}}</p>
+            <p>{{question_form.option_1}}</p>
+            <p>{{question_form.option_2}}</p>
+            <p>{{question_form.option_3}}</p>
+            <p>{{question_form.option_4}}</p>
+            <p>{{question_form.option_5}}</p>
+            <p>{{question_form.q_kind}}</p>
+            <p>{{question_form.q_weight}}</p>
+            <p>{{question_form.answer}}</p>
+            <p>{{question_form.answers}}</p>
+        </form>
+</fieldset>
+
+
+{% endblock %}

@@ -4,13 +4,11 @@ from django.contrib.auth.forms import UserCreationForm
 
 import users.models
 
-class ProfileForm(forms.ModelForm):
 
+class ProfileForm(forms.ModelForm):
     class Meta:
         model = users.models.Profile
         fields = ('family_name', 'first_name', 'middle_name', 'position')
-
-
 
 
 class UserRegisterForm(UserCreationForm):

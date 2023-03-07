@@ -6,6 +6,7 @@ from django.shortcuts import render
 from .models import QuestionSet, QuizeSet, Thems, QuizeResults
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
+from .forms import QuestionSetForm
 
 
 # Декоратор проверки группы пользователя для доступа
@@ -174,8 +175,8 @@ def next_question(request):
                     correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
                 # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
-                if int(request.POST.get('q_weight')) != 0:
-                    updated_score_number = user_result_data[0]['score_number'] + int(request.POST.get('q_weight'))
+                if float(request.POST.get('q_weight')) != 0.0:
+                    updated_score_number = user_result_data[0]['score_number'] + float(request.POST.get('q_weight'))
 
                 else:
                     updated_score_number = user_result_data[0]['score_number'] + 1
@@ -206,8 +207,8 @@ def next_question(request):
                     correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
                 # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
-                if int(request.POST.get('q_weight')) != 0:
-                    updated_score_number = user_result_data[0]['score_number'] + int(request.POST.get('q_weight'))
+                if float(request.POST.get('q_weight')) != 0.0:
+                    updated_score_number = user_result_data[0]['score_number'] + float(request.POST.get('q_weight'))
 
                 else:
                     updated_score_number = user_result_data[0]['score_number'] + 1
@@ -300,6 +301,33 @@ def tests_results_list(request):
 # Детали результатов теста
 def test_result_details(request, id):
     result = QuizeResults.objects.filter(id=id).values()
-    print('Object: ', result)
     context = {'result': result}
     return render(request, 'test_result_details.html', context=context)
+
+
+#Список вопросов из базы
+@login_required
+@group_required('krs')
+def question_list(request):
+    result = QuestionSet.objects.all()
+    context = {'questions': result}
+    return render(request, 'question_list.html', context=context)
+
+
+# Редактирование конкретно взятого вопроса
+def question_list_details(request, id):
+    if request.method == 'POST':
+        question_form = QuestionSetForm(request.POST)
+    else:
+        result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind', 'q_weight', 'answer', 'answers')
+
+        #DEBUG PRINT
+        print('result: ',  result)
+
+        question_form = QuestionSetForm(result[0])
+
+        # DEBUG PRINT
+        #print('question_form:', question_form)
+
+        context = {'question_form': question_form}
+    return render(request, 'question_list_details.html', context=context)

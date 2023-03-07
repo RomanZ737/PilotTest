@@ -1,0 +1,11 @@
+<!-- Список вопросов по всем темам -->
+
+{% extends "base_start.html" %}
+
+{% block content %}
+
+{% for i in questions %}
+<p><a href="{{i.id}}"><span class="">{{i.them_name}}</span> -> {{i.question}}</a></p>
+{% endfor %}
+
+{% endblock %}

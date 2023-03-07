@@ -13,7 +13,7 @@ header {
 
 nav{
     position: absolute;
-    left: 80%;
+    left: 70%;
     top: 50%;
     font-size: 17px;
 }
@@ -54,4 +54,8 @@ legend {
 a {
     text-decoration: none; /* Убирает подчеркивание для ссылок */
     color: rgb(209, 209,209);
+}
+
+theme_color {
+    color: rgb(170, 39, 47);
 }
