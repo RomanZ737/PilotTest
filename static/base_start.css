@@ -8,7 +8,7 @@ body {
 
 header {
     position: relative;
-    height: 10%;
+    height: 15%;
 }
 
 nav{
@@ -34,8 +34,9 @@ aside {
 
 section {
     position: absolute;
-    left: 21%;
+    left: 17%;
     top: 5%;
+    width: 80%;
 
 }
 
@@ -58,11 +59,24 @@ a {
 
 span.theme_color {
     color: rgb(170, 39, 47);
-    font-size: 15px;
+    font-size: 18px;
 }
 
 span.a_list {
     text-decoration: none; /* Убирает подчеркивание для ссылок */
     color: rgb(209, 209,209);
-    font-size: 15px;
+    font-size: 19px;
+}
+
+div.left_side {
+    display: inline-block;
+    width: 69%;
+
+}
+
+div.right_side {
+    position: absolute;
+    display: inline-block;
+    right: 1%; width: 28%;
+    font-size: 17px;
 }

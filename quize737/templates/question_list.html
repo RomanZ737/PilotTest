@@ -3,18 +3,21 @@
 {% extends "base_start.html" %}
 
 {% block content %}
-<div>
-{% for i in questions %}
-<p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span> -> <span class="a_list">{{i.question}}</span></a></p>
-{% endfor %}
+<div class="left_side">
+        {% for i in questions %}
+            <p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span> -> <span class="a_list">{{i.question}}</span></a></p>
+        {% endfor %}
 </div>
 
-<div>
-    <fieldset>
-        <legend>Добавить/Скачать</legend>
-        <form  id="data" method='post'>
-            <button>Нажать</button>
-        </form>
-    </fieldset>
+<div class="right_side">
+        <fieldset>
+            <legend>Редактировать</legend>
+
+            <p><a href="pass">Добавить вопрос</a></p>
+            <p><a href="pass">Редактировать Темы</a></p>
+            <p><a href="pass">Загрузить файл</a></p>
+            <p><a href="pass">Скачать базу</a></p>
+
+        </fieldset>
 </div>
 {% endblock %}
