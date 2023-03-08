@@ -336,3 +336,11 @@ def question_list_details(request, id):
         context = {'question_form': question_form}
 
         return render(request, 'question_list_details.html', context=context)
+
+
+# Загрузка результата теста
+def download_test_result(request, id):
+    # DEBUG PRINT
+    print('ID: ', id)
+    print('request: ', request)
+    pass
