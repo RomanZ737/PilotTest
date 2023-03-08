@@ -5,9 +5,9 @@
 {% load static %}
 
 {% block content %}
-
-{% for i in results %}
-<p><a href="{{i.id}}">{{i}}</a><a href="{% url 'download_test_result' id=i.id %}"><span> | </span><img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"><span>|</span></a></p>
-{% endfor %}
-
+<div class="result_list">
+    {% for i in results %}
+    <p><a href="{{i.id}}">{{i}}</a><a href="{% url 'download_test_result' id=i.id %}"><span> | </span><img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"><span>|</span></a></p>
+    {% endfor %}
+</div>
 {% endblock %}
