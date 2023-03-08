@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+
+import os
 import random
+import io
 
 from django.core.exceptions import PermissionDenied
 from django.utils import six
@@ -8,6 +12,12 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
 from .forms import QuestionSetForm
 from django.http import HttpResponse
+from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
+from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
+from reportlab.pdfbase.ttfonts import TTFont
+
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 
 
 # Декоратор проверки группы пользователя для доступа
@@ -340,7 +350,42 @@ def question_list_details(request, id):
 
 # Загрузка результата теста
 def download_test_result(request, id):
-    # DEBUG PRINT
-    print('ID: ', id)
-    print('request: ', request)
-    pass
+    result = QuizeResults.objects.filter(id=id).values()
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+    # Выясняем тукущую директорию
+    current_dir = os.getcwd()
+
+    print('current_dir: ', current_dir)
+
+    pdfmetrics.registerFont(TTFont('FreeSans', f'{current_dir}/static/FreeSans.ttf'))
+    p.setFont('FreeSans', 15)
+
+    #p.setFillColorRGB(128, 128, 128) # Цвет текста
+    #p. setStrokeColorRGB(0.2, 0.5, 0.3)
+    #p.setFillColorRGB(128, 128, 128)  # choose fill colour
+    #p.rect(1*inch, 1*inch, 200*inch, 200*inch, fill=1)  # draw rectangle
+
+    y = 750
+
+    #p.line(10, 700, 400, 700 * inch)
+
+    p.drawInlineImage(current_dir + "/static/nws_logo_white.jpg", 0, y, width=260, height=100)
+    y -= 25
+    p.drawString(20, y, f'ФИО: {result[0]["user_name"]}')
+    y -= 25
+    p.drawString(20, y, f'Дата: {result[0]["timestamp"].strftime("%d.%m.%Y %H:%M:%S")}')
+    y -= 25
+    p.drawString(20, y, f'Название теста: {result[0]["quize_name"]}')
+    y -= 25
+    p.drawString(20, y, f'Общее количество вопросов: {result[0]["total_num_q"]}')
+    y -= 25
+    p.drawString(20, y, f'Количество правильных ответов: {result[0]["correct_q_num"]}')
+    y -= 25
+    p.drawString(20, y, f'Общий результат: {result[0]["total_result"]}%')
+
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    filename = result[0]['user_name'].replace(' ', '')
+    return FileResponse(buffer, as_attachment=True, filename=f'{filename}.pdf')
