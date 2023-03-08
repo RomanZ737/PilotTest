@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%ql#=awy!d7h-h@#6nevaq*_f7rvhjc(0l%_@$^04rhq$m$z(9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -137,11 +137,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STATIC_ROOT = os.path.join(BASE_DIR / 'static')
+#STATIC_ROOT = os.getcwd() + '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR / 'static/')
 
-# STATICFILES_DIRS = [
-#       '/Users/Roman/PyProjects/PilotTest/static/base_generic'
-#   ]
+
+STATICFILES_DIRS = [
+       'C:/Users/User/PycharmProjects/PilotTest/'
+  ]
 
 LOGIN_REDIRECT_URL = 'start'
 LOGIN_URL = 'login'

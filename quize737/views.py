@@ -4,6 +4,7 @@ import os
 import random
 import io
 
+from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
 from django.utils import six
 from django.shortcuts import render, redirect
@@ -356,10 +357,9 @@ def download_test_result(request, id):
     # Выясняем тукущую директорию
     current_dir = os.getcwd()
 
-    print('current_dir: ', current_dir)
-
-    pdfmetrics.registerFont(TTFont('FreeSans', f'{current_dir}/static/FreeSans.ttf'))
+    pdfmetrics.registerFont(TTFont('FreeSans', os.path.join('static', 'FreeSans.ttf')))
     p.setFont('FreeSans', 15)
+
 
     #p.setFillColorRGB(128, 128, 128) # Цвет текста
     #p. setStrokeColorRGB(0.2, 0.5, 0.3)
@@ -370,7 +370,7 @@ def download_test_result(request, id):
 
     #p.line(10, 700, 400, 700 * inch)
 
-    p.drawInlineImage(current_dir + "/static/nws_logo_white.jpg", 0, y, width=260, height=100)
+    p.drawInlineImage(os.path.join('static', "nws_logo_white.jpg"), 0, y, width=260, height=100)
     y -= 25
     p.drawString(20, y, f'ФИО: {result[0]["user_name"]}')
     y -= 25
