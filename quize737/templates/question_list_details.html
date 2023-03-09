@@ -46,9 +46,10 @@ var checkBox = document.getElementById("q_kind");
 var answer_field = document.getElementById("answer");
 var answers_field = document.getElementById("answers");
 var checkBox_value = "{{question_form.q_kind.value}}"
+
 if (checkBox_value == "True") {
-    checkBox.setAttribute("checked", true); } else {
-    checkBox.setAttribute("checked", false);
+    checkBox.checked = true; } else {
+    checkBox.checked = false;
     }
 
 
@@ -72,10 +73,10 @@ function hideFunc() {
         answer_field.style.display = "block";
         }
     }
-//var checkBox_value = "{{question_form.q_kind.value}}";
-//var box = document.getElementById("q_type");
-//if (a == 'True') { box.setAttribute("checked", "checked") };
-document.getElementById("demo").innerHTML = "Value: " + checkBox_value
+
+//var box = document.getElementById("q_kind");
+//var x = box.getAttribute("checked")
+//document.getElementById("demo").innerHTML = "Value: " + checkBox_value + ' ' + x
 
 
 </script>
