@@ -10,7 +10,7 @@
         <legend>По отдельной теме</legend>
         <form  id="data" method='post'>
         {% csrf_token %}
-            <p>ФИО Тестируемого:</p><input style="font-size: 25px;" type="text" id="fio" name="user_name" required minlength="4" maxlength="30" size="30" value="{{user.last_name}} {{ user.first_name }}">
+            <p>ФИО Тестируемого:</p><input style="font-size: 25px;" type="text" id="fio" name="user_name" required minlength="4" maxlength="30" size="30" value="{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}">
             <br>
             <p>Выберите тему:</p>
             <select style="font-size: 20px;" name="them_select">
