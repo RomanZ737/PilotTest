@@ -1,17 +1,23 @@
 {% extends "base_start.html" %}
 
 {% block content %}
-    <div class="content-section">
-      <div class="media">
-        <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
-        <div class="media-body">
-            <h3>ФИО:</h3>
+    <div>
+      <div>
+<!--        <img src="{{ user.profile.image.url }}">-->
+        <div>
+            <h4>ФИО:</h4>
             <p>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</p>
-            <h3>Username:</h3>
+
+            <h4>Имя пользователя:</h4>
                  <p>{{ user.username }}</p>
             {% if user.email %}
-            <h3>Email:</h3>
-          <p>{{ user.email }}</p>
+                <h4>Email:</h4>
+                <p>{{ user.email }}</p>
+            {% endif %}
+
+            {% if user.profile.position %}
+                <h4>Должность:</h4>
+                <p>{{user.profile.position}}</p>
             {% endif %}
         </div>
       </div>

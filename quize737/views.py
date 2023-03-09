@@ -333,7 +333,6 @@ def question_list_details(request, id):
         #   Выясняем id вопроса для его обновления
         a = QuestionSet.objects.get(id=id)
         question_form = QuestionSetForm(request.POST, instance=a)
-
         if question_form.is_valid():
             question_form.save()
             return redirect('question_list')

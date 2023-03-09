@@ -141,9 +141,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = os.path.join(BASE_DIR / 'static/')
 
 
-STATICFILES_DIRS = [
-       'C:/Users/User/PycharmProjects/PilotTest/'
-  ]
+# STATICFILES_DIRS = [
+#       'C:/Users/User/PycharmProjects/PilotTest/'
+#  ]
 
 LOGIN_REDIRECT_URL = 'start'
 LOGIN_URL = 'login'

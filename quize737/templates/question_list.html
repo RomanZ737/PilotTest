@@ -5,7 +5,7 @@
 {% block content %}
 <div class="left_side">
         {% for i in questions %}
-            <p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span> -> <span class="a_list">{{i.question}}</span></a></p>
+            <p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span><span style="color: black;"> | </span><span class="a_list">{{i.question}}</span></a></p>
         {% endfor %}
 </div>
 

@@ -11,4 +11,4 @@ class Profile(models.Model):
     position = models.CharField(max_length=500, verbose_name='Должность', default=None)
 
     def __str__(self):
-        return f'{self.user.username} Профиль'
+        return f'{self.family_name} {self.first_name}'
