@@ -16,10 +16,10 @@
             <p>{{question_form.option_3.label}}: {{question_form.option_3}}</p>
             <p>{{question_form.option_4.label}}: {{question_form.option_4}}</p>
             <p>{{question_form.option_5.label}}: {{question_form.option_5}}</p>
-            <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_type"></p>
+            <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
             <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
-            <p>{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
-            <p>{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
+            <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
+            <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
             <button type="submit" >Сохранить</button>
         </form>
 </fieldset>
@@ -41,15 +41,44 @@ var q_field = document.getElementById("question");
 q_field.setAttribute("cols", q_text_Length);
 q_field.setAttribute("rows", q_rows_length);
 
-//Скрипт скрывае или паказывает нужные поля, в зависимости от варианта вопроса
-//var a = "{{question_form.q_kind.value}}";
+//Скрипт определяет изначальную видимость полей, в зависимости от вида вопроса
+var checkBox = document.getElementById("q_kind");
+var answer_field = document.getElementById("answer");
+var answers_field = document.getElementById("answers");
+var checkBox_value = "{{question_form.q_kind.value}}"
+if (checkBox_value == "True") {
+    checkBox.setAttribute("checked", true); } else {
+    checkBox.setAttribute("checked", false);
+    }
+
+
+if (checkBox.checked == true) {
+        answers_field.style.display = "block";
+        answer_field.style.display = "none"; } else {
+        answers_field.style.display = "none";
+        answer_field.style.display = "block";
+        }
+
+
+//Функция скрывает или паказывает нужные поля, в зависимости от варианта вопроса
+function hideFunc() {
+    var checkBox = document.getElementById("q_kind");
+    var answer_field = document.getElementById("answer");
+    var answers_field = document.getElementById("answers");
+    if (checkBox.checked == true){
+        answers_field.style.display = "block";
+        answer_field.style.display = "none"; } else {
+        answers_field.style.display = "none";
+        answer_field.style.display = "block";
+        }
+    }
+//var checkBox_value = "{{question_form.q_kind.value}}";
 //var box = document.getElementById("q_type");
 //if (a == 'True') { box.setAttribute("checked", "checked") };
-//document.getElementById("demo").innerHTML = "Lenght: " + q_text_Length + " " + q_rows_length
+document.getElementById("demo").innerHTML = "Value: " + checkBox_value
 
 
 </script>
-
 
 
 {% endblock %}
