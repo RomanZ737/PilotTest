@@ -355,9 +355,10 @@ def download_test_result(request, id):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer)
     # Выясняем тукущую директорию
-    current_dir = os.getcwd()
 
-    pdfmetrics.registerFont(TTFont('FreeSans', os.path.join('static', 'FreeSans.ttf')))
+    dir_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+
+    pdfmetrics.registerFont(TTFont('FreeSans', dir_path + '/static/FreeSans.ttf'))
     p.setFont('FreeSans', 15)
 
 
@@ -370,7 +371,8 @@ def download_test_result(request, id):
 
     #p.line(10, 700, 400, 700 * inch)
 
-    p.drawInlineImage(os.path.join('static', "nws_logo_white.jpg"), 0, y, width=260, height=100)
+
+    p.drawInlineImage(dir_path + '/static/nws_logo_white.jpg', 0, y, width=260, height=100)
     y -= 25
     p.drawString(20, y, f'ФИО: {result[0]["user_name"]}')
     y -= 25
