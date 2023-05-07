@@ -1,0 +1,85 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<section>
+
+    <h1>Создание теста</h1>
+    <br>
+    <h4>{{non_form_errors}}</h4>
+
+    {% for error in form_errors%}
+    <h4>{{error}}</h4>
+    {% endfor %}
+
+    <form id="question_form" method='post'>
+      {% csrf_token %}
+        <p>Название теста {{test_name_form.test_name}}</p>
+        {{ test_q_set.management_form }}
+        {% for form in test_q_set.forms %}
+        <div class="q_forms">
+            <span>Тема: {{ form.them }} Количество вопросов: {{ form.q_num }}</span>
+        </div>
+        <br>
+        {% endfor %}
+        <button id="add-form" type="button">Добавить тему</button>
+        <br>
+        <br>
+      <input type="submit" value="Сохранить">
+    </form>
+
+
+    <div id="empty_form" style="display:none">
+    {{ test_q_set.empty_form }}
+</div>
+
+<br>
+<form method='get' action='{% url "quize737:test_editor" %}'>
+<button type="submit">Вернуться</button>
+</form>
+</section>
+
+
+
+<!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
+
+<script type="text/javascript">
+
+        let qForm = document.querySelectorAll(".q_forms")
+        let container = document.querySelector("#question_form")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_questions-TOTAL_FORMS")
+
+
+        let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
+        addButton.addEventListener('click', addForm)
+
+        function addForm(e){
+            e.preventDefault()
+
+            let newForm = qForm[0].cloneNode(true)
+            let formRegex = RegExp(`questions-(\\d){1}-`,'g')
+
+
+
+            formNum++
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formNum}-`)
+            container.insertBefore(newForm, addButton)
+            var sp1 = document.createElement("br")
+            container.insertBefore(sp1, addButton)
+
+
+
+            totalForms.setAttribute('value', `${formNum+1}`)
+
+            let q_field = document.getElementById(`id_questions-${formNum}-q_num`) // Ищем новое поле с количеством вопросов
+            q_field.setAttribute('value', '')
+            let them_field = document.querySelector(`#id_questions-${formNum}-them`) // Ищем новое поле с темой
+            them_field.value = ''
+
+        }
+
+
+
+</script>
+
+{% endblock %}

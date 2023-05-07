@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 
 
-
+# Модель тем вопросов
 class Thems(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название Темы")
 
@@ -24,9 +24,13 @@ class QuestionSet(models.Model):
     q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
                                  help_text='Если вопрос подразумевает несколько правильных ответов')
     q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0,
-                                   help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
-    answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа', help_text='Поле используется если вопрос подразумевает один ответ', blank=True, null=True)
-    answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос', help_text='Поле используется если вопрос подразумевает несколько правильных ответов', blank=True, null=True)
+                                 help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
+    answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа',
+                                 help_text='Поле используется если вопрос подразумевает один ответ', blank=True,
+                                 null=True)
+    answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос',
+                               help_text='Поле используется если вопрос подразумевает несколько правильных ответов',
+                               blank=True, null=True)
 
     class Meta:
         ordering = ['-them_name']
@@ -43,10 +47,12 @@ class QuizeSet(models.Model):
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                        help_text='Имя пользователя, который проходит тест')
     timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
-    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True, help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
+    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True,
+                                     help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
-    max_score_amount = models.IntegerField(default=0, verbose_name='Максимальное кол-во баллов', help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
+    max_score_amount = models.IntegerField(default=0, verbose_name='Максимальное кол-во баллов',
+                                           help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
 
     def __str__(self):
         return self.quize_name
@@ -70,4 +76,22 @@ class QuizeResults(models.Model):
 
     def __str__(self):
         return f'{self.user_name} {self.timestamp.strftime("%d.%m.%Y %H:%M:%S")}'
-    #.strftime("%d.%m.%Y %H:%m:%S")
+    # .strftime("%d.%m.%Y %H:%m:%S")
+
+
+#  Модель конструктора тестов - названия и id тестов
+class TestConstructor(models.Model):
+    name = models.CharField(max_length=255, unique=True, verbose_name='Название Теста',
+                            help_text='Название теста которое будет видно пользователю')
+
+
+# Модель конструктора тестов - сами вопросы для теста
+class TestQuestionsBay(models.Model):
+    theme = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема',
+                              help_text='Тема из которой выбираются вопросы')
+    test_id = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, max_length=500, verbose_name='Тема',
+                                help_text='Тема из которой выбираются вопросы')
+    q_num = models.IntegerField(verbose_name='Количество вопросов по теме')
+
+    class Meta:
+        unique_together = ('theme', 'test_id')

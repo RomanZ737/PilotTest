@@ -4,14 +4,16 @@ import os
 import random
 import io
 
+from django.core.exceptions import ValidationError
+from django.forms import formset_factory, BaseFormSet
 from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
 from django.utils import six
 from django.shortcuts import render, redirect
-from .models import QuestionSet, QuizeSet, Thems, QuizeResults
+from .models import QuestionSet, QuizeSet, Thems, QuizeResults, TestQuestionsBay, TestConstructor
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
-from .forms import QuestionSetForm
+from .forms import QuestionSetForm, NewTestFormName, NewTestFormQuestions
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
@@ -355,21 +357,19 @@ def download_test_result(request, id):
     p = canvas.Canvas(buffer)
     # Выясняем тукущую директорию
 
-    dir_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     pdfmetrics.registerFont(TTFont('FreeSans', dir_path + '/static/FreeSans.ttf'))
     p.setFont('FreeSans', 15)
 
-
-    #p.setFillColorRGB(128, 128, 128) # Цвет текста
-    #p. setStrokeColorRGB(0.2, 0.5, 0.3)
-    #p.setFillColorRGB(128, 128, 128)  # choose fill colour
-    #p.rect(1*inch, 1*inch, 200*inch, 200*inch, fill=1)  # draw rectangle
+    # p.setFillColorRGB(128, 128, 128) # Цвет текста
+    # p. setStrokeColorRGB(0.2, 0.5, 0.3)
+    # p.setFillColorRGB(128, 128, 128)  # choose fill colour
+    # p.rect(1*inch, 1*inch, 200*inch, 200*inch, fill=1)  # draw rectangle
 
     y = 750
 
-    #p.line(10, 700, 400, 700 * inch)
-
+    # p.line(10, 700, 400, 700 * inch)
 
     p.drawInlineImage(dir_path + '/static/nws_logo_white.jpg', 0, y, width=260, height=100)
     y -= 25
@@ -390,3 +390,66 @@ def download_test_result(request, id):
     buffer.seek(0)
     filename = result[0]['user_name'].replace(' ', '')
     return FileResponse(buffer, as_attachment=True, filename=f'{filename}.pdf')
+
+
+# Проверка на одинаковые темы в новом тесте
+class BaseArticleFormSet(BaseFormSet):
+
+    def clean(self):
+        """Checks that no two articles have the same title."""
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid on its own
+            return
+        titles = []
+        for form in self.forms:
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            title = form.cleaned_data.get("them")
+            if title in titles:
+                raise ValidationError("Поля 'Тема' не могут быть одинаковыми")
+            titles.append(title)
+
+
+def test_editor(request):
+    if request.method == 'POST':
+        pass
+    else:
+        tests_names = TestConstructor.objects.all()
+        context = {'tests_names': tests_names}
+        return render(request, 'test_editor.html', context=context)
+
+
+def create_new_test(request):
+    test_name_form = NewTestFormName()  # Форма с названием теста
+    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20, formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
+
+    if request.method == 'POST':
+        test_q_set = QuestionFormSet(request.POST, request.FILES, initial=[{'them': '1', 'q_num': '4'}], prefix="questions")
+        test_name_form = NewTestFormName(request.POST)
+
+        print('request_POST:', request.POST)
+        print('request_FILES:', request.FILES)
+
+        if test_q_set.is_valid():
+            print('test_q_set.is_valid()', test_q_set.cleaned_data)
+            tests_names = TestConstructor.objects.all()
+            context = {'tests_names': tests_names}
+            return render(request, 'test_editor.html', context=context)
+
+        else:
+
+            # print('ERROR:', test_q_set.non_form_errors)
+            #print('next_len:', test_q_set.errors)
+            form_errors = [] # Ошибки при валидации формы
+            for error in test_q_set.errors:
+                if len(error) > 0:
+                    for value in error.values():
+                        form_errors.append(value)
+            errors_non_form = test_q_set.non_form_errors
+            context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form, 'form_errors': form_errors}
+            return render(request, 'new_test_form.html', context=context)
+    else:
+        # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
+        test_q_set = QuestionFormSet(initial=[{'them': '1', 'q_num': '4'}], prefix='questions')
+        context = {'test_name_form': test_name_form, 'test_q_set': test_q_set}
+        return render(request, 'new_test_form.html', context=context)
