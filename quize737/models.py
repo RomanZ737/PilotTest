@@ -7,7 +7,7 @@ class Thems(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название Темы")
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'#, id: {self.id}'
 
 
 # Вся база вопросов по всем темам
@@ -81,17 +81,22 @@ class QuizeResults(models.Model):
 
 #  Модель конструктора тестов - названия и id тестов
 class TestConstructor(models.Model):
-    name = models.CharField(max_length=255, unique=True, verbose_name='Название Теста',
+    name = models.CharField(max_length=255, verbose_name='Название Теста',
                             help_text='Название теста которое будет видно пользователю')
+    def __str__(self):
+        return f'{self.name} {self.id}'
 
 
 # Модель конструктора тестов - сами вопросы для теста
 class TestQuestionsBay(models.Model):
     theme = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема',
                               help_text='Тема из которой выбираются вопросы')
-    test_id = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, max_length=500, verbose_name='Тема',
-                                help_text='Тема из которой выбираются вопросы')
+    test_id = models.ForeignKey(TestConstructor, on_delete=models.CASCADE, verbose_name='id теста',
+                                help_text='id теста которому принадлежит вопрос')
     q_num = models.IntegerField(verbose_name='Количество вопросов по теме')
 
     class Meta:
         unique_together = ('theme', 'test_id')
+
+    def __str__(self):
+        return f'{self.theme}, Test_id: {self.test_id}, вопросов: {self.q_num}'

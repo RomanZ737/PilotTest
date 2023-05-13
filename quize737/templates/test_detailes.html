@@ -3,7 +3,7 @@
 {% block content %}
 <section>
 
-    <h1>Создание теста</h1>
+    <h1>Редактирование теста</h1>
     <br>
     <h4>{{non_form_errors}}</h4>
 
@@ -12,18 +12,22 @@
     {% endfor %}
 
     <form id="question_form" method='post'>
+
       {% csrf_token %}
         <p>Название теста {{test_name_form.name}}</p>
+        <input type="hidden" id="test_id_num" value="{{test_id}}">
         {{ test_q_set.management_form }}
-        {% for form in test_q_set.forms %}
+        {% for form in test_q_set %}
         <div class="q_forms">
             <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span>
         </div>
         <br>
         {% endfor %}
+
         <button id="add-form" type="button">Добавить тему</button>
         <br>
         <br>
+
       <input type="submit" value="Сохранить">
     </form>
 
@@ -31,6 +35,12 @@
     <div id="empty_form" style="display:none">
     {{ test_q_set.empty_form }}
 </div>
+
+
+<form method="post" action="{% url 'quize737:del_test' test_id %}">
+    {% csrf_token %}
+    <button type="submit">Удалить тест</button>
+</form>
 
 <br>
 <form method='get' action='{% url "quize737:test_editor" %}'>

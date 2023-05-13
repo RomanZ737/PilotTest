@@ -4,6 +4,10 @@ import os
 import random
 import io
 
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
+from users.models import Profile
+from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.forms import formset_factory, BaseFormSet
 from django.templatetags.static import static
@@ -14,10 +18,14 @@ from .models import QuestionSet, QuizeSet, Thems, QuizeResults, TestQuestionsBay
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
 from .forms import QuestionSetForm, NewTestFormName, NewTestFormQuestions
+from users.forms import TestsForUser
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
 from reportlab.pdfbase.ttfonts import TTFont
+from users.models import Profile, UserTests
+
+
 
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -283,7 +291,7 @@ def next_question(request):
             context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
                        'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result}
 
-            # Удаляем тест пользователя их базы
+            # Удаляем тест пользователя из базы
             QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
 
             return render(request, 'results.html', context=context)
@@ -329,15 +337,17 @@ def question_list(request):
 
 
 # Редактирование конкретно взятого вопроса
+@login_required
+@group_required('krs')
 def question_list_details(request, id):
     #  Если пользователь нажал 'соъхранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
         #   Выясняем id вопроса для его обновления
         a = QuestionSet.objects.get(id=id)
-        question_form = QuestionSetForm(request.POST, instance=a)
+        question_form = QuestionSetForm(request.POST, instance=a)  # Для форм основанных на модели объекта
         if question_form.is_valid():
             question_form.save()
-            return redirect('question_list')
+            return redirect('quize737:question_list')
 
     else:
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
@@ -351,6 +361,8 @@ def question_list_details(request, id):
 
 
 # Загрузка результата теста
+@login_required
+@group_required('krs')
 def download_test_result(request, id):
     result = QuizeResults.objects.filter(id=id).values()
     buffer = io.BytesIO()
@@ -404,52 +416,173 @@ class BaseArticleFormSet(BaseFormSet):
         for form in self.forms:
             if self.can_delete and self._should_delete_form(form):
                 continue
-            title = form.cleaned_data.get("them")
+            title = form.cleaned_data.get("theme")
             if title in titles:
                 raise ValidationError("Поля 'Тема' не могут быть одинаковыми")
             titles.append(title)
 
 
+# Проверка на одинаковые названия тестов в назначенных пользователю тестах
+class BaseUserTestFormSet(BaseFormSet):
+
+    def clean(self):
+        """Checks that no two articles have the same title."""
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid on its own
+            return
+        titles = []
+        for form in self.forms:
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            title = form.cleaned_data.get("test_name")
+            if title in titles:
+                raise ValidationError("Поля 'Название теста' не могут быть одинаковыми")
+            titles.append(title)
+
+@login_required
+@group_required('krs')
 def test_editor(request):
-    if request.method == 'POST':
-        pass
-    else:
-        tests_names = TestConstructor.objects.all()
-        context = {'tests_names': tests_names}
-        return render(request, 'test_editor.html', context=context)
+    tests_names = TestConstructor.objects.all()
+    context = {'tests_names': tests_names}
+    return render(request, 'test_editor.html', context=context)
 
-
+@login_required
+@group_required('krs')
 def create_new_test(request):
-    test_name_form = NewTestFormName()  # Форма с названием теста
-    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20, formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
+    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
+                                      formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
-        test_q_set = QuestionFormSet(request.POST, request.FILES, initial=[{'them': '1', 'q_num': '4'}], prefix="questions")
-        test_name_form = NewTestFormName(request.POST)
-
-        print('request_POST:', request.POST)
-        print('request_FILES:', request.FILES)
+        test_q_set = QuestionFormSet(request.POST, request.FILES, initial=[{'theme': '5', 'q_num': '4'}],
+                                     prefix="questions")
+        test_name_form = NewTestFormName(request.POST, prefix="test_name")
+        # print('dir_name:', dir(test_name_form))
+        # print('clean_name:', test_name_form.data['test_name-name'])
 
         if test_q_set.is_valid():
-            print('test_q_set.is_valid()', test_q_set.cleaned_data)
-            tests_names = TestConstructor.objects.all()
-            context = {'tests_names': tests_names}
-            return render(request, 'test_editor.html', context=context)
-
+            # Создаём объект теста
+            new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'])
+            # Создаём объекты вопросов теста
+            for question in test_q_set.cleaned_data:
+                TestQuestionsBay.objects.create(theme=question['theme'],
+                                                test_id=new_test,
+                                                q_num=question['q_num'], )
+            return redirect('quize737:test_editor')
         else:
-
-            # print('ERROR:', test_q_set.non_form_errors)
-            #print('next_len:', test_q_set.errors)
-            form_errors = [] # Ошибки при валидации формы
+            form_errors = []  # Ошибки при валидации формы
             for error in test_q_set.errors:
                 if len(error) > 0:
                     for value in error.values():
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
-            context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form, 'form_errors': form_errors}
+            context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                       'form_errors': form_errors}
             return render(request, 'new_test_form.html', context=context)
     else:
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
-        test_q_set = QuestionFormSet(initial=[{'them': '1', 'q_num': '4'}], prefix='questions')
+        test_name_form = NewTestFormName(prefix="test_name")
+        test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4'}], prefix='questions')
+        # print('test_q_set', test_q_set)
         context = {'test_name_form': test_name_form, 'test_q_set': test_q_set}
         return render(request, 'new_test_form.html', context=context)
+
+
+@login_required
+@group_required('krs')
+# Редактируем Детали уже существующего конекретного теста
+def test_details(request, id):
+    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
+                                      formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
+
+    if request.method == 'POST':
+        a = TestConstructor.objects.get(id=id)
+        test_name_form = NewTestFormName(request.POST)
+        test_q_set = QuestionFormSet(request.POST, request.FILES, prefix="questions")
+        TestQuestionsBay.objects.filter(test_id=id).delete()
+        if test_q_set.is_valid():
+            a.name = test_name_form.data.get('name')
+            a.save()
+            for question in test_q_set.cleaned_data:
+                TestQuestionsBay.objects.create(theme=question['theme'],
+                                                test_id=a,
+                                                q_num=question['q_num'], )
+            return redirect('quize737:test_editor')
+        else:
+            form_errors = []  # Ошибки при валидации формы
+            for error in test_q_set.errors:
+                if len(error) > 0:
+                    for value in error.values():
+                        form_errors.append(value)
+            errors_non_form = test_q_set.non_form_errors
+            context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                       'form_errors': form_errors, 'test_id': id}
+            return render(request, 'test_detailes.html', context=context)
+
+    else:
+        result = TestConstructor.objects.filter(id=id).values('name', 'id')
+        print('result:', result)
+        test_name_form = NewTestFormName(result[0])  # Форма с названием теста
+        test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
+        test_q_set = QuestionFormSet(initial=test_questions, prefix='questions')
+        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': result[0]['id']}
+        return render(request, 'test_detailes.html', context=context)
+
+
+# Удаляем тест
+@login_required
+@group_required('krs')
+def del_test(request, id):
+    TestConstructor.objects.get(id=id).delete()
+    return redirect('quize737:test_editor')
+
+@login_required
+@group_required('krs')
+def user_list(request):
+    if request.method == 'POST':
+        pass
+    else:
+        total_user_list = Profile.objects.all()
+        #  Постраничная разбивка
+        paginator = Paginator(total_user_list, 3)
+        page_number = request.GET.get('page', 1)
+        users = paginator.page(page_number)
+        context = {'user_list': users}
+        return render(request, 'user_list.html', context=context)
+
+@login_required
+@group_required('krs')
+def group_list(request):
+    if request.method == 'POST':
+        pass
+    else:
+        groups = Group.objects.all()
+        context = {'groups': groups}
+        return render(request, 'group_list.html', context=context)
+
+@login_required
+@group_required('krs')
+def user_detales(request, id):
+    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet)  # Extra - количество строк формы
+    user_profile = Profile.objects.filter(id=id)
+
+    if request.method == 'POST':
+        tests_for_user_form = UserTestForm(request.POST, request.FILES)
+        if tests_for_user_form.is_valid():
+            return redirect('quize737:test_editor')
+        else:
+            form_errors = []  # Ошибки при валидации формы
+            for error in tests_for_user_form.errors:
+                if len(error) > 0:
+                    for value in error.values():
+                        form_errors.append(value)
+            errors_non_form = tests_for_user_form.non_form_errors
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'non_form_errors': errors_non_form,
+                       'form_errors': form_errors, 'test_id': id}
+            return render(request, 'user_ditales.html', context=context)
+    else:
+        user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
+        print('user_tests', user_tests)
+        tests_for_user_form = UserTestForm(initial=user_tests)
+        # print("tests_for_user_form", tests_for_user_form)
+        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
+        return render(request, 'user_ditales.html', context=context)

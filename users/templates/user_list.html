@@ -1,0 +1,12 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<section>
+    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>
+    {% for user in user_list %}
+    <a href="{{user.id}}">{{forloop.counter}}.<span class="theme_color">{{user.family_name}} {{user.first_name}} {{user.middle_name}} <span> | </span> {{user.position}}</span><span style="color: black;"></span></a>
+    <br>
+    {% endfor %}
+    {% include "paginator.html" with page=user_list %}
+</section>
+{% endblock %}

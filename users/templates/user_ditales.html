@@ -1,0 +1,81 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<section>
+    <h1> {{user_profile.family_name}} {{user_profile.first_name}} {{user_profile.middle_name}}</h1>
+    <p>{{user_profile}}</p>
+    {% if user_tests|length > 0 %}
+    <p>Назначенные тесты:</p>
+
+    <h4>{{non_form_errors}}</h4>
+
+    {% for error in form_errors%}
+    <h4>{{error}}</h4>
+    {% endfor %}
+
+    {% else %}
+    <p>Назначенные тесты отсутствуют</p>
+    {% endif %}
+<form id="user_tests_form" method='post'>
+      {% csrf_token %}
+        {{ user_tests.management_form }}
+        {% for form in user_tests %}
+        <div class="form_set">
+            <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span>
+        </div>
+        <br>
+        {% endfor %}
+
+        <button id="add-form" type="button">Назначить новый тест</button>
+        <br>
+        <br>
+
+      <input type="submit" value="Сохранить">
+    </form>
+    <form method='get' action='{% url "quize737:user_list" %}'>
+<button type="submit">Вернуться</button>
+</form>
+
+</section>
+
+<script type="text/javascript">
+
+        let qForm = document.querySelectorAll(".form_set")
+        let container = document.querySelector("#user_tests_form")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+
+
+        let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
+        addButton.addEventListener('click', addForm)
+
+        function addForm(e){
+            e.preventDefault()
+
+            let newForm = qForm[0].cloneNode(true)
+            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+
+
+            formNum++
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+            container.insertBefore(newForm, addButton)
+            var sp1 = document.createElement("br")
+            container.insertBefore(sp1, addButton)
+
+
+
+            totalForms.setAttribute('value', `${formNum+1}`)
+
+            let q_field = document.getElementById(`id_form-${formNum}-test_name`) // Ищем новое поле с количеством вопросов
+            q_field.setAttribute('value', '1')
+            let them_field = document.querySelector(`#id_form-${formNum}-num_try`) // Ищем новое поле с темой
+            them_field.value = '3'
+
+        }
+
+
+
+</script>
+
+{% endblock %}

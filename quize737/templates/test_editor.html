@@ -6,14 +6,14 @@
     <h1>Редактор Тестов</h1>
 
     <br>
-    <h3><a href='{% url "quize737:create_new_test" %}'>+ Добавить тест</a></h3>
+    <h5><a href='{% url "quize737:create_new_test" %}'>+ Добавить тест</a></h5>
     <br>
-    {% with x=1 %}
     {% for test in tests_names %}
-        <a href="{{test.id}}. ">{{x}}.<span class="theme_color">{{test.name}}</span><span style="color: black;"></span></a>
-        {{ x|add:1 }}
+    <a href="{{test.id}}">{{forloop.counter}}.<span class="theme_color">{{test.name}}</span><span style="color: black;"></span></a>
+    <a href="{% url 'quize737:del_test' test.id %}">Удалить тест</a>
+    <br>
     {% endfor %}
-    {% endwith %}
+
 
 <br>
 

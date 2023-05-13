@@ -1,0 +1,11 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<section>
+    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>
+    {% for group in groups %}
+    <a href="{{group.id}}">{{forloop.counter}}.<span class="theme_color">{{group}}</span><span style="color: black;"></span></a>
+    <br>
+    {% endfor %}
+</section>
+{% endblock %}

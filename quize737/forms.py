@@ -12,10 +12,15 @@ class QuestionSetForm(forms.ModelForm):
 
 # Форма для имени создаваемого и теста
 class NewTestFormName(forms.Form):
-    test_name = forms.CharField(max_length=25, initial='Новый Тест')
+    name = forms.CharField(max_length=25, initial='Новый Тест')
 
 
 # Форма для вопросов создаваемого теста
-class NewTestFormQuestions(forms.Form):
-    them = forms.ModelChoiceField(queryset=Thems.objects.all(), empty_label='Все темы', required=False)
-    q_num = forms.IntegerField(label='Количество вопросов', error_messages={'required': 'Количество вопросов не может быть пустым'}, required=True)
+class NewTestFormQuestions(forms.ModelForm):
+    class Meta:
+        model = TestQuestionsBay
+        fields = ['theme', 'q_num']
+
+        # labels = {'name': _('Writer'),}
+        # help_texts = {'name': _('Some useful help text.'),}
+        error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"},}

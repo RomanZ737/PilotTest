@@ -3,6 +3,7 @@ from django.contrib import messages
 from .forms import UserRegisterForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 from .models import Profile
 from django.contrib.auth import login
 
@@ -12,9 +13,11 @@ def register(request):
         form_user = UserRegisterForm(request.POST)
         form_profile = ProfileForm(request.POST)
         if form_user.is_valid() and form_profile.is_valid():
+            group = Group.objects.get(name=form_profile.cleaned_data['position'])
             new_user = form_user.save(commit=False)
             new_user.set_password(form_user.cleaned_data['password1'])
             new_user.save()
+            new_user.groups.add(group)
             Profile.objects.create(
                 user=new_user,
                 family_name=form_profile.cleaned_data['family_name'],

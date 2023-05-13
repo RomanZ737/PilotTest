@@ -16,7 +16,12 @@ urlpatterns = [
     path('question_list/', views.question_list, name='question_list'),
     path('question_list/<int:id>/', views.question_list_details, name='question_list_details'),
     path('download_test_result/<int:id>/', views.download_test_result, name='download_test_result'),
-    path('test_editor', views.test_editor, name='test_editor'),
-    path('create_new_test', views.create_new_test, name='create_new_test')
-
+    path('test_editor/', views.test_editor, name='test_editor'),
+    path('create_new_test/', views.create_new_test, name='create_new_test'),
+    path('test_editor/<int:id>/', views.test_details, name='test_details'),
+    path('test_editor/del_test/<int:id>', views.del_test, name='del_test'),
+    path('test_editor/<int:id>/del_test/', views.del_test, name='test_details'),
+    path('user_list/', views.user_list, name='user_list'),
+    path('group_list/', views.group_list, name='group_list'),
+    path('user_list/<int:id>', views.user_detales, name='user_detales'),
 ]

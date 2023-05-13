@@ -26,11 +26,16 @@ secret_key = config('secret_key', default='')
 SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
+
+DATETIME_FORMAT = ['%d %M %Y']
+# DATE_INPUT_FORMATS = ['%d %M %Y']
+# DATE_FORMAT = ['%d %M %Y']
+
 
 INSTALLED_APPS = [
 

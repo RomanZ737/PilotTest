@@ -20,13 +20,15 @@ from django.conf.urls.static import static
 from django.conf import settings
 from users import views as users_views
 from django.contrib.auth import views as auth_views
+from quize737 import views as quize737_views
 
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
+                    path('', quize737_views.start, name='start'),
+                    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
                   path('profile/', users_views.profile, name='profile'),
-                  path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
                   path('register/', users_views.register, name='register'),
 
