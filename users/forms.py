@@ -58,3 +58,4 @@ class TestsForUser(forms.ModelForm):
         widgets = {
             'date_before': forms.SelectDateWidget(months=MONTH_CHOICES),
         }
+        error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"}, }

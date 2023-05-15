@@ -13,6 +13,10 @@ class QuestionSetForm(forms.ModelForm):
 # Форма для имени создаваемого и теста
 class NewTestFormName(forms.Form):
     name = forms.CharField(max_length=25, initial='Новый Тест')
+    pass_score = forms.IntegerField(initial=70, widget=forms.NumberInput(attrs={'size': '5',
+                                                                                'max': '100',  # For maximum number
+                                                                                'min': '0',  # For minimum number
+                                                                                }))
 
 
 # Форма для вопросов создаваемого теста

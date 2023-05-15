@@ -25,8 +25,6 @@ from reportlab.lib.units import inch  # Библиотека для формир
 from reportlab.pdfbase.ttfonts import TTFont
 from users.models import Profile, UserTests
 
-
-
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 
@@ -63,98 +61,116 @@ def all_them_q_set():
     pass
 
 
+# Начало теста
+def start_test(question_set_id):
+    # Формируем тест на основании заданных параметров, из каждой темы по N вопросов
+    all_theme_set = []
+    particular_user_questions = []
+    thems_num = Thems.objects.all().count()  # Общее количество тем
+    max_score_number = 0  # Максимальное количество баллов по сгенерированным вопросам
+
+    # Перебираем темы вопросов
+    for theme in Thems.objects.all():
+        quiz_set = QuestionSet.objects.filter(them_name=theme)
+        quiz_set = random.sample(list(quiz_set), int(request.POST.get("q_num")))
+        all_theme_set.append(quiz_set)
+        # Сохраняем вопросы для пользователя в базу
+
+        # Добавляем номер вопроса в объект теста для пользоваетеля
+        for we in quiz_set:
+            particular_user_questions.append(str(we.id))
+            # Если задан "вес вопроса", учитываем его в максимальном количестве баллов
+            if we.q_weight != 0:
+                max_score_number = max_score_number + we.q_weight
+            else:
+                max_score_number = max_score_number + 1
+
+    total_q_num_for_user = int(thems_num) * int(request.POST.get("q_num"))
+
+    user_quize_set = QuizeSet.objects.create(
+        quize_name="Все Темы " + request.POST.get("q_num") + ' Вопроса(ов)',
+        user_under_test=request.POST.get("user_name"),
+        # Переводим список номеров вопросов в строку для хранения в поле базы данных
+        questions_ids=' '.join(particular_user_questions),
+        # Вычисляем общее количество вопросов и добавдяем их в поле
+        q_sequence_num=total_q_num_for_user,
+        # Вносим максимально возможное кол-во баллов
+        max_score_amount=max_score_number
+    )
+
+    # -------  В этом месте генерируем первый вопрос теста пользователя
+    # Имя теста конкретного пользователя
+    user_set_name = "Все Темы " + request.POST.get("q_num") + ' Вопроса(ов)'
+
+    # Выясняем количество сгенерированных вопросов
+    q_amount = QuizeSet.objects.filter(id=user_quize_set.id).values('q_sequence_num')
+
+    # Выясняем сквозные номера вопросов, сгенерированные пользователю
+    q_num_list = QuizeSet.objects.filter(id=user_quize_set.id).values('questions_ids')
+
+    # Создаём список со сгенерированными вопросами
+    q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
+
+    # Достаём из базы вопросов первый вопрос с конца
+    sequence_number = (int(q_amount[0][
+                               'q_sequence_num']) - 1)  # Номер вопроса в списке вопросов пользователя
+    question_pisition = q_num_list[sequence_number]  # Номер вопроса в списке вопросов пользователя
+
+    # Достаём нужный вопрос из базы вопросов по сквозному номеру
+    question = QuestionSet.objects.filter(id=question_pisition).values()
+
+    # Формируем данные для отправки на страницу тестирования
+
+    # Обновляем количество оставшихся вопросов
+    QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
+
+    # Создаём запись с результатами теста
+    result_obj = QuizeResults.objects.create(
+        user_name=request.POST.get('user_name'),
+        quize_name=user_set_name,
+        total_num_q=sequence_number + 1,
+        questions_ids=', '.join(q_num_list),
+        correct_q_num=0,
+        score_number=0
+    )
+
+    context = {'user_name': request.POST.get("user_name"), 'question': question, 'user_set_id': user_quize_set.id,
+               'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind']}
+
+    # Проверяем содержит ли вопрос мультивыбор
+    if question[0]['q_kind'] == False:
+        q_page_layout = 'start_test_radio.html'
+    else:
+        q_page_layout = 'start_test_check.html'
+
+    # DEBUG PRINT
+    print('Q KIND: ', question[0]['q_kind'])
+    print("q_page_layout: ", q_page_layout)
+
+    return render(request, q_page_layout, context=context)
+
+
 # Заглавная страница + вопросы по всем темам
 @login_required  # Только для зарегитсрированных пользователей
-def start(request):
+def start(request, id=None):
     if request.method == 'POST':
-
-        # Формируем тест на основании заданных параметров, из каждой темы по N вопросов
-        all_theme_set = []
-        particular_user_questions = []
-        thems_num = Thems.objects.all().count()  # Общее количкство тем
-        max_score_number = 0  # Максимальное количество баллов по сгенерированным вопросам
-
-        # Перебираем темы вопросов
-        for theme in Thems.objects.all():
-            quiz_set = QuestionSet.objects.filter(them_name=theme)
-            quiz_set = random.sample(list(quiz_set), int(request.POST.get("q_num")))
-            all_theme_set.append(quiz_set)
-            # Сохраняем вопросы для пользователя в базу
-
-            # Добавляем номер вопроса в объект теста для пользоваетеля
-            for we in quiz_set:
-                particular_user_questions.append(str(we.id))
-                if we.q_weight != 0:
-                    max_score_number = max_score_number + we.q_weight
-                else:
-                    max_score_number = max_score_number + 1
-
-        total_q_num_for_user = int(thems_num) * int(request.POST.get("q_num"))
-
-        user_quize_set = QuizeSet.objects.create(
-            quize_name="Все Темы " + request.POST.get("q_num") + ' Вопроса(ов)',
-            user_under_test=request.POST.get("user_name"),
-            # Переводим список номеров вопросов в строку для хранения в поле базы данных
-            questions_ids=' '.join(particular_user_questions),
-            # Вычисляем общее количество вопросов и добавдяем их в поле
-            q_sequence_num=total_q_num_for_user,
-            # Вносим максимально возможное кол-во баллов
-            max_score_amount=max_score_number
-        )
-
-        # -------  В этом месте генерируем первый вопрос теста пользователя
-        # Имя теста конкретного пользователя
-        user_set_name = "Все Темы " + request.POST.get("q_num") + ' Вопроса(ов)'
-
-        # Выясняем количество сгенерированных вопросов
-        q_amount = QuizeSet.objects.filter(id=user_quize_set.id).values('q_sequence_num')
-
-        # Выясняем сквозные номера вопросов, сгенерированные пользователю
-        q_num_list = QuizeSet.objects.filter(id=user_quize_set.id).values('questions_ids')
-
-        # Создаём список со сгенерированными вопросами
-        q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
-
-        # Достаём из базы вопросов первый вопрос с конца
-        sequence_number = (int(q_amount[0][
-                                   'q_sequence_num']) - 1)  # Номер вопроса в списке вопросов пользователя
-        question_pisition = q_num_list[sequence_number]  # Номер вопроса в списке вопросов пользователя
-
-        # Достаём нужный вопрос из базы вопросов по сквозному номеру
-        question = QuestionSet.objects.filter(id=question_pisition).values()
-
-        # Формируем данные для отправки на страницу тестирования
-
-        # Обновляем количество оставшихся вопросов
-        QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
-
-        # Создаём запись с результатами теста
-        result_obj = QuizeResults.objects.create(
-            user_name=request.POST.get('user_name'),
-            quize_name=user_set_name,
-            total_num_q=sequence_number + 1,
-            questions_ids=', '.join(q_num_list),
-            correct_q_num=0,
-            score_number=0
-        )
-
-        context = {'user_name': request.POST.get("user_name"), 'question': question, 'user_set_id': user_quize_set.id,
-                   'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind']}
-
-        # Проверяем содержит ли вопрос мультивыбор
-        if question[0]['q_kind'] == False:
-            q_page_layout = 'start_test_radio.html'
-        else:
-            q_page_layout = 'start_test_check.html'
-
-        # DEBUG PRINT
-        print('Q KIND: ', question[0]['q_kind'])
-        print("q_page_layout: ", q_page_layout)
-
-        return render(request, q_page_layout, context=context)
+        start_test(id)
+        return redirect('quize737:start')
 
     else:
-        return render(request, 'start_all_q.html')
+        if id:
+            user_test = UserTests.objects.filter(test_name=id)
+            user_tests = UserTests.objects.filter(user=request.user)
+            print('user_test', user_test[0])
+            test_instance = TestConstructor.objects.get(id=id)
+            test_question_sets = TestQuestionsBay.objects.filter(test_id=id)
+            context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
+                       'user_tests': user_tests}
+            return render(request, 'start_test_ditales.html', context=context)
+        else:
+            user_tests = UserTests.objects.filter(user=request.user)
+            context = {'user_tests': user_tests}
+            return render(request, 'start.html', context=context)
 
 
 # Генерация последующих вопросов
@@ -439,12 +455,14 @@ class BaseUserTestFormSet(BaseFormSet):
                 raise ValidationError("Поля 'Название теста' не могут быть одинаковыми")
             titles.append(title)
 
+
 @login_required
 @group_required('krs')
 def test_editor(request):
     tests_names = TestConstructor.objects.all()
     context = {'tests_names': tests_names}
     return render(request, 'test_editor.html', context=context)
+
 
 @login_required
 @group_required('krs')
@@ -459,9 +477,10 @@ def create_new_test(request):
         # print('dir_name:', dir(test_name_form))
         # print('clean_name:', test_name_form.data['test_name-name'])
 
-        if test_q_set.is_valid():
+        if test_q_set.is_valid() and test_name_form.is_valid():
             # Создаём объект теста
-            new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'])
+            new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                      pass_score=test_name_form.data['test_name-pass_score'])
             # Создаём объекты вопросов теста
             for question in test_q_set.cleaned_data:
                 TestQuestionsBay.objects.create(theme=question['theme'],
@@ -499,8 +518,9 @@ def test_details(request, id):
         test_name_form = NewTestFormName(request.POST)
         test_q_set = QuestionFormSet(request.POST, request.FILES, prefix="questions")
         TestQuestionsBay.objects.filter(test_id=id).delete()
-        if test_q_set.is_valid():
+        if test_q_set.is_valid() and test_name_form.is_valid():
             a.name = test_name_form.data.get('name')
+            a.pass_score = test_name_form.data.get('pass_score')
             a.save()
             for question in test_q_set.cleaned_data:
                 TestQuestionsBay.objects.create(theme=question['theme'],
@@ -519,7 +539,7 @@ def test_details(request, id):
             return render(request, 'test_detailes.html', context=context)
 
     else:
-        result = TestConstructor.objects.filter(id=id).values('name', 'id')
+        result = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score')
         print('result:', result)
         test_name_form = NewTestFormName(result[0])  # Форма с названием теста
         test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
@@ -535,6 +555,7 @@ def del_test(request, id):
     TestConstructor.objects.get(id=id).delete()
     return redirect('quize737:test_editor')
 
+
 @login_required
 @group_required('krs')
 def user_list(request):
@@ -549,6 +570,7 @@ def user_list(request):
         context = {'user_list': users}
         return render(request, 'user_list.html', context=context)
 
+
 @login_required
 @group_required('krs')
 def group_list(request):
@@ -559,16 +581,40 @@ def group_list(request):
         context = {'groups': groups}
         return render(request, 'group_list.html', context=context)
 
+
 @login_required
 @group_required('krs')
+# Обрабатываем вызов деталей конкретного пользователя для назначения тестов
 def user_detales(request, id):
-    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet)  # Extra - количество строк формы
+    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
+                                   can_delete=True)  # Extra - количество строк формы
     user_profile = Profile.objects.filter(id=id)
 
     if request.method == 'POST':
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
+        print('request.POST', request.POST)
         if tests_for_user_form.is_valid():
-            return redirect('quize737:test_editor')
+            for test in tests_for_user_form.cleaned_data:
+                #  Удаляем все объекты
+                # Проверяем было ли указано имя объекта
+                try:
+                    if UserTests.objects.get(test_name=test['test_name']):
+                        UserTests.objects.filter(test_name=test['test_name']).delete()
+                except Exception:
+                    pass
+                # Создаём только те объекты, которые не помечены для удаления
+                if not test['DELETE']:
+                    user = User.objects.filter(id=id)
+                    UserTests.objects.create(user=user[0],
+                                             test_name=test['test_name'],
+                                             num_try=test['num_try'],
+                                             date_before=test['date_before'])
+            # Загружаем новые данные в форму
+            user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
+            tests_for_user_form = UserTestForm(initial=user_tests)
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
+            return render(request, 'user_ditales.html', context=context)
+
         else:
             form_errors = []  # Ошибки при валидации формы
             for error in tests_for_user_form.errors:
@@ -576,13 +622,12 @@ def user_detales(request, id):
                     for value in error.values():
                         form_errors.append(value)
             errors_non_form = tests_for_user_form.non_form_errors
-            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'test_id': id}
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form,
+                       'non_form_errors': errors_non_form,
+                       'form_errors': form_errors, 'user_id': id}
             return render(request, 'user_ditales.html', context=context)
     else:
         user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
-        print('user_tests', user_tests)
         tests_for_user_form = UserTestForm(initial=user_tests)
-        # print("tests_for_user_form", tests_for_user_form)
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
         return render(request, 'user_ditales.html', context=context)

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from quize737.models import TestConstructor
 import datetime
+from field_validators.validators import validate_not_zero
+
 
 class Profile(models.Model):
     class Position(models.TextChoices):
@@ -34,13 +36,13 @@ class Profile(models.Model):
 class UserTests(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     test_name = models.ForeignKey(TestConstructor, on_delete=models.CASCADE)
-    num_try = models.IntegerField(default=3, verbose_name='Количество попыток')
+    num_try = models.IntegerField(default=3, validators=[validate_not_zero], verbose_name='Количество попыток')
     date_before = models.DateTimeField(default=(
-                datetime.datetime.now() + datetime.timedelta(days=30)), verbose_name='Дата до которой необходимо выполнить тест')
+            datetime.datetime.now() + datetime.timedelta(days=30)),
+        verbose_name='Дата до которой необходимо выполнить тест')
 
     class Meta:
         unique_together = ('user', 'test_name')
 
     def __str__(self):
         return f'Пилот {self.user.last_name} {self.user.first_name}, --> {self.test_name}, попыток {self.num_try}, закончить до {self.date_before.strftime("%d.%m.%Y %H:%M")}'
-

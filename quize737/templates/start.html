@@ -1,0 +1,29 @@
+{% extends "base_start.html" %}
+
+{% block content %}
+
+
+<div>
+    <fieldset>
+        <legend>Профиль тестированя</legend>
+        <form  id="data" method='post'>
+        {% csrf_token %}
+<!--            <p>ФИО Тестируемого:</p><input style="font-size: 25px;" type="text" id="fio" name="user_name" required minlength="4" maxlength="30" size="30" value="{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}">-->
+<!--            <br>-->
+<!--            <p>Количство вопросов по каждой теме:</p>-->
+<!--            <p> <input style="font-size: 25px;" type="number" id="" name="q_num" required minlength="1" maxlength="2" size="2"></p>-->
+<!--            <p><button type="submit" form="data">Начать Тестирование</button></p>-->
+            {% if user_tests|length > 0 %}
+                <p>Вам назначены тесты:</p>
+                {% for test in user_tests %}
+                <p><a href="{% url 'quize737:start' test.test_name.id %}">"{{test.test_name}}"</a> --> Количество попыток: {{test.num_try}} Выполнить до: {{test.date_before | date:"d.m.Y"}}</p>
+            {% endfor %}
+
+            {% else %}
+                <p>Тесты отсутствуют</p>
+            {% endif %}
+        </form>
+    </fieldset>
+</div>
+
+{% endblock %}

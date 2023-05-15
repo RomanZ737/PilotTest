@@ -15,6 +15,7 @@
             <nav>
 
                 {% if user.is_authenticated %}
+                <p>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</p>
                     <span>|</span>
                     <a href="{% url 'quize737:start' %}">Главная</a>
                     <span>|</span>
@@ -37,11 +38,13 @@
         </header>
         <main>
             <aside>
-                <p><a href="{% url 'quize737:start' %}">По всем темам</a></p>
-                <p><a href="{% url 'quize737:one_them_q' %}">По отдельной теме</a></p>
-                <p><a href="{% url 'quize737:start' %}">После события</a></p>
-                <p><a href="{% url 'quize737:start' %}">Входное тестирование</a></p>
-
+                {% if user_tests|length > 0 %}
+                    {% for test in user_tests %}
+                    <p><a href="{% url 'quize737:start' test.test_name.id %}">{{test.test_name}}</a></p>
+                    {% endfor %}
+                {% else %}
+                <p>Тесты отсутствуют</p>
+                {% endif %}
             </aside>
             <section>
                 {% block content %}

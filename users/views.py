@@ -28,7 +28,7 @@ def register(request):
             new_user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, new_user)
 
-            return render(request, 'start_all_q.html')
+            return render(request, 'start.html')
 
         else:
             err_list = []

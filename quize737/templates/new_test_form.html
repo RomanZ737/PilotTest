@@ -14,6 +14,7 @@
     <form id="question_form" method='post'>
       {% csrf_token %}
         <p>Название теста {{test_name_form.name}}</p>
+        <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
         {{ test_q_set.management_form }}
         {% for form in test_q_set.forms %}
         <div class="q_forms">

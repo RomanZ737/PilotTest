@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 # Модель тем вопросов
@@ -83,8 +84,10 @@ class QuizeResults(models.Model):
 class TestConstructor(models.Model):
     name = models.CharField(max_length=255, verbose_name='Название Теста',
                             help_text='Название теста которое будет видно пользователю')
+    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=70, verbose_name='Количество правильных ответов', help_text='Минимальный процент правильных ответов для прохождения теста')
+
     def __str__(self):
-        return f'{self.name} {self.id}'
+        return f'{self.name}'
 
 
 # Модель конструктора тестов - сами вопросы для теста

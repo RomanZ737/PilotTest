@@ -32,9 +32,9 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-DATETIME_FORMAT = ['%d %M %Y']
+#DATETIME_FORMAT = ['%d %M %Y']
 # DATE_INPUT_FORMATS = ['%d %M %Y']
-# DATE_FORMAT = ['%d %M %Y']
+DATE_FORMAT = ['%d %M %Y']
 
 
 INSTALLED_APPS = [
