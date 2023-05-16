@@ -3,7 +3,7 @@
 {% block content %}
 <section>
 
-<form method='post' action='{% url "next_question" %}'>
+<form method='post' action='{% url "quize737:next_question" %}'>
 
     <!--Скрытое поле с id теста пользователя -->
         <input type="hidden" name="user_set_id" value="{{user_set_id}}">

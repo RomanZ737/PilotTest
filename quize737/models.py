@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
 
 
 # Модель тем вопросов
@@ -8,7 +9,7 @@ class Thems(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название Темы")
 
     def __str__(self):
-        return f'{self.name}'#, id: {self.id}'
+        return f'{self.name}'  # , id: {self.id}'
 
 
 # Вся база вопросов по всем темам
@@ -43,6 +44,7 @@ class QuestionSet(models.Model):
 # Сгенерированнный Тест для конекретного пользователя
 class QuizeSet(models.Model):
     """Варианты тестов"""
+    test_id = models.IntegerField(verbose_name='id теста из которого сформирован QuizeSet')
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
@@ -54,6 +56,8 @@ class QuizeSet(models.Model):
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
     max_score_amount = models.IntegerField(default=0, verbose_name='Максимальное кол-во баллов',
                                            help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
+    pass_score = models.IntegerField(verbose_name='Количество правильных ответов',
+                                     help_text='Минимальный процент правильных ответов для прохождения теста')
 
     def __str__(self):
         return self.quize_name
@@ -61,6 +65,8 @@ class QuizeSet(models.Model):
 
 # Объект результат теста конкретного пользователя
 class QuizeResults(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID пользователя',
+                                help_text='ID пользователя, для упрощённого поиска результатов')
     user_name = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                  help_text='Имя пользователя, который проходил тест')
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
@@ -71,20 +77,24 @@ class QuizeResults(models.Model):
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
     score_number = models.IntegerField(verbose_name='Количество баллов')
     total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
+    pass_score = models.IntegerField(verbose_name='Количество правильных ответов',
+                                     help_text='Минимальный процент правильных ответов для прохождения теста')
+    conclusion = models.BooleanField(verbose_name='Итоговый результат', null=True, help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
 
     class Meta:
         ordering = ['-timestamp']
 
     def __str__(self):
         return f'{self.user_name} {self.timestamp.strftime("%d.%m.%Y %H:%M:%S")}'
-    # .strftime("%d.%m.%Y %H:%m:%S")
 
 
 #  Модель конструктора тестов - названия и id тестов
 class TestConstructor(models.Model):
     name = models.CharField(max_length=255, verbose_name='Название Теста',
                             help_text='Название теста которое будет видно пользователю')
-    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=70, verbose_name='Количество правильных ответов', help_text='Минимальный процент правильных ответов для прохождения теста')
+    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=70,
+                                     verbose_name='Количество правильных ответов',
+                                     help_text='Минимальный процент правильных ответов для прохождения теста')
 
     def __str__(self):
         return f'{self.name}'

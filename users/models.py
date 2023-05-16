@@ -32,14 +32,14 @@ class Profile(models.Model):
         return "{value} ({display_value})".format(value=self.position, display_value=self.get_position_display())
 
 
+
 # Модель теста, назначенного пользователю
 class UserTests(models.Model):
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     test_name = models.ForeignKey(TestConstructor, on_delete=models.CASCADE)
     num_try = models.IntegerField(default=3, validators=[validate_not_zero], verbose_name='Количество попыток')
-    date_before = models.DateTimeField(default=(
-            datetime.datetime.now() + datetime.timedelta(days=30)),
-        verbose_name='Дата до которой необходимо выполнить тест')
+    date_before = models.DateTimeField(default=(datetime.datetime.now() + datetime.timedelta(days=30)).date(), verbose_name='Дата до которой необходимо выполнить тест')
 
     class Meta:
         unique_together = ('user', 'test_name')

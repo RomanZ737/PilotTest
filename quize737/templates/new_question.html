@@ -1,0 +1,96 @@
+<!-- Форма редактирования конкретного вопроса -->
+
+{% extends "base_start.html" %}
+
+{% block content %}
+
+
+<fieldset>
+        <legend>Новый вопрос</legend>
+        <form id="question_data" method='post'>
+            {% csrf_token %}
+            <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
+            <p>{{question_form.question.label}}: <textarea style="font-size: 15px; width: 80%;" id="question"
+                                                       name="question" oninput="autoGrow()"></textarea>
+        </p>
+            <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
+            <p>{{question_form.option_2.label}}: {{question_form.option_2}}</p>
+            <p>{{question_form.option_3.label}}: {{question_form.option_3}}</p>
+            <p>{{question_form.option_4.label}}: {{question_form.option_4}}</p>
+            <p>{{question_form.option_5.label}}: {{question_form.option_5}}</p>
+            <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
+            <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
+            <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5"></p>
+            <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="ex. 1,2,3,4..."></p>
+            <button type="submit" >Сохранить</button>
+        </form>
+</fieldset>
+        <form method='get' action='{% url "quize737:question_list" %}'>
+            <button type="submit" >Вернуться</button>
+        </form>
+
+
+<p id="demo"></p>
+
+<script type="text/javascript">
+
+//Скрипт меняет размер поля вопроса под фактическое количество символов
+var q_text_Length = "{{question_form.question.value}}".length;
+var q_rows_length = 1
+if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
+                              q_text_Length = 100 };
+var q_field = document.getElementById("question");
+q_field.setAttribute("cols", q_text_Length);
+q_field.setAttribute("rows", q_rows_length);
+
+//Скрипт определяет изначальную видимость полей, в зависимости от вида вопроса
+var checkBox = document.getElementById("q_kind");
+var answer_field = document.getElementById("answer");
+var answers_field = document.getElementById("answers");
+var checkBox_value = "{{question_form.q_kind.value}}"
+
+if (checkBox_value == "True") {
+    checkBox.checked = true; } else {
+    checkBox.checked = false;
+    }
+
+
+if (checkBox.checked == true) {
+        answers_field.style.display = "block";
+        answer_field.style.display = "none"; } else {
+        answers_field.style.display = "none";
+        answer_field.style.display = "block";
+        }
+
+
+//Функция скрывает или паказывает нужные поля, в зависимости от варианта вопроса
+function hideFunc() {
+    var checkBox = document.getElementById("q_kind");
+    var answer_field = document.getElementById("answer");
+    var answers_field = document.getElementById("answers");
+    if (checkBox.checked == true){
+        answers_field.style.display = "block";
+        answer_field.style.display = "none"; } else {
+        answers_field.style.display = "none";
+        answer_field.style.display = "block";
+        }
+    }
+
+//Динамическое изменение поля воода текста вопроса
+var q_text = document.getElementById("question");
+function autoGrow() {
+  if (q_text.scrollHeight > q_text.clientHeight) {
+    q_text.style.height = `${q_text.scrollHeight}px`;
+  }
+}
+
+
+//var box = document.getElementById("q_kind");
+//var x = box.getAttribute("checked")
+//document.getElementById("demo").innerHTML = "Value: " + checkBox_value + ' ' + x
+
+
+</script>
+
+
+{% endblock %}
