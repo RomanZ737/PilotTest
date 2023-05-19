@@ -22,10 +22,15 @@
             <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
             <button type="submit" >Сохранить</button>
         </form>
-</fieldset>
+        <form method="post" action="{% url 'quize737:question_del' q_id %}">
+            {% csrf_token %}
+            <button type="submit">Удалить вопрос</button>
+        </form>
         <form method='get' action='{% url "quize737:question_list" %}'>
             <button type="submit" >Вернуться</button>
         </form>
+</fieldset>
+
 
 
 <p id="demo"></p>

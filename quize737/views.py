@@ -3,7 +3,11 @@
 import os
 import random
 import io
+import csv
+import re
 
+from common import send_email
+from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from users.models import Profile
@@ -14,10 +18,10 @@ from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
 from django.utils import six
 from django.shortcuts import render, redirect
-from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults
+from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
-from .forms import QuestionSetForm, NewTestFormName, NewTestFormQuestions
+from .forms import QuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm
 from users.forms import TestsForUser
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
@@ -412,7 +416,6 @@ def next_question(request):
             # Вычисляем процент прохождения теста и округляем результат до десятой
             total_result = ('%.0f' % ((result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
 
-
             # Если пользователь сдал тест
             if int(total_result) >= int(result_data[0]['pass_score']):
                 #  Вынимаем объект набора вопросов (QuizeSet) для исфользования в фильтре удаления теста польхователя, если он сдал тест
@@ -424,7 +427,8 @@ def next_question(request):
                 #  Удаляем тест у пользователя
                 UserTests.objects.filter(user=request.user, test_name=user_test_id).delete()
                 context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
-                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result, 'conclusion': True}
+                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
+                           'conclusion': True}
                 # Удаляем тест пользователя из базы тестов пользователя
                 QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
 
@@ -439,10 +443,11 @@ def next_question(request):
                 num_try -= 1
                 user_test_instance.update(num_try=num_try)
                 # Добавляем итоговый результать в отчёт по пользователю
-                #QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(total_result=total_result)
+                # QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(total_result=total_result)
                 # Формируем данные для отправки
                 context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
-                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result, 'conclusion': False}
+                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
+                           'conclusion': False}
 
             # Удаляем тест пользователя из базы
             QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
@@ -484,9 +489,13 @@ def test_result_details(request, id):
 @login_required
 @group_required('krs')
 def question_list(request):
-    result = QuestionSet.objects.all()
-    context = {'questions': result}
+    question_list = QuestionSet.objects.all()
+    paginator = Paginator(question_list, 5)
+    page_number = request.GET.get('page', 1)
+    questions = paginator.page(page_number)
+    context = {'questions': questions}
     return render(request, 'question_list.html', context=context)
+
 
 # Добавить новый вопрос в базу вопросов
 @login_required
@@ -502,8 +511,8 @@ def new_question(request):
             return redirect('quize737:question_list')
 
     else:
-        #result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3','option_4', 'option_5', 'q_kind', 'q_weight', 'answer','answers')
-        question_form = QuestionSetForm()#result[0])
+        # result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3','option_4', 'option_5', 'q_kind', 'q_weight', 'answer','answers')
+        question_form = QuestionSetForm()  # result[0])
 
         context = {'question_form': question_form}
 
@@ -526,15 +535,21 @@ def question_list_details(request, id):
     else:
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
                                                           'option_4', 'option_5', 'q_kind', 'q_weight', 'answer',
-                                                          'answers')
+                                                          'answers', 'id')
         question_form = QuestionSetForm(result[0])
 
-        context = {'question_form': question_form}
+        context = {'question_form': question_form, 'q_id': result[0]['id']}
 
         return render(request, 'question_list_details.html', context=context)
 
 
-# Загрузка результата теста
+# Удаляем вопрос
+def question_del(request, id):
+    QuestionSet.objects.get(id=id).delete()
+    return redirect('quize737:question_list')
+
+
+# Скачивание результата теста
 @login_required
 @group_required('krs')
 def download_test_result(request, id):
@@ -748,6 +763,8 @@ def user_detales(request, id):
                                    can_delete=True)  # Extra - количество строк формы
     user_profile = Profile.objects.filter(id=id)
 
+    # sent = False  # Переменная для отправки письма
+
     if request.method == 'POST':
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
         print('request.POST', request.POST)
@@ -767,10 +784,18 @@ def user_detales(request, id):
                                              test_name=test['test_name'],
                                              num_try=test['num_try'],
                                              date_before=test['date_before'])
+
+                    #  Отправляем письмо пользователю
+                    subject = f"Вам назначен Тест: '{test['test_name']}'"
+                    message = f"Уважаемый, {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}.\nВам назначен тест {test['test_name']} на портале {config('SITE_URL', default='')}.\nТест необходимо выполнить до {test['date_before']}"
+
+                    email_msg = {'subject': subject, 'message': message, 'to': request.user.email}
+                    send_email(request, email_msg)
+
             # Загружаем новые данные в форму
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             tests_for_user_form = UserTestForm(initial=user_tests)
-            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True}
             return render(request, 'user_ditales.html', context=context)
 
         else:
@@ -789,3 +814,113 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
         return render(request, 'user_ditales.html', context=context)
+
+
+@login_required
+@group_required('krs')
+#  Загрузка файла с вопросами
+def file_upload(request):
+    upload_form = FileUploadForm()
+    if request.method == 'POST':
+        # print('upload FILES:', request.FILES['docfile'])
+
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            #  Зашружаем файл
+            newdoc = FileUpload(docfile=request.FILES['docfile'])
+            newdoc.save()
+            error_read = {}  # Ошибка при чтении файл
+            wrong_data = []  # Ошибки в данных файла (пропущенные поля)
+            answers = ''  # Правильные ответы на вопрос
+            answer = None
+            them_created = 0
+            questions_created = 0
+            # Анализируем загруженный файл
+            dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            with open(f"{dir_path}/media/documents/{request.FILES['docfile']}", newline='',
+                      encoding='utf-8') as csvfile:
+
+                #  Пропускаем первую строку (заголовок)
+                heading = next(csvfile)
+                fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
+                              'q_weight', 'answer', 'answers']
+                reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
+                try:
+                    for row in reader:
+                        if row['theme'] and row['question'] and row['option_1'] and row['option_2'] and row['q_kind']:
+                            if row['answer'] or row['answers']:
+                                #  Вынимаем тему, если такой темы нет, создаём её
+                                them = Thems.objects.get_or_create(name=row['theme'])
+                                #  Подсчитывае созданные темы
+                                if them[1]:
+                                    them_created += 1
+                                #  Проверяем существование вопроса, если такого вопроса нет, создаём его
+                                if row['q_kind'] == 'Один Ответ':
+                                    q_kind = True
+                                    answer = row['answer']
+                                    if len(row['answer']) > 1 or not row['answer'].isdigit():
+                                        wrong_data.append(
+                                            f'В поле "Ответ" должна быть одна цифра, строка {reader.line_num}')
+                                        continue
+                                else:
+                                    q_kind = False
+                                    answers = row['answers']
+                                    print('answers before:', answers)
+                                    answers = answers.replace(' ', '')
+                                    print('answers:', answers)
+                                    if len(answers) < 2:
+                                        wrong_data.append(
+                                            f'В поле "Ответы" должно быть больше одной цифры и они должны быть разделены запятыми без пробелов {reader.line_num}')
+                                        continue
+
+                                if not row['q_weight']:
+                                    q_weight = 0.0
+                                else:
+                                    q_weight = row['q_weight']
+                                # проверяем наличие вопроса
+                                #TODO: доделать проверку если в фале в вопросе были зменены параметры, а сам вопрос остался прежним
+                                question = QuestionSet.objects.get_or_create(them_name=them[0],
+                                                                             question=row['question'],
+                                                                             option_1=row['option_1'],
+                                                                             option_2=row['option_2'],
+                                                                             option_3=row['option_3'],
+                                                                             option_4=row['option_4'],
+                                                                             option_5=row['option_5'],
+                                                                             q_kind=q_kind,
+                                                                             q_weight=q_weight,
+                                                                             answer=answer,
+                                                                             answers=answers
+                                                                             )
+                                # Подсчитываем созданные вопросы
+                                if question[1]:
+                                    questions_created += 1
+
+
+                            else:
+                                wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
+                                continue
+
+                        else:
+                            for data in row.values():
+                                alpha = False
+                                print('data:', data)
+                                if data is not None:
+                                    if len(data) > 2:
+                                        alpha = True
+
+                            if alpha == True:
+                                wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
+                                continue
+
+                except csv.Error as e:
+                    error_read = {'file': filename, 'line': reader.line_num, 'error': e}
+                    sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
+            os.remove(f"{dir_path}/media/documents/{request.FILES['docfile']}")
+
+            context = {"upload_form": upload_form, 'reading_errors': error_read, 'them_num_created': them_created,
+                       'q_num_created': questions_created, 'uploaded': True, 'wrong_data': wrong_data}
+            return render(request, 'file_upload.html', context=context)
+
+    else:
+        context = {"upload_form": upload_form, 'uploaded': False}
+        return render(request, 'file_upload.html', context=context)

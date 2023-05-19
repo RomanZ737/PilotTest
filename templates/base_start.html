@@ -12,10 +12,12 @@
 
         <header>
 			<p><img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto"></p>
+
+            {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}
             <nav>
 
                 {% if user.is_authenticated %}
-                <p>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</p>
+
                     <span>|</span>
                     <a href="{% url 'quize737:start' %}">Главная</a>
                     <span>|</span>

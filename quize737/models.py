@@ -17,7 +17,7 @@ class QuestionSet(models.Model):
     # Имя темы связано с классом Nhem
 
     them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
-    question = models.CharField(max_length=500, verbose_name='Вопрос')
+    question = models.CharField(unique=True, max_length=500, verbose_name='Вопрос')
     option_1 = models.CharField(max_length=500, verbose_name='Вариант 1')
     option_2 = models.CharField(max_length=500, verbose_name='Вариант 2')
     option_3 = models.CharField(max_length=500, verbose_name='Вариант 3', blank=True, null=True)
@@ -28,7 +28,7 @@ class QuestionSet(models.Model):
     q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0,
                                  help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
     answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа',
-                                 help_text='Поле используется если вопрос подразумевает один ответ', blank=True,
+                                 help_text='Поле используется если вопрос подразумевает один ответ, True - если один ответ, False - если несколько ответов', blank=True,
                                  null=True)
     answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос',
                                help_text='Поле используется если вопрос подразумевает несколько правильных ответов',
@@ -36,6 +36,10 @@ class QuestionSet(models.Model):
 
     class Meta:
         ordering = ['-them_name']
+
+        indexes = [
+            models.Index(fields=['question'])
+        ]
 
     def __str__(self):
         return f'{self.them_name}, {self.question}'
@@ -113,3 +117,7 @@ class TestQuestionsBay(models.Model):
 
     def __str__(self):
         return f'{self.theme}, Test_id: {self.test_id}, вопросов: {self.q_num}'
+
+
+class FileUpload(models.Model):
+    docfile = models.FileField(upload_to='documents/')

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
+#from quize737.common import DKIMBackend
+
 
 import os
 
@@ -26,14 +28,14 @@ secret_key = config('secret_key', default='')
 SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-#DATETIME_FORMAT = ['%d %M %Y']
+# DATETIME_FORMAT = ['%d %M %Y']
 # DATE_INPUT_FORMATS = ['%d %M %Y']
 DATE_FORMAT = ['%d %M %Y']
 
@@ -74,7 +76,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-        'builtins': [
+            'builtins': [
                 'quize737.templatetags.tags',
             ]
         },
@@ -112,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS' : {'min_length': 3}
+        'OPTIONS': {'min_length': 3}
     },
     # {
     #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -143,9 +145,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#STATIC_ROOT = os.getcwd() + '/static/'
+# STATIC_ROOT = os.getcwd() + '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR / 'static/')
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # STATICFILES_DIRS = [
 #       'C:/Users/User/PycharmProjects/PilotTest/'
@@ -153,5 +157,3 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'static/')
 
 LOGIN_REDIRECT_URL = 'start'
 LOGIN_URL = 'login'
-
-

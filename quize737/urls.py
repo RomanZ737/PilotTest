@@ -26,4 +26,7 @@ urlpatterns = [
     path('user_list/', views.user_list, name='user_list'),
     path('group_list/', views.group_list, name='group_list'),
     path('user_list/<int:id>', views.user_detales, name='user_detales'),
+    path('file_upload/', views.file_upload, name='file_upload'),
+    path('question_list/question_del/<int:id>', views.question_del, name='question_del'),
+    path('question_list/<int:id>/question_del/', views.question_del, name='question_list'),
 ]

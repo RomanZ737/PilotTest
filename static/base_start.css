@@ -86,3 +86,28 @@ div.result_list {
     position: absolute;
     right: 38%;
 }
+
+
+.result_confirm {
+    color: rgb(170, 39, 47);
+    font-size: 18px;
+    animation: disappear 2s linear 3s 1 forwards;
+
+}
+
+@keyframes shadow {
+    from {text-shadow: 0 0 3px black;}
+    50% {text-shadow: 0 0 30px black;}
+    to {text-shadow: 0 0 3px black;}
+    }
+
+@keyframes disappear {
+    0%{
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

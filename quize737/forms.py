@@ -13,7 +13,6 @@ class QuestionSetForm(forms.ModelForm):
         # }
 
 
-
 # Форма для имени создаваемого и теста
 class NewTestFormName(forms.Form):
     name = forms.CharField(max_length=25, initial='Новый Тест')
@@ -31,4 +30,12 @@ class NewTestFormQuestions(forms.ModelForm):
 
         # labels = {'name': _('Writer'),}
         # help_texts = {'name': _('Some useful help text.'),}
-        error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"},}
+        error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"}, }
+
+
+#  Форма для загрузки файла
+class FileUploadForm(forms.Form):
+    docfile = forms.FileField(
+        label='Выберите файл',
+        #help_text='max. 42 megabytes'
+    )

@@ -16,6 +16,10 @@
     <p>Назначенные тесты отсутствуют</p>
     {% endif %}
 
+    {% if test_and_data_saved %}
+    <p class="result_confirm">Данные сохранены</p>
+    {% endif %}
+
 <form id="user_tests_form" method='post'>
       {% csrf_token %}
         {{ user_tests.management_form }}
@@ -64,7 +68,7 @@
 
             formNum = qForm.length-1
 
-            document.getElementById("demo_1").innerHTML = 'AFTER: ' + ' formNum: ' + formNum
+            //document.getElementById("demo_1").innerHTML = 'AFTER: ' + ' formNum: ' + formNum
 
             if (formNum > 0) {
                 let newForm = qForm[0].cloneNode(true)

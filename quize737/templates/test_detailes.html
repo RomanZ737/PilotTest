@@ -10,7 +10,6 @@
     {% for error in form_errors%}
     <h4>{{error}}</h4>
     {% endfor %}
-
     <form id="question_form" method='post'>
 
       {% csrf_token %}
