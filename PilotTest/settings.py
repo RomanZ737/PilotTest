@@ -30,12 +30,12 @@ SECRET_KEY = secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-EMAIL_HOST = "mail.zfamily.aero"
-EMAIL_PORT = 465
+EMAIL_HOST = config('EMAIL_HOST', default='')
+EMAIL_PORT = config('EMAIL_PORT', default='')
 #EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = "pilottest@zfamily.aero"
-EMAIL_HOST_PASSWORD = "Target77"
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
