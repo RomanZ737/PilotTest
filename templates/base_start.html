@@ -5,15 +5,15 @@
 <link rel="stylesheet" href="{% static 'base_start.css' %}" type="text/css">
     <head>
         <title>NWS Pilot Test</title>
-        <link rel = "icon" href="{% static 'nws_icon.png' %}">
+        <link rel="icon" href="{% static 'nws_icon.png' %}">
     </head>
 
     <body>
 
         <header>
-			<p><img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto"></p>
 
-            {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}
+            <span><img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto"></span>
+            <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
             <nav>
 
                 {% if user.is_authenticated %}
@@ -21,7 +21,7 @@
                     <span>|</span>
                     <a href="{% url 'quize737:start' %}">Главная</a>
                     <span>|</span>
-                    <a href="{% url 'profile' %}">Профиль</a>
+                    <a href="{% url 'password_change' %}">Профиль</a>
                             {% if request.user|has_group:'krs' or user.is_superuser %}
                                 <span>|</span>
                                 <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>

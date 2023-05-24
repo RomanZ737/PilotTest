@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 class Thems(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название Темы")
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return f'{self.name}'  # , id: {self.id}'
 

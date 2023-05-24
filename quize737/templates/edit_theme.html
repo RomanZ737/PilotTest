@@ -1,0 +1,34 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+
+<div class="left_side">
+<fieldset>
+    <legend>Редактировать название темы</legend>
+    <form id="theme_name" method='post'>
+        {% csrf_token %}
+<!--        {% for error in new_theme_form.errors.values %}-->
+<!--        <p>{{error}}</p>-->
+<!--        {% endfor %}-->
+        <p>Название темы:</p> {{new_theme_form.name}}
+        <button type="submit">Изменить</button>
+    </form>
+    <form method='get' action='{% url "quize737:theme_editor" %}'>
+        <button type="submit">Вернуться</button>
+    </form>
+</fieldset>
+</div>
+
+<div class="right_side">
+        <fieldset>
+            <legend>Редактировать</legend>
+
+            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>
+            <p><a href="pass">Редактировать Темы</a></p>
+            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>
+            <p><a href="pass">Скачать базу</a></p>
+
+        </fieldset>
+</div>
+
+{% endblock %}

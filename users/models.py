@@ -38,6 +38,7 @@ class UserTests(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     test_name = models.ForeignKey(TestConstructor, on_delete=models.CASCADE)
+    num_try_initial = models.IntegerField(verbose_name='Изначальное Количество попыток', null=True)
     num_try = models.IntegerField(default=3, validators=[validate_not_zero], verbose_name='Количество попыток')
     date_before = models.DateTimeField(default=(datetime.datetime.now() + datetime.timedelta(days=30)).date(), verbose_name='Дата до которой необходимо выполнить тест')
 

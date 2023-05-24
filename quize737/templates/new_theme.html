@@ -1,0 +1,21 @@
+{% extends "base_start.html" %}
+
+{% block content %}
+
+
+<fieldset>
+    <legend>Новая тема</legend>
+    <form id="theme_name" method='post'>
+        {% csrf_token %}
+        {% for error in new_theme_form.errors.values %}
+        <p>{{error}}</p>
+        {% endfor %}
+        <p>Название темы:</p> {{new_theme_form.name}}
+        <button type="submit" >Добавить</button>
+    </form>
+    <form method='get' action='{% url "quize737:theme_editor" %}'>
+        <button type="submit" >Вернуться</button>
+    </form>
+</fieldset>
+
+{% endblock %}

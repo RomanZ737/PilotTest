@@ -6,8 +6,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from .models import Profile
 from django.contrib.auth import login
+from django.contrib.auth.views import (
+    PasswordChangeView,
+    PasswordChangeDoneView
 
+)
 
+@login_required
 def register(request):
     if request.method == 'POST':
         form_user = UserRegisterForm(request.POST)
@@ -59,4 +64,11 @@ def register(request):
 
 @login_required
 def profile(request):
-    return render(request, 'profile.html')
+    chang_pass_form = PasswordChangeView()
+    print('chang_pass_form:', dir(chang_pass_form))
+    print('chang_pass_form:', chang_pass_form)
+    context = {'change_pass_form': chang_pass_form}
+    return render(request, 'profile.html', context=context)
+
+
+

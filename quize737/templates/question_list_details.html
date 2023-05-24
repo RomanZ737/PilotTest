@@ -1,14 +1,17 @@
 <!-- Форма редактирования конкретного вопроса -->
 
-{% extends "base_start.html" %}
+{% extends "main_base.html" %}
 
 {% block content %}
 
-
+<div class="left_side">
 <fieldset>
         <legend>Редактировать вопрос</legend>
         <form id="question_data" method='post'>
             {% csrf_token %}
+<!--            {% for error in question_form.errors %}-->
+<!--            <p>{{error}}</p>-->
+<!--            {% endfor %}-->
             <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
             <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
             <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
@@ -20,17 +23,28 @@
             <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
             <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
             <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
-            <button type="submit" >Сохранить</button>
+            <button type="submit">Сохранить</button>
         </form>
         <form method="post" action="{% url 'quize737:question_del' q_id %}">
             {% csrf_token %}
             <button type="submit">Удалить вопрос</button>
         </form>
         <form method='get' action='{% url "quize737:question_list" %}'>
-            <button type="submit" >Вернуться</button>
+            <button type="submit">Вернуться</button>
         </form>
 </fieldset>
+</div>
+<div class="right_side">
+        <fieldset>
+            <legend>Редактировать</legend>
 
+            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>
+            <p><a href="pass">Редактировать Темы</a></p>
+            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>
+            <p><a href="pass">Скачать базу</a></p>
+
+        </fieldset>
+</div>
 
 
 <p id="demo"></p>

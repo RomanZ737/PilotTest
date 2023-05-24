@@ -22,14 +22,30 @@ from users import views as users_views
 from django.contrib.auth import views as auth_views
 from quize737 import views as quize737_views
 
+from django.contrib.auth.views import (
+    LogoutView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+    PasswordChangeView,
+    PasswordChangeDoneView
+
+)
+
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                    path('', quize737_views.start, name='start'),
-                    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+                  path('', quize737_views.start, name='start'),
+                  path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
                   path('profile/', users_views.profile, name='profile'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
                   path('register/', users_views.register, name='register'),
-
+                  path('password-reset/', PasswordResetView.as_view(template_name='password_reset.html', html_email_template_name='password_reset_email.html'), name='password-reset'),
+                  path('password-reset/done/', PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
+                  path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
+                  path('password-reset-complete/', PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
+                  path('password_change/', PasswordChangeView.as_view(template_name='password_change.html'), name='password_change'),
+                  path('password_change_done/', PasswordChangeDoneView.as_view(template_name='password_change_done.html'), name='password_change_done'),
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

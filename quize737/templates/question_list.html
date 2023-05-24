@@ -1,12 +1,17 @@
 <!-- Список вопросов по всем темам -->
 
-{% extends "base_start.html" %}
+{% extends "main_base.html" %}
 
 {% block content %}
 <div class="left_side">
+    <fieldset>
+            <legend>Список вопросов</legend>
         {% for i in questions %}
-    <p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span><span style="color: black;"> | </span><span class="a_list">{{i.question}}</span></a></p> <span style="color: black;"> | </span><span><a href="{% url 'quize737:question_del' i.id %}">Удалить вопрос</a></span>
+
+    <p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span><span style="color: black;"> | </span><span class="a_list">{{i.question}}</span></a><span style="color: black;"> | </span><span><a href="{% url 'quize737:question_del' i.id %}">Удалить вопрос</a></span></p>
+
         {% endfor %}
+            </fieldset>
     {% include "paginator.html" with page=questions %}
 </div>
 
@@ -15,7 +20,7 @@
             <legend>Редактировать</legend>
 
             <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>
-            <p><a href="pass">Редактировать Темы</a></p>
+            <p><a href="{% url 'quize737:theme_editor' %}">Редактировать Темы</a></p>
             <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>
             <p><a href="pass">Скачать базу</a></p>
 

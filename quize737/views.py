@@ -6,6 +6,7 @@ import io
 import csv
 import re
 
+import common
 from common import send_email
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 from django.contrib.auth.models import User
@@ -21,7 +22,8 @@ from django.shortcuts import render, redirect
 from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
-from .forms import QuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm
+from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
+    NewThemeForm
 from users.forms import TestsForUser
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
@@ -63,108 +65,6 @@ def group_required(group, login_url=None, raise_exception=False):
 # Формироваине теста с вопросами из всех тем
 def all_them_q_set():
     pass
-
-
-# Начало теста
-# def start_test(question_set_id, user_instance, request):
-#     # Формируем тест на основании заданных параметров, из каждой темы по N вопросов
-#     # Наборы вопросов из теста
-#     test_instance = TestConstructor.objects.filter(id=question_set_id)
-#     q_sets_instances = TestQuestionsBay.objects.filter(test_id=question_set_id).values('theme', 'q_num')
-#     total_q_number = 0  # Общее количество вопросов в тесте для пользователя
-#     all_theme_set = []  # Объекты вопросов для пользователя
-#     particular_user_questions = []
-#     thems_num = Thems.objects.all().count()  # Общее количество тем
-#     max_score_number = 0  # Максимальное количество баллов по сгенерированным вопросам
-#     # Перебераем темы вопросов
-#     for q_set in q_sets_instances:
-#         # Перебираем темы вопросов, если тема = 5 (Все темы)
-#         if q_set['theme'] == 5:
-#             for theme in Thems.objects.all():
-#                 if theme.name != 'Все темы':
-#                     print('theme', theme.name)
-#                     quiz_set = QuestionSet.objects.filter(them_name=theme.id)
-#                     quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
-#                     all_theme_set.append(quiz_set)
-#                     # Считаем количество вопросов
-#                     total_q_number += int(q_set['q_num'])
-#         # Сохраняем вопросы для пользователя в базу
-#         else:
-#             quiz_set = QuestionSet.objects.filter(them_name=q_set['theme'])
-#             quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
-#             all_theme_set.append(quiz_set)
-#             total_q_number += int(q_set['q_num'])
-#         # Добавляем номер вопроса в объект теста для пользоваетеля
-#     for q_set in all_theme_set:
-#         for q in q_set:
-#             particular_user_questions.append(str(q.id))
-#             # Если задан "вес вопроса", учитываем его в максимальном количестве баллов
-#             if q.q_weight != 0:
-#                 max_score_number = max_score_number + q.q_weight
-#             else:
-#                 max_score_number = max_score_number + 1
-#
-#     total_q_num_for_user = total_q_number
-#     test_name = test_instance[0].name + ' ' + str(total_q_number) + ' Вопроса(ов)'
-#     user_quize_set = QuizeSet.objects.create(
-#         quize_name=test_name,
-#         user_under_test=user_instance.username,
-#         # Переводим список номеров вопросов в строку для хранения в поле базы данных
-#         questions_ids=' '.join(particular_user_questions),
-#         # Вычисляем общее количество вопросов и добавдяем их в поле
-#         q_sequence_num=total_q_num_for_user,
-#         # Вносим максимально возможное кол-во баллов
-#         max_score_amount=max_score_number,
-#         pass_score=test_instance[0].pass_score
-#     )
-#
-#     # -------  В этом месте генерируем первый вопрос теста пользователя
-#     # Имя теста конкретного пользователя
-#     user_set_name = test_name
-#
-#     # Выясняем количество сгенерированных вопросов
-#     q_amount = QuizeSet.objects.filter(id=user_quize_set.id).values('q_sequence_num')
-#
-#     # Выясняем сквозные номера вопросов, сгенерированные пользователю
-#     q_num_list = QuizeSet.objects.filter(id=user_quize_set.id).values('questions_ids')
-#
-#     # Создаём список со сгенерированными вопросами
-#     q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
-#
-#     # Достаём из базы вопросов первый вопрос с конца
-#     sequence_number = (int(q_amount[0][
-#                                'q_sequence_num']) - 1)  # Номер вопроса в списке вопросов пользователя
-#     question_pisition = q_num_list[sequence_number]  # Номер вопроса в списке вопросов пользователя
-#
-#     # Достаём нужный вопрос из базы вопросов по сквозному номеру
-#     question = QuestionSet.objects.filter(id=question_pisition).values()
-#
-#     # Формируем данные для отправки на страницу тестирования
-#
-#     # Обновляем количество оставшихся вопросов
-#     QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
-#
-#     # Создаём запись с результатами теста
-#     result_obj = QuizeResults.objects.create(
-#         user_name=user_instance.username,
-#         quize_name=user_set_name,
-#         total_num_q=sequence_number + 1,
-#         questions_ids=', '.join(q_num_list),
-#         correct_q_num=0,
-#         score_number=0,
-#         pass_score=test_instance[0].pass_score
-#     )
-#
-#     context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id,
-#                'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind']}
-#
-#     # Проверяем содержит ли вопрос мультивыбор
-#     if question[0]['q_kind'] == False:
-#         q_page_layout = 'start_test_radio.html'
-#     else:
-#         q_page_layout = 'start_test_check.html'
-#
-#     return render(request, q_page_layout, context=context)
 
 
 # Заглавная страница + вопросы по всем темам
@@ -423,7 +323,8 @@ def next_question(request):
                 QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(
                     total_result=total_result, conclusion=True)
                 # Вынимаем id теста для удаления теста у пользователя
-                user_test_id = set_instance[0].test_id
+                user_test_id = set_instance[0].test_id  #  ID теста пользователя
+                user_test_name = set_instance[0].quize_name  #  Название теста пользователя
                 #  Удаляем тест у пользователя
                 UserTests.objects.filter(user=request.user, test_name=user_test_id).delete()
                 context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
@@ -432,16 +333,32 @@ def next_question(request):
                 # Удаляем тест пользователя из базы тестов пользователя
                 QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
 
+                # Отправляем письмо КРС
+                subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал тест'
+                message = f'Пилот {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name} Сдал Тест: {user_test_name}\nКоличетсво набранных баллов: {total_result}%\nПроходной балл: {result_data[0]["pass_score"]}%'
+                to = common.krs_mail_list
+                email_msg = {'subject': subject, 'message': message, 'to': to}
+                common.send_email(request, email_msg)
+
                 return render(request, 'results.html', context=context)
 
+            # Если пользователь тест НЕ сдал
             else:
                 set_instance = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id')))
                 user_test_id = set_instance[0].test_id
+                user_test_name = set_instance[0].quize_name  # Название теста пользователя
                 user_test_instance = UserTests.objects.filter(user=request.user, test_name=user_test_id)
                 # Уменьшаем количество попыток
                 num_try = user_test_instance[0].num_try
                 num_try -= 1
                 user_test_instance.update(num_try=num_try)
+                # Если у пользователя не осталось попыток, отправляем письмо КРС
+                if int(num_try) == 0:
+                    subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
+                    message = f'Пилот {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name} НЕ сдал Тест: {user_test_name}\nКоличетсво набранных баллов: {total_result}%\nПроходной балл: {result_data[0]["pass_score"]}%\nПопыток сделано: {user_test_instance[0].num_try_initial}'
+                    to = common.krs_mail_list
+                    email_msg = {'subject': subject, 'message': message, 'to': to}
+                    common.send_email(request, email_msg)
                 # Добавляем итоговый результать в отчёт по пользователю
                 # QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(total_result=total_result)
                 # Формируем данные для отправки
@@ -501,21 +418,19 @@ def question_list(request):
 @login_required
 @group_required('krs')
 def new_question(request):
-    #  Если пользователь нажал 'соъхранить', выполняем проверку и сохраняем форму
+    #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
-        #   Выясняем id вопроса для его обновления
-        # a = QuestionSet.objects.get(id=id)
-        question_form = QuestionSetForm(request.POST)  # Для форм основанных на модели объекта
+        question_form = NewQuestionSetForm(request.POST)  # Для форм основанных на модели объекта
         if question_form.is_valid():
             question_form.save()
             return redirect('quize737:question_list')
+        else:
+            context = {'question_form': question_form}
+            return render(request, 'new_question.html', context=context)
 
     else:
-        # result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3','option_4', 'option_5', 'q_kind', 'q_weight', 'answer','answers')
-        question_form = QuestionSetForm()  # result[0])
-
+        question_form = NewQuestionSetForm()
         context = {'question_form': question_form}
-
         return render(request, 'new_question.html', context=context)
 
 
@@ -523,7 +438,7 @@ def new_question(request):
 @login_required
 @group_required('krs')
 def question_list_details(request, id):
-    #  Если пользователь нажал 'соъхранить', выполняем проверку и сохраняем форму
+    #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
         #   Выясняем id вопроса для его обновления
         a = QuestionSet.objects.get(id=id)
@@ -531,12 +446,16 @@ def question_list_details(request, id):
         if question_form.is_valid():
             question_form.save()
             return redirect('quize737:question_list')
+        else:
+            context = {'question_form': question_form, 'q_id': id}
+            return render(request, 'question_list_details.html', context=context)
 
     else:
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
                                                           'option_4', 'option_5', 'q_kind', 'q_weight', 'answer',
                                                           'answers', 'id')
         question_form = QuestionSetForm(result[0])
+        print('error:', question_form.errors)
 
         context = {'question_form': question_form, 'q_id': result[0]['id']}
 
@@ -547,6 +466,61 @@ def question_list_details(request, id):
 def question_del(request, id):
     QuestionSet.objects.get(id=id).delete()
     return redirect('quize737:question_list')
+
+
+# Редактор тем вопросов
+@login_required
+@group_required('krs')
+def theme_editor(request, id=None):
+    if request.method == 'POST':
+        form = NewThemeForm(request.POST)
+        if form.is_valid():  # TODO: добавить проверку на уже существующую тему
+            theme = Thems.objects.get(id=id)
+            theme.name = request.POST.get('name')
+            theme.save()
+            return redirect('quize737:theme_editor')
+        else:
+            context = {'new_theme_form': form}
+            return render(request, 'edit_theme.html', context=context)
+    else:
+        if id:
+            theme = Thems.objects.filter(id=id).values('name')
+            theme_form = NewThemeForm(theme[0])
+            context = {'new_theme_form': theme_form}
+            return render(request, 'edit_theme.html', context=context)
+        else:
+
+            theme_list = Thems.objects.all()
+            print('theme_list:', theme_list)
+            paginator = Paginator(theme_list, 7)
+            page_number = request.GET.get('page', 1)
+            themes = paginator.page(page_number)
+            context = {'themes': themes}
+            return render(request, 'theme_editor.html', context=context)
+
+
+#  Создание новой темы
+def new_theme(request):
+    form = NewThemeForm()
+    if request.method == 'POST':
+        form = NewThemeForm(request.POST)
+        if form.is_valid():  # TODO: добавить в валидацию проверку на уже существующую тему
+            form.save()
+            return redirect('quize737:theme_editor')
+        else:
+            context = {'new_theme_form': form}
+            return render(request, 'new_theme.html', context=context)
+    else:
+        context = {'new_theme_form': form}
+        return render(request, 'new_theme.html', context=context)
+
+
+# Удаление темы
+@login_required
+@group_required('krs')
+def theme_del(request, id):
+    Thems.objects.get(id=id).delete()
+    return redirect('quize737:theme_editor')
 
 
 # Скачивание результата теста
@@ -691,7 +665,7 @@ def test_details(request, id):
         test_name_form = NewTestFormName(request.POST)
         test_q_set = QuestionFormSet(request.POST, request.FILES, prefix="questions")
         TestQuestionsBay.objects.filter(test_id=id).delete()
-        if test_q_set.is_valid() and test_name_form.is_valid():
+        if test_q_set.is_valid():
             a.name = test_name_form.data.get('name')
             a.pass_score = test_name_form.data.get('pass_score')
             a.save()
@@ -782,6 +756,7 @@ def user_detales(request, id):
                     user = User.objects.filter(id=id)
                     UserTests.objects.create(user=user[0],
                                              test_name=test['test_name'],
+                                             num_try_initial=test['num_try'],
                                              num_try=test['num_try'],
                                              date_before=test['date_before'])
 
@@ -878,7 +853,7 @@ def file_upload(request):
                                 else:
                                     q_weight = row['q_weight']
                                 # проверяем наличие вопроса
-                                #TODO: доделать проверку если в фале в вопросе были зменены параметры, а сам вопрос остался прежним
+                                # TODO: доделать проверку если в фале в вопросе были зменены параметры, а сам вопрос остался прежним
                                 question = QuestionSet.objects.get_or_create(them_name=them[0],
                                                                              question=row['question'],
                                                                              option_1=row['option_1'],

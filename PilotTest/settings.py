@@ -14,7 +14,7 @@ from pathlib import Path
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 #from quize737.common import DKIMBackend
 
-
+import common
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,8 +28,17 @@ secret_key = config('secret_key', default='')
 SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
+EMAIL_HOST = "mail.zfamily.aero"
+EMAIL_PORT = 465
+#EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = "pilottest@zfamily.aero"
+EMAIL_HOST_PASSWORD = "Target77"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 ALLOWED_HOSTS = ['*']
 

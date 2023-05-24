@@ -13,6 +13,9 @@
     <form id="question_form" method='post'>
 
       {% csrf_token %}
+<!--        <p>{% for name_error in test_name_form.errors.values %}</p>-->
+<!--            <p>{{name_error}}</p>-->
+<!--        {% endfor %}-->
         <p>Название теста {{test_name_form.name}}</p>
         <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
         <input type="hidden" id="test_id_num" value="{{test_id}}">
