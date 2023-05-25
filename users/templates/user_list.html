@@ -1,12 +1,14 @@
 {% extends "main_base.html" %}
 
 {% block content %}
-<section>
-    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>
+<fieldset>
+    <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
+<!--    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>-->
     {% for user in user_list %}
-    <a href="{{user.id}}">{{forloop.counter}}.<span class="theme_color">{{user.family_name}} {{user.first_name}} {{user.middle_name}} <span> | </span> {{user.position}}</span><span style="color: black;"></span></a>
+    <span style="color: black;">{{forloop.counter}}. </span><a href="{{user.id}}">{{user.family_name}} {{user.first_name}} {{user.middle_name}}</a><span style="color: black;"> | </span> <span class="theme_color">{{user.position}}</span>
     <br>
     {% endfor %}
+    <br>
     {% include "paginator.html" with page=user_list %}
-</section>
+</fieldset>
 {% endblock %}

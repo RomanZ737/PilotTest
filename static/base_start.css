@@ -125,3 +125,24 @@ div.result_list {
 h4 {
     color: rgb(209, 209,209);
 }
+
+span.mark_up {
+    color: rgb(209, 209,209);
+    font-size: 19px;
+}
+
+span.main_sign {
+    font-size: 19px;
+}
+
+span.positive {
+    color: rgb(148, 192, 74);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+span.negative{
+    color: rgb(142, 23, 11);
+    font-size: 20px;
+    font-weight: bold;
+}

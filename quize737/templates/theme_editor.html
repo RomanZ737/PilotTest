@@ -3,7 +3,17 @@
 {% block content %}
 <div class="left_side">
     <fieldset>
-        <legend>Редактор Тем</legend>
+        <legend>
+            <a href="{% url 'quize737:question_list' %}">Список вопросов</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:new_question' %}">Добавить вопрос</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:theme_editor' %}">РЕДАКТОР ТЕМЫ</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
+            <span style="color: black;"> | </span>
+            <a href="pass">Скачать базу</a>
+        </legend>
     <p><a href="{% url 'quize737:new_theme' %}">+ Добавить тему</a></p>
         {% for theme in themes %}
     <p><a href="{{theme.id}}"><span class="theme_color">{{theme.name}}</span></a> | <span><a href="{% url 'quize737:theme_del' theme.id %}" onclick="return confirm('Внимание! При удалении темы будут удалены все связанные с ней вопросы. Продолжить?') || event.preventDefault()" name="theme_del">Удалить Тему</a></span>
@@ -13,17 +23,17 @@
     </fieldset>
 </div>
 
-<div class="right_side">
-        <fieldset>
-            <legend>Редактировать</legend>
+<!--<div class="right_side">-->
+<!--        <fieldset>-->
+<!--            <legend>Редактировать</legend>-->
 
-            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>
-            <p><a href="pass">Редактировать Темы</a></p>
-            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>
-            <p><a href="pass">Скачать базу</a></p>
+<!--            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>-->
+<!--            <p><a href="pass">Редактировать Темы</a></p>-->
+<!--            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>-->
+<!--            <p><a href="pass">Скачать базу</a></p>-->
 
-        </fieldset>
-</div>
+<!--        </fieldset>-->
+<!--</div>-->
 
 <script type="text/javascript">
     var DelTheme = document.getElementsByName('theme_del');

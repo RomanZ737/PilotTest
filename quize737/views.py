@@ -109,7 +109,8 @@ def start(request, id=None):
                     max_score_number = max_score_number + 1
 
         total_q_num_for_user = total_q_number
-        test_name = test_instance[0].name + ' ' + str(total_q_number) + ' Вопроса(ов)'
+        test_name = test_instance[0].name
+        #  Формируем объект теста пользователя
         user_quize_set = QuizeSet.objects.create(
             test_id=test_instance[0].id,
             quize_name=test_name,
@@ -151,9 +152,10 @@ def start(request, id=None):
         QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
 
         # Создаём запись с результатами теста
+        user_name_for_h = f'{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}'
         result_obj = QuizeResults.objects.create(
             user_id=request.user,
-            user_name=user_instance.username,
+            user_name=user_name_for_h,
             quize_name=user_set_name,
             total_num_q=sequence_number + 1,
             questions_ids=', '.join(q_num_list),
@@ -163,7 +165,7 @@ def start(request, id=None):
         )
 
         context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id,
-                   'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind']}
+                   'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'], 'q_num_left': total_q_num_for_user}
 
         # Проверяем содержит ли вопрос мультивыбор
         if not question[0]['q_kind']:
@@ -292,7 +294,7 @@ def next_question(request):
             # Формируем данные для отправки на страницу тестирования
             context = {'user_name': request.POST.get("user_name"), 'user_set_id': request.POST.get('user_set_id'),
                        'question': question, 'results_object_id': request.POST.get('results_object_id'),
-                       'q_kind': question[0]['q_kind']}
+                       'q_kind': question[0]['q_kind'], 'q_num_left': q_amount[0]['q_sequence_num']}
 
             # Обновляем количество оставшихся вопросов
             QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).update(q_sequence_num=question_sequence)
@@ -389,7 +391,10 @@ def one_them_q(request):
 # Все результаты тестов
 def tests_results_list(request):
     results_list = QuizeResults.objects.all()
-    context = {'results': results_list}
+    paginator = Paginator(results_list, 8)
+    page_number = request.GET.get('page', 1)
+    results_list_pages = paginator.page(page_number)
+    context = {'results': results_list_pages}
     return render(request, 'tests_results_list.html', context=context)
 
 
@@ -407,7 +412,7 @@ def test_result_details(request, id):
 @group_required('krs')
 def question_list(request):
     question_list = QuestionSet.objects.all()
-    paginator = Paginator(question_list, 5)
+    paginator = Paginator(question_list, 7)
     page_number = request.GET.get('page', 1)
     questions = paginator.page(page_number)
     context = {'questions': questions}
@@ -491,7 +496,6 @@ def theme_editor(request, id=None):
         else:
 
             theme_list = Thems.objects.all()
-            print('theme_list:', theme_list)
             paginator = Paginator(theme_list, 7)
             page_number = request.GET.get('page', 1)
             themes = paginator.page(page_number)
@@ -607,7 +611,10 @@ class BaseUserTestFormSet(BaseFormSet):
 @group_required('krs')
 def test_editor(request):
     tests_names = TestConstructor.objects.all()
-    context = {'tests_names': tests_names}
+    paginator = Paginator(tests_names, 7)
+    page_number = request.GET.get('page', 1)
+    tests_names_pages = paginator.page(page_number)
+    context = {'tests_names': tests_names_pages}
     return render(request, 'test_editor.html', context=context)
 
 
@@ -711,7 +718,7 @@ def user_list(request):
     else:
         total_user_list = Profile.objects.all()
         #  Постраничная разбивка
-        paginator = Paginator(total_user_list, 3)
+        paginator = Paginator(total_user_list, 20)
         page_number = request.GET.get('page', 1)
         users = paginator.page(page_number)
         context = {'user_list': users}
@@ -725,7 +732,10 @@ def group_list(request):
         pass
     else:
         groups = Group.objects.all()
-        context = {'groups': groups}
+        paginator = Paginator(groups, 20)
+        page_number = request.GET.get('page', 1)
+        groups_pages = paginator.page(page_number)
+        context = {'groups': groups_pages}
         return render(request, 'group_list.html', context=context)
 
 

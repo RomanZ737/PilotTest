@@ -11,13 +11,13 @@
         {% csrf_token %}
             <input type="hidden" name="question_set" id="question_set" value="{{user_test.test_name.id}}">
             <h1>"{{test_name.name}}"</h1>
-            <p>Выполнить до: {{user_test.date_before | date:"d.m.Y"}}</p>
-            <p>Минимальное количество правильных ответов: {{test_name.pass_score}}%</p>
-            <p>Число попыток: {{user_test.num_try}}</p>
+            <p>Выполнить до: <span class="mark_up">{{user_test.date_before | date:"d.m.Y"}}</span></p>
+            <p>Минимальное количество правильных ответов: <span class="mark_up">{{test_name.pass_score}}%</span></p>
+            <p>Число попыток: <span class="mark_up">{{user_test.num_try}}</span></p>
             {% if user_test.num_try > 0 %}
             <h3>Вопросы:</h3>
                 {% for them in question_set%}
-                    <p>{{them.theme}}: {{them.q_num}} вопроса(ов)</p>
+            <p><span class="theme_color">{{them.theme}}</span>: <span class="mark_up">{{them.q_num}}</span> вопроса(ов)</p>
                 {% endfor %}
 
                 <p><button type="submit" form="data">Начать Тестирование</button></p>

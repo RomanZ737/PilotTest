@@ -16,7 +16,7 @@
             {% if user_tests|length > 0 %}
                 <p>Вам назначены тесты:</p>
                 {% for test in user_tests %}
-                <p><a href="{% url 'quize737:start' test.test_name.id %}">"{{test.test_name}}"</a> --> Количество попыток: {{test.num_try}} Выполнить до: {{test.date_before | date:"d.m.Y"}}</p>
+            <p><a href="{% url 'quize737:start' test.test_name.id %}">{{test.test_name}}</a> Количество попыток: <span class="mark_up">{{test.num_try}}</span> Выполнить до: <span class="mark_up">{{test.date_before | date:"d.m.Y"}}</span></p>
             {% endfor %}
 
             {% else %}

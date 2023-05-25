@@ -1,11 +1,13 @@
 {% extends "main_base.html" %}
 
 {% block content %}
-<section>
-    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>
+<fieldset>
+            <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
     {% for group in groups %}
-    <a href="{{group.id}}">{{forloop.counter}}.<span class="theme_color">{{group}}</span><span style="color: black;"></span></a>
+    <a href="{{group.id}}"><span style="color: black;">{{forloop.counter}}. </span><span class="theme_color">{{group}}</span></a>
     <br>
     {% endfor %}
-</section>
+    <br>
+    {% include "paginator.html" with page=groups %}
+</fieldset>
 {% endblock %}

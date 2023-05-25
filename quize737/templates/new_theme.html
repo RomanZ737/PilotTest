@@ -1,21 +1,31 @@
-{% extends "base_start.html" %}
+{% extends "main_base.html" %}
 
 {% block content %}
 
 
 <fieldset>
-    <legend>Новая тема</legend>
+    <legend>
+    <a href="{% url 'quize737:question_list' %}">Список вопросов</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_question' %}">Добавить вопрос</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:theme_editor' %}">РЕДАКТОР ТЕМЫ</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
+        <span style="color: black;"> | </span>
+        <a href="pass">Скачать базу</a>
+    </legend>
     <form id="theme_name" method='post'>
         {% csrf_token %}
         {% for error in new_theme_form.errors.values %}
         <p>{{error}}</p>
         {% endfor %}
         <p>Название темы:</p> {{new_theme_form.name}}
-        <button type="submit" >Добавить</button>
+        <input type="submit" value="Добавить">
     </form>
-    <form method='get' action='{% url "quize737:theme_editor" %}'>
-        <button type="submit" >Вернуться</button>
-    </form>
+<!--    <form method='get' action='{% url "quize737:theme_editor" %}'>-->
+<!--        <button type="submit" >Вернуться</button>-->
+<!--    </form>-->
 </fieldset>
 
 {% endblock %}

@@ -3,9 +3,12 @@
 {% block content %}
 <section>
 
+    <fieldset>
+        <legend>Вопрос</legend>
+
 <form method='post' action='{% url "quize737:next_question" %}'>
 
-    <!--Скрытое поле с название теста пользователя -->
+    <!--Скрытое поле с названием теста пользователя -->
         <input type="hidden" name="user_set_id" value="{{user_set_id}}">
     <!--Скрытое поле id результатов теста пользователя -->
         <input type="hidden" name="results_object_id" value="{{results_object_id}}">
@@ -82,6 +85,7 @@
     <br>
     <button type="submit" class="btn btn-primary">Ответить</button>
   </form>
+    </fieldset>
 </section>
 
 {% endblock %}

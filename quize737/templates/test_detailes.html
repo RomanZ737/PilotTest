@@ -1,10 +1,9 @@
 {% extends "main_base.html" %}
 
 {% block content %}
-<section>
 
-    <h1>Редактирование теста</h1>
-    <br>
+<fieldset>
+            <legend>Редактирование теста</legend>
     <h4>{{non_form_errors}}</h4>
 
     {% for error in form_errors%}
@@ -27,12 +26,17 @@
         <br>
         {% endfor %}
 
-        <button id="add-form" type="button">Добавить тему</button>
+        <input type="submit" id="add-form" value="+ Добавить тему">
         <br>
         <br>
-
-      <input type="submit" value="Сохранить">
+        <br>
+      <input type="submit" value="Сохранить"><span style="color: black;"> | </span> <input type="submit" value="Удалить тест" form="del_dest" onclick="return confirm('Удалить Тест?') || event.preventDefault()">
     </form>
+
+    <form method="post" action="{% url 'quize737:del_test' test_id %}" id="del_dest">
+    {% csrf_token %}
+
+</form>
 
 
     <div id="empty_form" style="display:none">
@@ -40,16 +44,14 @@
 </div>
 
 
-<form method="post" action="{% url 'quize737:del_test' test_id %}">
-    {% csrf_token %}
-    <button type="submit">Удалить тест</button>
-</form>
+
 
 <br>
 <form method='get' action='{% url "quize737:test_editor" %}'>
-<button type="submit">Вернуться</button>
+<input type="submit" value="Вернуться">
 </form>
-</section>
+</fieldset>
+
 
 
 

@@ -1,19 +1,28 @@
 <!-- Детали конкретного отчёта -->
 
-{% extends "base_start.html" %}
+{% extends "main_base.html" %}
 
 {% block content %}
 
 <div class="result_list">
+    <fieldset>
+            <legend>Результаты теста</legend>
     {% for i in result %}
-    <p>Дата: {{i.timestamp|date:"d.m.Y H:i:s"}}</p>
-    <p>ФИО: {{i.user_name}}</p>
-    <p>Название теста: {{i.quize_name}}</p>
-    <p>Количество вопросов: {{i.total_num_q}}</p>
-    <p>Количество правильных ответов: {{i.correct_q_num}}</p>
-    <p>Количество баллов: {{i.score_number}}</p>
-    <p>Общий результат: {{i.total_result}}%</p>
+        <p>Дата: <span class="mark_up">{{i.timestamp|date:"d.m.Y H:i:s"}}</span></p>
+        <p>ФИО: <span class="mark_up">{{i.user_name}}</span></p>
+        <p>Название теста: <span class="mark_up">{{i.quize_name}}</span></p>
+        <p>Количество вопросов: <span class="mark_up">{{i.total_num_q}}</span></p>
+        <p>Количество правильных ответов: <span class="mark_up">{{i.correct_q_num}}</span></p>
+        <p>Количество баллов: <span class="mark_up">{{i.score_number}}</span></p>
+        <p>Общий результат: <span class="mark_up">{{i.total_result}}%</span></p>
+        {% if i.conclusion %}
+        <span class="positive">ТЕСТ СДАН</span>
+        {% else %}
+        <span class="negative">ТЕСТ НЕ СДАН</span>
+        {% endif %}
+
     {% endfor %}
+    </fieldset>
 </div>
 
 {% endblock %}

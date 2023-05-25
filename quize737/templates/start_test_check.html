@@ -3,6 +3,9 @@
 {% block content %}
 <section>
 
+    <fieldset>
+        <legend>Вопрос</legend>
+
 <form method='post' action='{% url "quize737:next_question" %}'>
 
     <!--Скрытое поле с id теста пользователя -->
@@ -82,6 +85,7 @@
     <br>
     <button type="submit" class="btn btn-primary">Ответить</button>
   </form>
+    </fieldset>
 </section>
 
 {% endblock %}

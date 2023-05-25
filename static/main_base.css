@@ -43,8 +43,8 @@ aside {
 section {
     position: absolute;
     left: 1%;
-    top: 5%;
-    width: 100%;
+    top: -30%;
+    width: 98%;
 
 }
 
@@ -80,7 +80,7 @@ span.a_list {
 div.left_side {
     position: absolute;
     display: inline-block;
-    width: 78%;
+    width: 99%;
 
 }
 
@@ -93,7 +93,8 @@ div.right_side {
 
 div.result_list {
     position: absolute;
-    right: 38%;
+    right: 2%;
+    left: 2%
 }
 
 
@@ -123,4 +124,25 @@ div.result_list {
 
 h4 {
     color: rgb(209, 209,209);
+}
+
+span.mark_up {
+    color: rgb(209, 209,209);
+    font-size: 19px;
+}
+
+span.main_sign {
+    font-size: 19px;
+}
+
+span.positive {
+    color: rgb(148, 192, 74);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+span.negative{
+    color: rgb(142, 23, 11);
+    font-size: 20px;
+    font-weight: bold;
 }

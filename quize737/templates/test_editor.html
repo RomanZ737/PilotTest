@@ -1,28 +1,23 @@
 {% extends "main_base.html" %}
 
 {% block content %}
-<section>
 
-    <h1>Редактор Тестов</h1>
+<fieldset>
+            <legend>Редактор Тестов</legend>
 
-    <br>
     <h5><a href='{% url "quize737:create_new_test" %}'>+ Добавить тест</a></h5>
     <br>
     {% for test in tests_names %}
-    <a href="{{test.id}}">{{forloop.counter}}.<span class="theme_color">{{test.name}}</span><span style="color: black;"></span></a>
-    <a href="{% url 'quize737:del_test' test.id %}">Удалить тест</a>
+    <a href="{{test.id}}"><span style="color: black;">{{forloop.counter}}.</span> {{test.name}}</a>
+    <span style="color: black;"> | </span><a href="{% url 'quize737:del_test' test.id %}">Удалить тест</a>
     <br>
     {% endfor %}
+    <br>
+    {% include "paginator.html" with page=tests_names %}
 
+<!--<form method='get' action='{% url "quize737:start" %}'>-->
+<!--<button type="submit">На главную</button>-->
+<!--</form>-->
+</fieldset>
 
-<br>
-
-<br>
-
-
-<br>
-<form method='get' action='{% url "quize737:start" %}'>
-<button type="submit">На главную</button>
-</form>
-</section>
 {% endblock %}

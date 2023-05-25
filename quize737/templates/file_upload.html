@@ -4,7 +4,17 @@
 
 <div class="left_side">
 <fieldset>
-    <legend>Загрузить файла с вопросами</legend>
+    <legend>
+        <a href="{% url 'quize737:question_list' %}">Список вопросов</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:new_question' %}">Добавить вопрос</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:theme_editor' %}">Редактировать Темы</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:file_upload' %}">ЗАГРУЗИТЬ ФАЙЛ</a>
+            <span style="color: black;"> | </span>
+            <a href="pass">Скачать базу</a>
+    </legend>
     {% if uploaded %}
         <div class="disappear">
             <p>Файл загружен</p>
@@ -39,15 +49,15 @@
     {% endfor %}
 </div>
 
-<div class="right_side">
-        <fieldset>
-            <legend>Редактировать</legend>
+<!--<div class="right_side">-->
+<!--        <fieldset>-->
+<!--            <legend>Редактировать</legend>-->
 
-            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>
-            <p><a href="pass">Редактировать Темы</a></p>
-            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>
-            <p><a href="pass">Скачать базу</a></p>
+<!--            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>-->
+<!--            <p><a href="pass">Редактировать Темы</a></p>-->
+<!--            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>-->
+<!--            <p><a href="pass">Скачать базу</a></p>-->
 
-        </fieldset>
-</div>
+<!--        </fieldset>-->
+<!--</div>-->
 {% endblock %}

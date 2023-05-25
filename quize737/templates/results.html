@@ -2,23 +2,27 @@
 
 {% block content %}
 <section>
+<fieldset>
+    <legend>Результат теста</legend>
 
-<h1>{{user_name}}</h1>
+<h1>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</h1>
 <br>
-<h2>Общее количество вопросов: {{total_num_q}}</h2>
-<br>
-<h2>Количество правильных ответов: {{correct_q_num}}</h2>
-<br>
-<h2>Результать теста с учётом "веса" вопросов {{total_result}}%</h2>
+    <h2>Общее количество вопросов: <span class="mark_up">{{total_num_q}}</span></h2>
+
+    <h2>Количество правильных ответов: <span class="mark_up">{{correct_q_num}}</span></h2>
+
+    <h2>Результать теста с учётом "веса" вопросов <span class="mark_up">{{total_result}}%</span></h2>
+
     {% if conclusion%}
-    <h2>Тест пройден успешно</h2>
+    <span class="positive">ТЕСТ СДАН</span>
     {% else %}
-    <h2>Тест не сдан</h2>
+    <span class="negative">ТЕСТ НЕ СДАН</span>
     {% endif %}
 
 <br>
 <form method='get' action='{% url "start" %}'>
 <button type="submit">На главную</button>
 </form>
+</fieldset>
 </section>
 {% endblock %}

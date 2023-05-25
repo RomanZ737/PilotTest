@@ -1,13 +1,29 @@
 <!-- Отчеты по результатам тестов -->
 
-{% extends "base_start.html" %}
+{% extends "main_base.html" %}
 
 {% load static %}
 
 {% block content %}
+
+
+
 <div class="result_list">
+    <fieldset>
+            <legend>Результаты тестирования</legend>
     {% for i in results %}
-    <p><a href="{{i.id}}">{{i}}</a><a href="{% url 'quize737:download_test_result' id=i.id %}"><span> | </span><img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"><span>|</span></a></p>
+    <p><a href="{{i.id}}">{{i}}</a><a href="{% url 'quize737:download_test_result' id=i.id %}"><span style="color: black"> | </span><img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"><span style="color: black">|</span></a>
+    {% if i.conclusion%}
+    <span class="positive">ТЕСТ СДАН</span>
+    {% else %}
+    <span class="negative">ТЕСТ НЕ СДАН</span>
+    {% endif %}
+        <span> | </span>
+    </p>
     {% endfor %}
+        {% include "paginator.html" with page=results %}
+         </fieldset>
 </div>
+
+
 {% endblock %}

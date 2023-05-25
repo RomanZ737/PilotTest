@@ -6,7 +6,17 @@
 
 <div class="left_side">
 <fieldset>
-        <legend>Редактировать вопрос</legend>
+        <legend>
+            <a href="{% url 'quize737:question_list' %}">СПИСОК ВОПРОСОВ</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:new_question' %}">Добавить вопрос</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:theme_editor' %}">Редактировать Темы</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
+            <span style="color: black;"> | </span>
+            <a href="pass">Скачать базу</a>
+        </legend>
         <form id="question_data" method='post'>
             {% csrf_token %}
 <!--            {% for error in question_form.errors %}-->
@@ -23,28 +33,33 @@
             <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
             <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
             <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
-            <button type="submit">Сохранить</button>
         </form>
-        <form method="post" action="{% url 'quize737:question_del' q_id %}">
+
+        <form method="post" action="{% url 'quize737:question_del' q_id %}" id="del_question_form">
             {% csrf_token %}
-            <button type="submit">Удалить вопрос</button>
         </form>
-        <form method='get' action='{% url "quize737:question_list" %}'>
-            <button type="submit">Вернуться</button>
+        <form method='get' action='{% url "quize737:question_list" %}' id="back_to_list">
         </form>
+<!--    Кнопки к формам-->
+        <input type="submit" value="Сохранить" form="question_data">
+        <span style="color: black;"> | </span>
+        <input type="submit" value="Удалить вопрос" form="del_question_form" onclick="return confirm('Удалить Вопрос?') || event.preventDefault()">
+<!--        <br>-->
+<!--        <input type="submit" value="Вернуться" form="back_to_list">-->
+
 </fieldset>
 </div>
-<div class="right_side">
-        <fieldset>
-            <legend>Редактировать</legend>
+<!--<div class="right_side">-->
+<!--        <fieldset>-->
+<!--            <legend>Редактировать</legend>-->
 
-            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>
-            <p><a href="pass">Редактировать Темы</a></p>
-            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>
-            <p><a href="pass">Скачать базу</a></p>
+<!--            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>-->
+<!--            <p><a href="pass">Редактировать Темы</a></p>-->
+<!--            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>-->
+<!--            <p><a href="pass">Скачать базу</a></p>-->
 
-        </fieldset>
-</div>
+<!--        </fieldset>-->
+<!--</div>-->
 
 
 <p id="demo"></p>
