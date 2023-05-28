@@ -11,10 +11,10 @@
                 <p>{{ user.email }}</p>
             {% endif %}
 
-            {% if user.profile.position %}
+<!--            {% if user.profile.position %}-->
                 <h4>Должность:</h4>
-                <p>{{user.profile.position}}</p>
-            {% endif %}
+                <p>{{user.profile.get_position_display}}</p>
+<!--            {% endif %}-->
             <h4>Логин:</h4>
                  <p>{{ user.username }}</p>
 

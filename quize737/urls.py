@@ -34,6 +34,7 @@ urlpatterns = [
     path('theme_editor/', views.theme_editor, name='theme_editor'),
     path('theme_editor/<int:id>/', views.theme_editor, name='theme_editor'),
     path('theme_editor/<int:id>/theme_del/', views.theme_del, name='theme_del'),
-    path('new_theme/', views.new_theme, name='new_theme')
+    path('new_theme/', views.new_theme, name='new_theme'),
+    path('question_form_file_download/', views.question_form_file_download, name='question_form_file_download')
 
     ]

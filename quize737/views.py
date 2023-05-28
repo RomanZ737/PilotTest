@@ -948,3 +948,11 @@ def file_upload(request):
     else:
         context = {"upload_form": upload_form, 'uploaded': False}
         return render(request, 'file_upload.html', context=context)
+
+
+# Скачивание формы для заполнения вопросов
+def question_form_file_download(request):
+    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    path_to_file = dir_path + '/static/PilotTest.xlsx'
+    f = open(path_to_file, 'rb')
+    return FileResponse(f, as_attachment=True, filename='PilotTest.xlsx')

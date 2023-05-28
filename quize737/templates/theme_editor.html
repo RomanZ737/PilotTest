@@ -13,6 +13,8 @@
             <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
             <span style="color: black;"> | </span>
             <a href="pass">Скачать базу</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
         </legend>
     <p><a href="{% url 'quize737:new_theme' %}">+ Добавить тему</a></p>
         {% for theme in themes %}
