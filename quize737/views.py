@@ -5,6 +5,7 @@ import random
 import io
 import csv
 import re
+import sys
 
 import common
 from common import send_email
@@ -18,6 +19,7 @@ from django.forms import formset_factory, BaseFormSet
 from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
 from django.utils import six
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -714,16 +716,53 @@ def del_test(request, id):
 @group_required('KRS')
 def user_list(request):
     if request.method == 'POST':
-        print('POST:', request.POST)
+        pass
     else:
-        print('HERE GET:', dir(request))
-        total_user_list = Profile.objects.all()
-        #  Постраничная разбивка
-        paginator = Paginator(total_user_list, 20)
-        page_number = request.GET.get('page', 1)
-        users = paginator.page(page_number)
-        context = {'user_list': users}
-        return render(request, 'user_list.html', context=context)
+        user_search_input = request.GET.get("user_search")
+        print('user_search_input:', user_search_input)
+        no_search_result = False
+        if user_search_input:
+            user_search_data = request.GET.get("user_search").split()
+            # user_search_data = user_search_input
+            # total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data}') |
+            #                                          Q(first_name__icontains=f'{user_search_data}')
+            #                                          )
+
+            if len(user_search_data) == 3:
+                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'), Q(first_name__icontains=f'{user_search_data[1]}'), Q(middle_name__icontains=f'{user_search_data[2]}'))
+            elif len(user_search_data) == 2:
+                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'), Q(first_name__icontains=f'{user_search_data[1]}'))
+                    if not total_user_list:
+                        print('HEREEEEE NEW')
+                        total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
+                                                                 Q(middle_name__icontains=f'{user_search_data[1]}'))
+
+            elif len(user_search_data) == 1:
+                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}') | Q(first_name__icontains=f'{user_search_data[0]}') | Q(middle_name__icontains=f'{user_search_data[0]}'))
+            else:
+                no_search_result = True
+                results = f'Пилоты по запросу "{user_search_input}" не найдены'
+                context = {'no_search_results': no_search_result, 'results': results}
+                return render(request, 'user_list.html', context=context)
+            if not total_user_list:
+                no_search_result = True
+                results = f'Пилоты по запросу "{user_search_input}" не найдены'
+                context = {'no_search_results': no_search_result, 'results': results}
+                return render(request, 'user_list.html', context=context)
+            else:
+                paginator = Paginator(total_user_list, 20)
+                page_number = request.GET.get('page', 1)
+                users = paginator.page(page_number)
+                context = {'user_list': users, 'no_search_results': no_search_result}
+                return render(request, 'user_list.html', context=context)
+        else:
+            total_user_list = Profile.objects.all()
+            #  Постраничная разбивка
+            paginator = Paginator(total_user_list, 20)
+            page_number = request.GET.get('page', 1)
+            users = paginator.page(page_number)
+            context = {'user_list': users, 'no_search_results': no_search_result}
+            return render(request, 'user_list.html', context=context)
 
 
 @login_required
