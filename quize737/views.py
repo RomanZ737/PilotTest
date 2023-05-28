@@ -733,7 +733,6 @@ def user_list(request):
             elif len(user_search_data) == 2:
                     total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'), Q(first_name__icontains=f'{user_search_data[1]}'))
                     if not total_user_list:
-                        print('HEREEEEE NEW')
                         total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
                                                                  Q(middle_name__icontains=f'{user_search_data[1]}'))
 
