@@ -811,7 +811,10 @@ def user_detales(request, id):
 
                     #  Отправляем письмо пользователю
                     subject = f"Вам назначен Тест: '{test['test_name']}'"
-                    message = f"Уважаемый, {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}.\nВам назначен тест {test['test_name']} на портале {config('SITE_URL', default='')}.\nТест необходимо выполнить до {test['date_before']}"
+                    message = f"<h4>Уважаемый, {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}.</h4>" \
+                              f"Вам назначен тест: <b>'{test['test_name']}'</b><br>" \
+                              f"На портале {config('SITE_URL', default='')}<br>" \
+                              f"Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b>"
 
                     email_msg = {'subject': subject, 'message': message, 'to': request.user.email}
                     send_email(request, email_msg)

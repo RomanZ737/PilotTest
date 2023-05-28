@@ -18,13 +18,13 @@ def send_email(request, email_msg):
 
     # Делаем альтернативную версию HTML
     logo_cid = make_msgid()
-    msg.add_alternative("""\
+    msg.add_alternative("""
     <html>
         <head>
-            <img src="cid:{nws_logo}" />
+            <img src="cid:{nws_logo}" width="270" height="80">
       </head>
       <body>
-        <p>"{message}"</p>
+        <p>{message}</p>
       </body>
     </html>
     """.format(message=email_msg['message'], nws_logo=logo_cid[1:-1]), subtype='html')
