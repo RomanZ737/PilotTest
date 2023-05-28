@@ -1,9 +1,12 @@
 {% extends "main_base.html" %}
 
 {% block content %}
-<section>
+<fieldset>
+    <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
+
+
     <h1> {{user_profile.family_name}} {{user_profile.first_name}} {{user_profile.middle_name}}</h1>
-    <p>{{user_profile}}</p>
+    <p>{{user_profile.get_position_display}}</p>
 
     <h4>{{non_form_errors}}</h4>
     {% for error in form_errors%}
@@ -30,20 +33,20 @@
         <br>
         {% endfor %}
 
-        <button id="add-form" type="button">Назначить новый тест</button>
+        <input id="add-form" type="submit" value="+ Назначить новый тест">
         <br>
         <br>
 
       <input type="submit" value="Сохранить">
     </form>
-    <form method='get' action='{% url "quize737:user_list" %}'>
-        <button type="submit">Вернуться</button>
-    </form>
+<!--    <form method='get' action='{% url "quize737:user_list" %}'>-->
+<!--        <button type="submit">Вернуться</button>-->
+<!--    </form>-->
     <div class="form_set" style="display:none">
         <span class="empty_form">Название теста: {{ user_tests.empty_form.test_name }} Количество попыток: {{ user_tests.empty_form.num_try }} Выполнить до: {{user_tests.empty_form.date_before}}</span><span>{{user_tests.empty_form.DELETE}} Удалить тест </span>
     </div>
 
-</section>
+</fieldset>
 
 <p id="demo_0"></p>
 <p id="demo_1"></p>

@@ -2,7 +2,7 @@
 
 {% block content %}
 <fieldset>
-            <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
+            <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">ГРУППЫ</a></legend>
     {% for group in groups %}
     <a href="{{group.id}}"><span style="color: black;">{{forloop.counter}}. </span><span class="theme_color">{{group}}</span></a>
     <br>

@@ -387,7 +387,7 @@ def one_them_q(request):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 # Все результаты тестов
 def tests_results_list(request):
     results_list = QuizeResults.objects.all()
@@ -399,7 +399,7 @@ def tests_results_list(request):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 # Детали результатов теста
 def test_result_details(request, id):
     result = QuizeResults.objects.filter(id=id).values()
@@ -409,7 +409,7 @@ def test_result_details(request, id):
 
 # Список вопросов из базы
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def question_list(request):
     question_list = QuestionSet.objects.all()
     paginator = Paginator(question_list, 7)
@@ -421,7 +421,7 @@ def question_list(request):
 
 # Добавить новый вопрос в базу вопросов
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def new_question(request):
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
@@ -441,7 +441,7 @@ def new_question(request):
 
 # Редактирование конкретно взятого вопроса
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def question_list_details(request, id):
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
@@ -475,7 +475,7 @@ def question_del(request, id):
 
 # Редактор тем вопросов
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def theme_editor(request, id=None):
     if request.method == 'POST':
         form = NewThemeForm(request.POST)
@@ -521,7 +521,7 @@ def new_theme(request):
 
 # Удаление темы
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def theme_del(request, id):
     Thems.objects.get(id=id).delete()
     return redirect('quize737:theme_editor')
@@ -529,7 +529,7 @@ def theme_del(request, id):
 
 # Скачивание результата теста
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def download_test_result(request, id):
     result = QuizeResults.objects.filter(id=id).values()
     buffer = io.BytesIO()
@@ -608,7 +608,7 @@ class BaseUserTestFormSet(BaseFormSet):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def test_editor(request):
     tests_names = TestConstructor.objects.all()
     paginator = Paginator(tests_names, 7)
@@ -619,7 +619,7 @@ def test_editor(request):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def create_new_test(request):
     QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
@@ -661,7 +661,7 @@ def create_new_test(request):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 # Редактируем Детали уже существующего конекретного теста
 def test_details(request, id):
     QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
@@ -704,18 +704,19 @@ def test_details(request, id):
 
 # Удаляем тест
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def del_test(request, id):
     TestConstructor.objects.get(id=id).delete()
     return redirect('quize737:test_editor')
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def user_list(request):
     if request.method == 'POST':
-        pass
+        print('POST:', request.POST)
     else:
+        print('HERE GET:', dir(request))
         total_user_list = Profile.objects.all()
         #  Постраничная разбивка
         paginator = Paginator(total_user_list, 20)
@@ -726,7 +727,7 @@ def user_list(request):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 def group_list(request):
     if request.method == 'POST':
         pass
@@ -740,7 +741,7 @@ def group_list(request):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 # Обрабатываем вызов деталей конкретного пользователя для назначения тестов
 def user_detales(request, id):
     UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
@@ -802,7 +803,7 @@ def user_detales(request, id):
 
 
 @login_required
-@group_required('krs')
+@group_required('KRS')
 #  Загрузка файла с вопросами
 def file_upload(request):
     upload_form = FileUploadForm()

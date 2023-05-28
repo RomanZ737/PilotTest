@@ -2,8 +2,15 @@
 
 {% block content %}
 <fieldset>
-    <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
+    <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
 <!--    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>-->
+
+
+    <form id="user_search">
+        <input type="text" placeholder="Поиск пилота...">
+        <input type="submit" value="Искать">
+    </form>
+
     {% for user in user_list %}
     <span style="color: black;">{{forloop.counter}}. </span><a href="{{user.id}}">{{user.family_name}} {{user.first_name}} {{user.middle_name}}</a><span style="color: black;"> | </span> <span class="theme_color">{{user.position}}</span>
     <br>
