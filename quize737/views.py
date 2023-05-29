@@ -88,7 +88,6 @@ def start(request, id=None):
             if q_set['theme'] == 5:
                 for theme in Thems.objects.all():
                     if theme.name != 'Все темы':
-                        print('theme', theme.name)
                         quiz_set = QuestionSet.objects.filter(them_name=theme.id)
                         quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
                         all_theme_set.append(quiz_set)
@@ -181,7 +180,6 @@ def start(request, id=None):
         if id:
             user_test = UserTests.objects.filter(test_name=id)
             user_tests = UserTests.objects.filter(user=request.user)
-            print('user_test', user_test[0])
             test_instance = TestConstructor.objects.get(id=id)
             test_question_sets = TestQuestionsBay.objects.filter(test_id=id)
             context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
@@ -209,10 +207,6 @@ def next_question(request):
 
         # Проверяем вид вопроса
         if request.POST.get('q_kind') == 'True':
-
-            # DEBUG PRINT
-            print('МУЛЬТИОТВЕТНЫЙ ВОПРОС')
-
             user_answers_list = []
             for a in request.POST.keys():
                 if 'user_answer' in a:
@@ -220,9 +214,6 @@ def next_question(request):
 
             # Если ответ пользователя правильный
             if request.POST.get('answers') == ','.join(user_answers_list):
-
-                # DEBUG PRINT
-                print('Привильный ответ')
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                 user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
@@ -246,14 +237,8 @@ def next_question(request):
                 print('Не правильный ответ')
 
         else:
-            # DEBUG PRINT
-            print('ОБЫЧНЫЙ ВОПРОС')
-
             # Если пользователь правильно ответил на вопрос:
             if request.POST.get('answer') == request.POST.get('user_answer'):
-
-                # DEBUG PRINT
-                print('Правильный ответ')
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                 user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
@@ -462,7 +447,6 @@ def question_list_details(request, id):
                                                           'option_4', 'option_5', 'q_kind', 'q_weight', 'answer',
                                                           'answers', 'id')
         question_form = QuestionSetForm(result[0])
-        print('error:', question_form.errors)
 
         context = {'question_form': question_form, 'q_id': result[0]['id']}
 
@@ -630,8 +614,6 @@ def create_new_test(request):
         test_q_set = QuestionFormSet(request.POST, request.FILES, initial=[{'theme': '5', 'q_num': '4'}],
                                      prefix="questions")
         test_name_form = NewTestFormName(request.POST, prefix="test_name")
-        # print('dir_name:', dir(test_name_form))
-        # print('clean_name:', test_name_form.data['test_name-name'])
 
         if test_q_set.is_valid() and test_name_form.is_valid():
             # Создаём объект теста
@@ -657,7 +639,6 @@ def create_new_test(request):
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
         test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4'}], prefix='questions')
-        # print('test_q_set', test_q_set)
         context = {'test_name_form': test_name_form, 'test_q_set': test_q_set}
         return render(request, 'new_test_form.html', context=context)
 
@@ -696,7 +677,6 @@ def test_details(request, id):
 
     else:
         result = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score')
-        print('result:', result)
         test_name_form = NewTestFormName(result[0])  # Форма с названием теста
         test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
         test_q_set = QuestionFormSet(initial=test_questions, prefix='questions')
@@ -719,14 +699,9 @@ def user_list(request):
         pass
     else:
         user_search_input = request.GET.get("user_search")
-        print('user_search_input:', user_search_input)
         no_search_result = False
         if user_search_input:
             user_search_data = request.GET.get("user_search").split()
-            # user_search_data = user_search_input
-            # total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data}') |
-            #                                          Q(first_name__icontains=f'{user_search_data}')
-            #                                          )
 
             if len(user_search_data) == 3:
                 total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'), Q(first_name__icontains=f'{user_search_data[1]}'), Q(middle_name__icontains=f'{user_search_data[2]}'))
@@ -790,7 +765,6 @@ def user_detales(request, id):
 
     if request.method == 'POST':
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
-        print('request.POST', request.POST)
         if tests_for_user_form.is_valid():
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
@@ -809,14 +783,15 @@ def user_detales(request, id):
                                              num_try=test['num_try'],
                                              date_before=test['date_before'])
 
+                    print('USER:', user[0].profile.family_name, user[0].email)
                     #  Отправляем письмо пользователю
                     subject = f"Вам назначен Тест: '{test['test_name']}'"
-                    message = f"<h4>Уважаемый, {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}.</h4>" \
+                    message = f"<h4>Уважаемый, {user[0].profile.family_name} {user[0].profile.first_name} {user[0].profile.middle_name}.</h4>" \
                               f"Вам назначен тест: <b>'{test['test_name']}'</b><br>" \
                               f"На портале {config('SITE_URL', default='')}<br>" \
                               f"Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b>"
 
-                    email_msg = {'subject': subject, 'message': message, 'to': request.user.email}
+                    email_msg = {'subject': subject, 'message': message, 'to': user[0].email}
                     send_email(request, email_msg)
 
             # Загружаем новые данные в форму
@@ -849,7 +824,6 @@ def user_detales(request, id):
 def file_upload(request):
     upload_form = FileUploadForm()
     if request.method == 'POST':
-        # print('upload FILES:', request.FILES['docfile'])
 
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -892,14 +866,11 @@ def file_upload(request):
                                 else:
                                     q_kind = False
                                     answers = row['answers']
-                                    print('answers before:', answers)
                                     answers = answers.replace(' ', '')
-                                    print('answers:', answers)
                                     if len(answers) < 2:
                                         wrong_data.append(
                                             f'В поле "Ответы" должно быть больше одной цифры и они должны быть разделены запятыми без пробелов {reader.line_num}')
                                         continue
-
                                 if not row['q_weight']:
                                     q_weight = 0.0
                                 else:
@@ -930,7 +901,6 @@ def file_upload(request):
                         else:
                             for data in row.values():
                                 alpha = False
-                                print('data:', data)
                                 if data is not None:
                                     if len(data) > 2:
                                         alpha = True

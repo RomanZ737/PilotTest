@@ -4,7 +4,11 @@
 <section>
 
     <fieldset>
-        <legend>Вопрос</legend>
+        <legend>
+        {% if q_num_left %}
+                <span class="q_num_count">Осталось {{q_num_left}}</span>
+            {% endif %}
+        </legend>
 
 <form method='post' action='{% url "quize737:next_question" %}'>
 
@@ -83,9 +87,24 @@
 
     <br>
     <br>
-    <button type="submit" class="btn btn-primary">Ответить</button>
+    <input type="submit" value="Ответить" id="answer_btn">
+    <span id="wait" style="display: none;">Ответ принят, ожидайте...</span>
   </form>
+
     </fieldset>
 </section>
+<script type="text/javascript">
+
+    const btn = document.getElementById('answer_btn');
+
+btn.addEventListener('click', () => {
+  btn.style.display = 'none';
+  const box = document.getElementById('wait');
+  box.style.display = 'block';
+});
+
+</script>
 
 {% endblock %}
+
+

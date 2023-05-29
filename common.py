@@ -21,7 +21,7 @@ def send_email(request, email_msg):
     msg.add_alternative("""
     <html>
         <head>
-            <img src="cid:{nws_logo}" width="270" height="80">
+            <img src="cid:{nws_logo}" width="250" height="70">
       </head>
       <body>
         <p>{message}</p>

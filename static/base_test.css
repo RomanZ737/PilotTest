@@ -4,7 +4,7 @@ body {
 
 header {
     position: relative;
-    height: 10%;
+    height: 14%;
 }
 
 nav{
@@ -23,7 +23,7 @@ main {
 
 section {
     position: absolute;
-    top: 180%;
+    top: 5%;
     left: 4%;
     right: 4%;
 }
