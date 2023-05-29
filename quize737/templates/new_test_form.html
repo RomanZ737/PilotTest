@@ -26,7 +26,7 @@
         {{ test_q_set.management_form }}
         {% for form in test_q_set.forms %}
         <div class="q_forms">
-            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }} {{form.q_num.help_text}} </span><span id="max_q{{form.id}}"></span>
+            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }} {{form.q_num.help_text}} </span><span id="max_q_{{forloop.counter}}">Max. </span>
 
         </div>
         <br>
