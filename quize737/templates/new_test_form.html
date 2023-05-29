@@ -58,22 +58,24 @@
 <!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
 
 <script type="text/javascript">
-        // Вычисление количества вопросов
 
+        // Вычисление количества вопросов
         //let form_for_num_Regex = RegExp(`questions-(\\d){1}-form`,'g')   //Регулярное выражение для поиска формы
         let Select = document.querySelectorAll("select");
         //document.getElementById("demo").innerHTML = "Value: " + Select
-        for (i of Select) {
+        var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
 
-                i.addEventListener('change', ThemSelection);
+        for (i of Select) {
+                i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
                 // Вынемаем порядковый номер формы, для сихронизации с полем количества вопросов
-                var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
+
                 let select_id = i.name.match( numberPattern ) // Номер поля
+
                 document.getElementById("demo_1").innerHTML = "Value_1: " + select_id
+
                 let valueOfSelect = i.value //Вынимаем значение выбранного поля
                 let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
-                //let numOfQField =
-                document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода
+                document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
                 //numOfQField.setAttribute('value', `${numOfqAct}`)  // Устанавливаем знеачение поля
                 document.getElementById("demo_0").innerHTML = "Value_0: " + valueOfSelect
 
@@ -83,6 +85,10 @@
             event.preventDefault()
             //let TargetName = event.target
             document.getElementById("demo_0").innerHTML = "Value: " + event.target.value
+            let select_id = event.target.name.match( numberPattern ) // Номер поля
+            let valueOfSelect = event.target.value //Вынимаем значение выбранного поля
+            let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
+            document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
             }
 
         //Создаём новые формы
