@@ -111,6 +111,7 @@ class TestQuestionsBay(models.Model):
     test_id = models.ForeignKey(TestConstructor, on_delete=models.CASCADE, verbose_name='id теста',
                                 help_text='id теста которому принадлежит вопрос')
     q_num = models.IntegerField(verbose_name='Количество вопросов по теме')
+    #max_q_num = models.IntegerField(verbose_name='Максимальное Количество вопросов по теме', null=True)
 
     class Meta:
         unique_together = ('theme', 'test_id')

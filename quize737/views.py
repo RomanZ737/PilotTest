@@ -636,10 +636,22 @@ def create_new_test(request):
                        'form_errors': form_errors}
             return render(request, 'new_test_form.html', context=context)
     else:
+        thems = Thems.objects.all()
+        total_q_num_per_them = {}
+        totla_q_num = 0
+        for them_name in thems:
+            # Считаем количество вопросов в каждой теме, кроме "Все темы"
+            if them_name.id != 5:
+                q_num = QuestionSet.objects.filter(them_name=them_name).count()
+                total_q_num_per_them[f'{them_name.id}'] = q_num
+                totla_q_num +=1
+        total_q_num_per_them['5'] = totla_q_num
+        print("Q_NUM DICT:", total_q_num_per_them)
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
-        test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4'}], prefix='questions')
-        context = {'test_name_form': test_name_form, 'test_q_set': test_q_set}
+        test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
+        #print('form_set:', dir(test_q_set[0]))
+        context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them}
         return render(request, 'new_test_form.html', context=context)
 
 

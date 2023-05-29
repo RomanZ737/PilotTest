@@ -1,14 +1,19 @@
 {% extends "main_base.html" %}
 
 {% block content %}
-<section>
 
-    <h1>Создание теста</h1>
+<fieldset>
+    <legend>Создание теста</legend>
     <br>
     <h4>{{non_form_errors}}</h4>
 
     {% for error in form_errors%}
     <h4>{{error}}</h4>
+    {% endfor %}
+
+    <!--Перебираем количество вопросов по темам-->
+    {% for them, q_num in q_num_per_them.items %}
+        <input type="hidden" id="{{them}}" value="{{q_num}}">
     {% endfor %}
 
     <form id="question_form" method='post'>
@@ -21,33 +26,52 @@
         {{ test_q_set.management_form }}
         {% for form in test_q_set.forms %}
         <div class="q_forms">
-            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span>
+            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }} {{form.q_num.help_text}} </span><span id="max_q{{form.id}}"></span>
+
         </div>
         <br>
         {% endfor %}
-        <button id="add-form" type="button">Добавить тему</button>
+        <input id="add-form" type="button" value="+ Добавить тему">
         <br>
         <br>
-      <input type="submit" value="Сохранить">
-    </form>
 
+    </form>
+<form method='get' id="go_back" action='{% url "quize737:test_editor" %}'>
+
+</form>
+
+    <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input type="submit" value="Вернуться" form="go_back">
 
     <div id="empty_form" style="display:none">
     {{ test_q_set.empty_form }}
 </div>
 
-<br>
-<form method='get' action='{% url "quize737:test_editor" %}'>
-<button type="submit">Вернуться</button>
-</form>
-</section>
+</fieldset>
 
 
+
+<p id="demo"></p>
 
 <!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
 
 <script type="text/javascript">
+        // Вычисление количества вопросов
 
+        //let form_for_num_Regex = RegExp(`questions-(\\d){1}-form`,'g')   //Регулярное выражение для поиска формы
+        let Select = document.querySelectorAll("select");
+        //document.getElementById("demo").innerHTML = "Value: " + Select
+        for (i of Select) {
+                //document.getElementById("demo").innerHTML = "Value: " + i
+                i.addEventListener('change', ThemSelection);
+             };
+
+        function ThemSelection(event){
+            event.preventDefault()
+            //let TargetName = event.target
+            document.getElementById("demo").innerHTML = "Value: " + event.target.value
+            }
+
+        //Создаём новые формы
         let qForm = document.querySelectorAll(".q_forms")
         let container = document.querySelector("#question_form")
         let addButton = document.querySelector("#add-form")

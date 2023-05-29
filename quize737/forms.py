@@ -1,6 +1,7 @@
 from .models import QuestionSet, TestConstructor, TestQuestionsBay, Thems
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms import ModelForm, Textarea, NumberInput
 
 
 # Валидатор для формы QuestionSetForm - проверят уникальность вопроса
@@ -39,6 +40,7 @@ def similar_test_name(value):
     if len(test_name) > 0:
         raise ValidationError('Тест с таким именем уже существует')
 
+
 # Форма для имени создаваемого и теста
 class NewTestFormName(forms.Form):
 
@@ -47,7 +49,7 @@ class NewTestFormName(forms.Form):
         self.fields['name'].validators = [similar_test_name]
 
     name = forms.CharField(max_length=25, initial='Новый Тест')
-    pass_score = forms.IntegerField(initial=70, widget=forms.NumberInput(attrs={'size': '5',
+    pass_score = forms.IntegerField(initial=70, widget=forms.NumberInput(attrs={'size': '3',
                                                                                 'max': '100',  # For maximum number
                                                                                 'min': '0',  # For minimum number
                                                                                 }))
@@ -57,11 +59,21 @@ class NewTestFormName(forms.Form):
 class NewTestFormQuestions(forms.ModelForm):
     class Meta:
         model = TestQuestionsBay
-        fields = ['theme', 'q_num']
+        fields = ['theme', 'q_num', ]
 
         # labels = {'name': _('Writer'),}
         # help_texts = {'name': _('Some useful help text.'),}
         error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"}, }
+        widgets = {
+            "q_num": NumberInput(attrs={'size': '3', 'min': '1'}),
+        }
+
+        # def __init__(self, *args, **kwargs):
+        #     super(NewTestFormQuestions, self).__init__(*args, **kwargs)
+        #     self.fields['family_name'].disabled = True
+        # help_texts = {
+        #     'q_num': 'Маx',
+        # }
 
 
 #  Форма для загрузки файла
