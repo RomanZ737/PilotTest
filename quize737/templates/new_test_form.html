@@ -65,7 +65,7 @@
         //document.getElementById("demo").innerHTML = "Value: " + Select
         var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
 
-        for (i of Select) {
+        for (i of Select) {  // Пребираем уже существующие поля, вешаем listener и подставляем количество вопросов из темы
                 i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
                 // Вынемаем порядковый номер формы, для сихронизации с полем количества вопросов
 
