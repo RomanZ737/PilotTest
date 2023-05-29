@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% load django_template_maths %}
+
 <fieldset>
     <legend>Создание теста</legend>
     <br>
@@ -26,7 +28,7 @@
         {{ test_q_set.management_form }}
         {% for form in test_q_set.forms %}
         <div class="q_forms">
-            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }} {{form.q_num.help_text}} </span><span id="max_q_{{forloop.counter}}">Max. </span>
+            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }} {{form.q_num.help_text}} </span><span id="max_q_{{ forloop.counter|sub:'1' }}">Max. </span>
 
         </div>
         <br>
@@ -42,15 +44,16 @@
 
     <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input type="submit" value="Вернуться" form="go_back">
 
-    <div id="empty_form" style="display:none">
-    {{ test_q_set.empty_form }}
-</div>
+<!--    <div id="empty_form" style="display:none">-->
+<!--    {{ test_q_set.empty_form }}-->
+<!--</div>-->
 
 </fieldset>
 
 
 
-<p id="demo"></p>
+<p id="demo_0"></p>
+<p id="demo_1"></p>
 
 <!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
 
@@ -61,14 +64,25 @@
         let Select = document.querySelectorAll("select");
         //document.getElementById("demo").innerHTML = "Value: " + Select
         for (i of Select) {
-                //document.getElementById("demo").innerHTML = "Value: " + i
+
                 i.addEventListener('change', ThemSelection);
+                // Вынемаем порядковый номер формы, для сихронизации с полем количества вопросов
+                var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
+                let select_id = i.name.match( numberPattern ) // Номер поля
+                document.getElementById("demo_1").innerHTML = "Value_1: " + select_id
+                let valueOfSelect = i.value //Вынимаем значение выбранного поля
+                let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
+                //let numOfQField =
+                document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода
+                //numOfQField.setAttribute('value', `${numOfqAct}`)  // Устанавливаем знеачение поля
+                document.getElementById("demo_0").innerHTML = "Value_0: " + valueOfSelect
+
              };
 
         function ThemSelection(event){
             event.preventDefault()
             //let TargetName = event.target
-            document.getElementById("demo").innerHTML = "Value: " + event.target.value
+            document.getElementById("demo_0").innerHTML = "Value: " + event.target.value
             }
 
         //Создаём новые формы
