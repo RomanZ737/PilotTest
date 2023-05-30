@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% load django_template_maths %}
+
 <fieldset>
             <legend>Редактирование теста</legend>
     <h4>{{non_form_errors}}</h4>
@@ -9,8 +11,14 @@
     {% for error in form_errors%}
     <h4>{{error}}</h4>
     {% endfor %}
-    <form id="question_form" method='post'>
 
+            <!--Перебираем количество вопросов по темам-->
+    {% for them, q_num in q_num_per_them.items %}
+        <input type="hidden" id="{{them}}" value="{{q_num}}">
+    {% endfor %}
+
+
+    <form id="question_form" method='post'>
       {% csrf_token %}
 <!--        <p>{% for name_error in test_name_form.errors.values %}</p>-->
 <!--            <p>{{name_error}}</p>-->
@@ -21,17 +29,17 @@
         {{ test_q_set.management_form }}
         {% for form in test_q_set %}
         <div class="q_forms">
-            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span>
+            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span><span id="max_q_{{ forloop.counter|sub:'1' }}">Max. </span>
         </div>
         <br>
         {% endfor %}
 
-        <input type="submit" id="add-form" value="+ Добавить тему">
+        <input type="button" id="add-form" value="+ Добавить тему">
         <br>
         <br>
         <br>
-      <input type="submit" value="Сохранить"><span style="color: black;"> | </span> <input type="submit" value="Удалить тест" form="del_dest" onclick="return confirm('Удалить Тест?') || event.preventDefault()">
     </form>
+    <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span> <input type="submit" value="Удалить тест" form="del_dest" onclick="return confirm('Удалить Тест?') || event.preventDefault()">
 
     <form method="post" action="{% url 'quize737:del_test' test_id %}" id="del_dest">
     {% csrf_token %}
@@ -39,9 +47,9 @@
 </form>
 
 
-    <div id="empty_form" style="display:none">
-    {{ test_q_set.empty_form }}
-</div>
+<!--    <div id="empty_form" style="display:none">-->
+<!--    {{ test_q_set.empty_form }}-->
+<!--</div>-->
 
 
 
@@ -59,6 +67,50 @@
 
 <script type="text/javascript">
 
+        // Вычисление количества вопросов
+
+        let Select = document.querySelectorAll("select");
+        //document.getElementById("demo").innerHTML = "Value: " + Select
+        var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
+
+        for (i of Select) {  // Перебираем уже существующие поля, вешаем listener и подставляем количество вопросов из темы
+                i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
+                // Вынимаем порядковый номер формы, для сихронизации с полем количества вопросов
+
+                let select_id = i.name.match( numberPattern ) // Номер поля
+
+
+
+                let valueOfSelect = i.value //Вынимаем значение выбранного поля
+                let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
+
+                document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+                let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
+                numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
+
+                //document.getElementById("demo_0").innerHTML = "Value_0: " + valueOfSelect
+
+             };
+
+        function ThemSelection(event){ //Функция отслеживаем выбранную тему и подставляет количество вопросов
+            event.preventDefault()
+            //let TargetName = event.target
+
+            //document.getElementById("demo_0").innerHTML = "Value_0: " + event.target.value
+
+            let select_id = event.target.name.match( numberPattern ) // Номер поля
+
+            //document.getElementById("demo_1").innerHTML = "Value_1: " + select_id
+
+            let valueOfSelect = event.target.value //Вынимаем значение выбранного поля
+            let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
+            document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+            let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
+            numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
+
+            }
+
+        //Создаём новые формы
         let qForm = document.querySelectorAll(".q_forms")
         let container = document.querySelector("#question_form")
         let addButton = document.querySelector("#add-form")
@@ -73,23 +125,30 @@
 
             let newForm = qForm[0].cloneNode(true)
             let formRegex = RegExp(`questions-(\\d){1}-`,'g')
+            let fieldRegex = RegExp(`max_q_(\\d){1}`,'g')
 
 
 
             formNum++
             newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formNum}-`)
+            newForm.innerHTML = newForm.innerHTML.replace(fieldRegex, `max_q_${formNum}`)
             container.insertBefore(newForm, addButton)
             var sp1 = document.createElement("br")
             container.insertBefore(sp1, addButton)
+            newForm.addEventListener('change', ThemSelection); // Вешаем listener на объект select
 
 
 
             totalForms.setAttribute('value', `${formNum+1}`)
 
+            // Устанавливаем начальные значения
             let q_field = document.getElementById(`id_questions-${formNum}-q_num`) // Ищем новое поле с количеством вопросов
-            q_field.setAttribute('value', '')
-            let them_field = document.querySelector(`#id_questions-${formNum}-them`) // Ищем новое поле с темой
+            q_field.setAttribute('value', '1')
+            let them_field = document.getElementById(`id_questions-${formNum}-theme`) // Ищем новое поле с темой
             them_field.value = '5'
+            let numOfqAct = document.getElementById('5').value
+            document.getElementById("max_q_" + formNum).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+
 
         }
 

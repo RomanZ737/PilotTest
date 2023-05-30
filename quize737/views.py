@@ -639,13 +639,16 @@ def create_new_test(request):
         thems = Thems.objects.all()
         total_q_num_per_them = {}
         totla_q_num = 0
+        min_q_them = []
         for them_name in thems:
             # Считаем количество вопросов в каждой теме, кроме "Все темы"
             if them_name.id != 5:
                 q_num = QuestionSet.objects.filter(them_name=them_name).count()
                 total_q_num_per_them[f'{them_name.id}'] = q_num
-                totla_q_num +=1
-        total_q_num_per_them['5'] = totla_q_num
+                totla_q_num += 1
+                min_q_them.append(q_num)
+        min_q_them.sort()
+        total_q_num_per_them['5'] = min_q_them[0]
         print("Q_NUM DICT:", total_q_num_per_them)
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
@@ -688,11 +691,24 @@ def test_details(request, id):
             return render(request, 'test_detailes.html', context=context)
 
     else:
+        thems = Thems.objects.all()
+        total_q_num_per_them = {}
+        totla_q_num = 0
+        min_q_them = []
+        for them_name in thems:
+            # Считаем количество вопросов в каждой теме, кроме "Все темы"
+            if them_name.id != 5:
+                q_num = QuestionSet.objects.filter(them_name=them_name).count()
+                total_q_num_per_them[f'{them_name.id}'] = q_num
+                totla_q_num += 1
+                min_q_them.append(q_num)
+        min_q_them.sort()
+        total_q_num_per_them['5'] = min_q_them[0]
         result = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score')
         test_name_form = NewTestFormName(result[0])  # Форма с названием теста
         test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
         test_q_set = QuestionFormSet(initial=test_questions, prefix='questions')
-        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': result[0]['id']}
+        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': result[0]['id'], 'q_num_per_them': total_q_num_per_them}
         return render(request, 'test_detailes.html', context=context)
 
 
