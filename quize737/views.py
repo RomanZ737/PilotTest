@@ -885,14 +885,14 @@ def file_upload(request):
                                     them_created += 1
                                 #  Проверяем существование вопроса, если такого вопроса нет, создаём его
                                 if row['q_kind'] == 'Один Ответ':
-                                    q_kind = True
+                                    q_kind = False
                                     answer = row['answer']
                                     if len(row['answer']) > 1 or not row['answer'].isdigit():
                                         wrong_data.append(
                                             f'В поле "Ответ" должна быть одна цифра, строка {reader.line_num}')
                                         continue
                                 else:
-                                    q_kind = False
+                                    q_kind = True
                                     answers = row['answers']
                                     answers = answers.replace(' ', '')
                                     if len(answers) < 2:
@@ -905,21 +905,25 @@ def file_upload(request):
                                     q_weight = row['q_weight']
                                 # проверяем наличие вопроса
                                 # TODO: доделать проверку если в фале в вопросе были зменены параметры, а сам вопрос остался прежним
-                                question = QuestionSet.objects.get_or_create(them_name=them[0],
-                                                                             question=row['question'],
-                                                                             option_1=row['option_1'],
-                                                                             option_2=row['option_2'],
-                                                                             option_3=row['option_3'],
-                                                                             option_4=row['option_4'],
-                                                                             option_5=row['option_5'],
-                                                                             q_kind=q_kind,
-                                                                             q_weight=q_weight,
-                                                                             answer=answer,
-                                                                             answers=answers
-                                                                             )
+                                if not QuestionSet.objects.filter(question=row['question']):
+                                    question = QuestionSet.objects.get_or_create(them_name=them[0],
+                                                                                 question=row['question'],
+                                                                                 option_1=row['option_1'],
+                                                                                 option_2=row['option_2'],
+                                                                                 option_3=row['option_3'],
+                                                                                 option_4=row['option_4'],
+                                                                                 option_5=row['option_5'],
+                                                                                 q_kind=q_kind,
+                                                                                 q_weight=q_weight,
+                                                                                 answer=answer,
+                                                                                 answers=answers
+                                                                                 )
+                                    if question[1]:
+                                        questions_created += 1
+                                else:
+                                    print('Вопрос существует')
                                 # Подсчитываем созданные вопросы
-                                if question[1]:
-                                    questions_created += 1
+
 
 
                             else:
