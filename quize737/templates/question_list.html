@@ -18,12 +18,53 @@
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
         </legend>
-        {% for i in questions %}
+        <div class="search-form">
+            <form id="question_search" action="{% url 'quize737:question_list' %}" method="get">
+            <input type="text" name="question_search" placeholder="Поиск вопроса...">
+            <input type="submit" value="Искать">
+            </form>
+        </div>
 
-    <p><a href="{{i.id}}"><span class="theme_color">{{i.them_name}}</span><span style="color: black;"> | </span><span class="a_list">{{i.question}}</span></a><span style="color: black;"> | </span><span><a href="{% url 'quize737:question_del' i.id %}">Удалить вопрос</a></span></p>
+        <div class="filter-form">
+            <form id="theme_filter" action="{% url 'quize737:question_list' %}" method="get">
+                <select name="theme_filter">
+                    {% for option in them_list %}
+                        {% if option.name != 'Все темы'%}
+                            <option value="{{option.id}}">{{option.name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Фильтр">
+            </form>
+        </div>
 
-        {% endfor %}
-        {% include "paginator.html" with page=questions %}
+        {% if no_search_results %}
+            <span style="color: rgb(209, 209,209);">{{results}}</span>
+        {% else %}
+            {% for i in questions %}
+            <div class="block_light_up">
+                <div class="list-them">
+                    <a href="{% url 'quize737:theme_editor' i.them_name.id %}"><span class="theme_color">{{i.them_name}}</span></a>
+                </div>
+                    <span style="color: black;"> | </span>
+                <div class="list-question">
+                    <a href="{{i.id}}">{{i.question}}</a>
+                </div>
+                    <span style="color: black;"> | </span>
+                <div class="list-delete">
+                    <a href="{% url 'quize737:question_del' i.id %}" onclick="return confirm('Удалить вопрос?') || event.preventDefault()">Удалить вопрос</a>
+                </div>
+            </div>
+            {% empty %}
+                <div class="list-question">
+                <span style="color: rgb(209, 209,209);">Вопросы отсутсвуют</span>
+                </div>
+
+            {% endfor %}
+            <br>
+            {% include "paginator.html" with page=questions %}
+
+        {% endif %}
             </fieldset>
 
 </div>

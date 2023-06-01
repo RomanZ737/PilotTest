@@ -166,7 +166,8 @@ def start(request, id=None):
         )
 
         context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id,
-                   'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'], 'q_num_left': total_q_num_for_user}
+                   'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'],
+                   'q_num_left': total_q_num_for_user}
 
         # Проверяем содержит ли вопрос мультивыбор
         if not question[0]['q_kind']:
@@ -312,8 +313,8 @@ def next_question(request):
                 QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(
                     total_result=total_result, conclusion=True)
                 # Вынимаем id теста для удаления теста у пользователя
-                user_test_id = set_instance[0].test_id  #  ID теста пользователя
-                user_test_name = set_instance[0].quize_name  #  Название теста пользователя
+                user_test_id = set_instance[0].test_id  # ID теста пользователя
+                user_test_name = set_instance[0].quize_name  # Название теста пользователя
                 #  Удаляем тест у пользователя
                 UserTests.objects.filter(user=request.user, test_name=user_test_id).delete()
                 context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
@@ -377,12 +378,32 @@ def one_them_q(request):
 @group_required('KRS')
 # Все результаты тестов
 def tests_results_list(request):
-    results_list = QuizeResults.objects.all()
-    paginator = Paginator(results_list, 10)
-    page_number = request.GET.get('page', 1)
-    results_list_pages = paginator.page(page_number)
-    context = {'results': results_list_pages}
-    return render(request, 'tests_results_list.html', context=context)
+    user_search_input = request.GET.get("user_search")
+    no_search_result = False
+    if user_search_input:
+
+        total_results_list = QuizeResults.objects.filter(Q(user_name__icontains=f'{user_search_input}'))
+
+        if not total_results_list:
+            no_search_result = True
+            results = f'Пилоты по запросу "{user_search_input}" не найдены'
+            context = {'no_search_results': no_search_result, 'results': results}
+            return render(request, 'tests_results_list.html', context=context)
+        else:
+            paginator = Paginator(total_results_list, 10)
+            page_number = request.GET.get('page', 1)
+            results_list_pages = paginator.page(page_number)
+            context = {'results': results_list_pages, 'no_search_results': no_search_result}
+            return render(request, 'tests_results_list.html', context=context)
+
+
+    else:
+        results_list = QuizeResults.objects.all()
+        paginator = Paginator(results_list, 10)
+        page_number = request.GET.get('page', 1)
+        results_list_pages = paginator.page(page_number)
+        context = {'results': results_list_pages}
+        return render(request, 'tests_results_list.html', context=context)
 
 
 @login_required
@@ -398,12 +419,38 @@ def test_result_details(request, id):
 @login_required
 @group_required('KRS')
 def question_list(request):
-    question_list = QuestionSet.objects.all()
-    paginator = Paginator(question_list, 7)
-    page_number = request.GET.get('page', 1)
-    questions = paginator.page(page_number)
-    context = {'questions': questions}
-    return render(request, 'question_list.html', context=context)
+    them_list = Thems.objects.all()
+    user_search_input = request.GET.get("question_search")
+    filter_input = request.GET.get("theme_filter")
+    no_search_result = False
+    if user_search_input or filter_input:
+        if user_search_input:
+            total_questions_list = QuestionSet.objects.filter(Q(question__icontains=f'{user_search_input}'))
+            if not total_questions_list:
+                no_search_result = True
+                results = f'Вопросы по запросу "{user_search_input}" не найдены'
+                context = {'no_search_results': no_search_result, 'results': results, 'them_list': them_list}
+                return render(request, 'question_list.html', context=context)
+            else:
+                paginator = Paginator(total_questions_list, 15)
+                page_number = request.GET.get('page', 1)
+                results_list_pages = paginator.page(page_number)
+                context = {'questions': results_list_pages, 'no_search_results': no_search_result, 'them_list': them_list}
+                return render(request, 'question_list.html', context=context)
+        else:
+            them_q_list = QuestionSet.objects.filter(them_name=filter_input)
+            paginator = Paginator(them_q_list, 15)
+            page_number = request.GET.get('page', 1)
+            results_list_pages = paginator.page(page_number)
+            context = {'questions': results_list_pages, 'no_search_results': no_search_result, 'them_list': them_list}
+            return render(request, 'question_list.html', context=context)
+    else:
+        question_list = QuestionSet.objects.all()
+        paginator = Paginator(question_list, 15)
+        page_number = request.GET.get('page', 1)
+        questions = paginator.page(page_number)
+        context = {'questions': questions, 'them_list': them_list}
+        return render(request, 'question_list.html', context=context)
 
 
 # Добавить новый вопрос в базу вопросов
@@ -653,7 +700,7 @@ def create_new_test(request):
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
         test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
-        #print('form_set:', dir(test_q_set[0]))
+        # print('form_set:', dir(test_q_set[0]))
         context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them}
         return render(request, 'new_test_form.html', context=context)
 
@@ -708,7 +755,8 @@ def test_details(request, id):
         test_name_form = NewTestFormName(result[0])  # Форма с названием теста
         test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
         test_q_set = QuestionFormSet(initial=test_questions, prefix='questions')
-        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': result[0]['id'], 'q_num_per_them': total_q_num_per_them}
+        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': result[0]['id'],
+                   'q_num_per_them': total_q_num_per_them}
         return render(request, 'test_detailes.html', context=context)
 
 
@@ -732,15 +780,20 @@ def user_list(request):
             user_search_data = request.GET.get("user_search").split()
 
             if len(user_search_data) == 3:
-                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'), Q(first_name__icontains=f'{user_search_data[1]}'), Q(middle_name__icontains=f'{user_search_data[2]}'))
+                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
+                                                         Q(first_name__icontains=f'{user_search_data[1]}'),
+                                                         Q(middle_name__icontains=f'{user_search_data[2]}'))
             elif len(user_search_data) == 2:
-                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'), Q(first_name__icontains=f'{user_search_data[1]}'))
-                    if not total_user_list:
-                        total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
-                                                                 Q(middle_name__icontains=f'{user_search_data[1]}'))
+                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
+                                                         Q(first_name__icontains=f'{user_search_data[1]}'))
+                if not total_user_list:
+                    total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
+                                                             Q(middle_name__icontains=f'{user_search_data[1]}'))
 
             elif len(user_search_data) == 1:
-                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}') | Q(first_name__icontains=f'{user_search_data[0]}') | Q(middle_name__icontains=f'{user_search_data[0]}'))
+                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}') | Q(
+                    first_name__icontains=f'{user_search_data[0]}') | Q(
+                    middle_name__icontains=f'{user_search_data[0]}'))
             else:
                 no_search_result = True
                 results = f'Пилоты по запросу "{user_search_input}" не найдены'

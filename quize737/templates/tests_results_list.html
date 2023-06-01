@@ -11,23 +11,31 @@
 <div class="result_list">
     <fieldset>
             <legend>Результаты тестирования</legend>
+
+        <form id="user_search" action="{% url 'quize737:tests_results_list' %}" method="get">
+        <input type="text" name="user_search" placeholder="Поиск пилота...">
+        <input type="submit" value="Искать">
+        </form>
+        {% if no_search_results %}
+        <span style="color: rgb(209, 209,209);">{{results}}</span>
+        {% else %}
                 <div class="main-list">
-                <div class="list-first"><span class="list-title">ФИО</span></div><span style="color: black"> |</span>
-                <div class="list-second"><span class="list-title">Дата</span></div><span style="color: black"> |</span>
-                <div class="list-third"><span class="list-title">Должность</span></div><span style="color: black"> |</span>
-                <div class="list-fourth"><span class="list-title">Результат</span></div>
-                <div class="hr"></div>
-                    <br>
+<!--                <div id="head_1"><span class="list-title">ФИО</span></div><span style="color: black"> |</span>-->
+<!--                <div class="list-date"><span class="list-title">Дата</span></div><span style="color: black"> |</span>-->
+<!--                <div class="list-position"><span class="list-title">Должность</span></div><span style="color: black"> |</span>-->
+<!--                <div class="list-test_result"><span class="list-title">Результат</span></div>-->
+<!--                <div class="hr"></div>-->
+<!--                    <br>-->
                     {% for i in results %}
-                <br>
+<!--                <br>-->
                     <div class="block_light_up">
-                    <div class="list-first"><a href="{{i.id}}">{{i.user_name}}</a></div>
+                    <div class="list-fio"><a href="{{i.id}}">{{i.user_name}}</a></div>
                         <span style="color: black">|</span>
-                    <div class="list-second">{{i.timestamp | date:"d.m.Y"}}</div>
+                    <div class="list-date">{{i.timestamp | date:"d.m.Y"}}</div>
                             <span style="color: black">|</span>
-                    <div class="list-third">{{i.user_id.profile.position}}</div>
+                    <div class="list-position">{{i.user_id.profile.position}}</div>
                             <span style="color: black">|</span>
-                    <div class="list-fourth">
+                    <div class="list-test_result">
                         {% if i.conclusion%}
                                 <span class="positive">ТЕСТ СДАН</span>
                             {% else %}
@@ -39,7 +47,8 @@
                             <a href="{% url 'quize737:download_test_result' id=i.id %}">
                             <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"></a>
                     </div>
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
                     <br>
                     <br>
                 {% include "paginator.html" with page=results %}

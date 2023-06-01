@@ -75,16 +75,16 @@ span.theme_color {
     font-size: 18px;
 }
 
-span.a_list {
-    text-decoration: none; /* Убирает подчеркивание для ссылок */
+/* span.a_list {
+    text-decoration: none;
     color: rgb(209, 209,209);
     font-size: 19px;
-}
+} */
 
 div.left_side {
-    position: absolute;
+    /*position: absolute;
     display: inline-block;
-    width: 99%;
+    width: 99%; */
 
 }
 
@@ -96,9 +96,9 @@ div.right_side {
 }
 
 div.result_list {
-    position: absolute;
+    /* position: absolute;
     right: 2%;
-    left: 2%
+    left: 2% */
 }
 
 
@@ -161,18 +161,27 @@ div.main-list {
 
 }
 
-div.list-first {
-    position: relative;
+#head_1 {
+   position: relative;
     display: inline-block;
     left: 0%;
-    width: 55%;
-    word-wrap: break-word;
+    width: 50%;
+
     text-align: center;
+}
+
+div.list-fio {
+    position: relative;
+    display: inline-block;
+    left: 5%;
+    width: 40%;
+    word-wrap: break-word;
+    text-align: left;
 
 
 }
 
-div.list-second {
+div.list-date {
     position: relative;
     display: inline-block;
     width: 8%;
@@ -182,7 +191,7 @@ div.list-second {
 
 }
 
-div.list-third {
+div.list-position {
     position: relative;
     display: inline-block;
     width: 9%;
@@ -192,7 +201,7 @@ div.list-third {
 
 }
 
-div.list-fourth {
+div.list-test_result {
     position: relative;
     display: inline-block;
     width: 13%;
@@ -200,6 +209,32 @@ div.list-fourth {
     text-align: center;
 
 
+}
+
+div.list-them {
+    position: relative;
+    display: inline-block;
+    width: 9%;
+    margin: 0px;
+    text-align: right;
+}
+
+div.list-question {
+    position: relative;
+    display: inline-block;
+    width: 70%;
+    margin: 0px;
+    margin-bottom: -1px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+div.list-delete {
+    position: relative;
+    display: inline-block;
+    width: 12%;
+    margin: 0px;
+    text-align: center;
 }
 
 div.hr {
@@ -221,5 +256,17 @@ div.block_light_up:hover {
 div.block_light_up {
     margin: 0px;
     padding: 0px;
-    margin-bottom: -20px;
+    /*margin-bottom: -3px; */
+}
+
+div.search-form {
+    display: inline-block;
+    position: relative;
+    left: 1%;
+}
+
+div.filter-form {
+    position: relative;
+    display: inline-block;
+    left: 6%;
 }
