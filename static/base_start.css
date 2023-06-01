@@ -66,6 +66,10 @@ a {
     color: rgb(209, 209,209);
 }
 
+a:hover {
+    text-shadow: 1px 1px 1px #997676, 0 0 1em #23506b, 0 0 0.1em #9e9292; /* Добавляет тень к тексту при наведении */
+}
+
 span.theme_color {
     color: rgb(170, 39, 47);
     font-size: 18px;
