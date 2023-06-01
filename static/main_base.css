@@ -66,6 +66,10 @@ a {
     color: rgb(209, 209,209);
 }
 
+a:hover {
+    text-shadow: 1px 1px 1px #997676, 0 0 1em #23506b, 0 0 0.1em #9e9292; /* Добавляет тень к тексту при наведении */
+}
+
 span.theme_color {
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -145,4 +149,77 @@ span.negative{
     color: rgb(142, 23, 11);
     font-size: 20px;
     font-weight: bold;
+}
+
+span.list-title {
+    color: rgb(170, 39, 47);
+    font-weight: bold;
+}
+
+div.main-list {
+    position: relative;
+
+}
+
+div.list-first {
+    position: relative;
+    display: inline-block;
+    left: 0%;
+    width: 55%;
+    word-wrap: break-word;
+    text-align: center;
+
+
+}
+
+div.list-second {
+    position: relative;
+    display: inline-block;
+    width: 8%;
+    margin: 2px;
+    text-align: center;
+
+
+}
+
+div.list-third {
+    position: relative;
+    display: inline-block;
+    width: 9%;
+    margin: 2px;
+    text-align: center;
+
+
+}
+
+div.list-fourth {
+    position: relative;
+    display: inline-block;
+    width: 13%;
+    margin: 2px;
+    text-align: center;
+
+
+}
+
+div.hr {
+    /* border: 1px dotted; */
+    position: absolute;
+    width: 80%;
+    left: 10%;
+
+}
+
+div.paginator {
+    text-align: center;
+}
+
+div.block_light_up:hover {
+    background-color: #4f93ce;
+}
+
+div.block_light_up {
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: -20px;
 }

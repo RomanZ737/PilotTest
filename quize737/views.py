@@ -378,7 +378,7 @@ def one_them_q(request):
 # Все результаты тестов
 def tests_results_list(request):
     results_list = QuizeResults.objects.all()
-    paginator = Paginator(results_list, 8)
+    paginator = Paginator(results_list, 10)
     page_number = request.GET.get('page', 1)
     results_list_pages = paginator.page(page_number)
     context = {'results': results_list_pages}

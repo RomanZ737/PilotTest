@@ -11,18 +11,41 @@
 <div class="result_list">
     <fieldset>
             <legend>Результаты тестирования</legend>
-    {% for i in results %}
-    <p><a href="{{i.id}}">{{i}}</a><a href="{% url 'quize737:download_test_result' id=i.id %}"><span style="color: black"> | </span><img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"><span style="color: black">|</span></a>
-    {% if i.conclusion%}
-    <span class="positive">ТЕСТ СДАН</span>
-    {% else %}
-    <span class="negative">ТЕСТ НЕ СДАН</span>
-    {% endif %}
-        <span> | </span>
-    </p>
-    {% endfor %}
-        {% include "paginator.html" with page=results %}
-         </fieldset>
+                <div class="main-list">
+                <div class="list-first"><span class="list-title">ФИО</span></div><span style="color: black"> |</span>
+                <div class="list-second"><span class="list-title">Дата</span></div><span style="color: black"> |</span>
+                <div class="list-third"><span class="list-title">Должность</span></div><span style="color: black"> |</span>
+                <div class="list-fourth"><span class="list-title">Результат</span></div>
+                <div class="hr"></div>
+                    <br>
+                    {% for i in results %}
+                <br>
+                    <div class="block_light_up">
+                    <div class="list-first"><a href="{{i.id}}">{{i.user_name}}</a></div>
+                        <span style="color: black">|</span>
+                    <div class="list-second">{{i.timestamp | date:"d.m.Y"}}</div>
+                            <span style="color: black">|</span>
+                    <div class="list-third">{{i.user_id.profile.position}}</div>
+                            <span style="color: black">|</span>
+                    <div class="list-fourth">
+                        {% if i.conclusion%}
+                                <span class="positive">ТЕСТ СДАН</span>
+                            {% else %}
+                                <span class="negative">ТЕСТ НЕ СДАН</span>
+                            {% endif %}
+                    </div>
+
+                            <span style="color: black">|</span>
+                            <a href="{% url 'quize737:download_test_result' id=i.id %}">
+                            <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"></a>
+                    </div>
+        {% endfor %}
+                    <br>
+                    <br>
+                {% include "paginator.html" with page=results %}
+
+                </div>
+    </fieldset>
 </div>
 
 
