@@ -4,28 +4,82 @@
 {% block content %}
 
 
-<div>
-    <fieldset>
+
+<fieldset>
         <legend>Профиль тестированя</legend>
         <form  id="data" method='post'>
         {% csrf_token %}
             <input type="hidden" name="question_set" id="question_set" value="{{user_test.test_name.id}}">
-            <h1>"{{test_name.name}}"</h1>
-            <p>Выполнить до: <span class="mark_up">{{user_test.date_before | date:"d.m.Y"}}</span></p>
-            <p>Минимальное количество правильных ответов: <span class="mark_up">{{test_name.pass_score}}%</span></p>
-            <p>Число попыток: <span class="mark_up">{{user_test.num_try}}</span></p>
-            {% if user_test.num_try > 0 %}
-            <h3>Вопросы:</h3>
-                {% for them in question_set%}
-            <p><span class="theme_color">{{them.theme}}</span>: <span class="mark_up">{{them.q_num}}</span> вопроса(ов)</p>
-                {% endfor %}
+            <div class="block_none_light_up">
+                <span class="main_sign">{{test_name.name}}</span>
+            </div>
+            <div class="block_none_light_up">
+                <div class="list-text_numtry">
+                    <span>Количество попыток: </span>
+                </div>
+                <div class="list-number_num_try">
+                        {% if user_test.num_try >= 2 %}
+                            <span style="color: rgb(148, 192, 74)">{{user_test.num_try}}</span>
+                        {% elif user_test.num_try > 0 and user_test.num_try < 2 %}
+                            <span style="color: rgb(202, 163, 13)">{{user_test.num_try}}</span>
+                        {% else %}
+                            <span style="color: rgb(142, 23, 11)">{{user_test.num_try}}</span>
+                        {% endif %}
+                    </div>
+                <div class="list-do_before_text">
+                        <span>Выполнить до:</span>
+                    </div>
+                <div class="list-date">
+                        <span class="mark_up">{{user_test.date_before | date:"d.m.Y"}}</span>
+                    </div>
 
-                <p><input type="submit" form="data" value="Начать Тестирование"></p>
+                <div class="list-pass_score_text">
+                    <span>Проходной балл: </span>
+                </div>
+                <div class="list-pass_score_num">
+                    <span class="mark_up">{{test_name.pass_score}}%</span>
+                </div>
+
+            </div>
+            <br>
+            {% if user_test.num_try > 0 %}
+            <div class="block_none_light_up">
+                <span class="main_sign">Вопросы теста:</span>
+            </div>
+
+                {% for them in question_set%}
+                    {% if not forloop.counter|divisibleby:2 %}
+                        <div class="block_none_light_up">
+                            <div class="list-them">
+                                <span class="theme_color">{{them.theme}}:</span>
+                            </div>
+                            <div class="list-q_number">
+                                <span class="mark_up">{{them.q_num}}</span> вопроса(ов)
+                            </div>
+                            {% if forloop.last %}
+                                </div>
+                            {% endif %}
+                    {% else %}
+                        <div class="list-them">
+                                <span class="theme_color">{{them.theme}}:</span>
+                            </div>
+                            <div class="list-q_number">
+                                <span class="mark_up">{{them.q_num}}</span> вопроса(ов)
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            <div>
+                <input type="submit" form="data" value="Начать Тестирование">
+            </div>
             {% else %}
-                <p>Попытки израсходованы, обратитесь к руководству отряда</p>
+            <div>
+                <span>Попытки израсходованы, обратитесь к руководству отряда</span>
+            </div>
             {% endif%}
         </form>
-    </fieldset>
-</div>
+
+</fieldset>
+
 
 {% endblock %}

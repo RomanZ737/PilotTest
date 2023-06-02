@@ -191,7 +191,7 @@ def start(request, id=None):
             context = {'user_tests': user_tests}
             return render(request, 'start.html', context=context)
 
-
+@login_required  # Только для зарегитсрированных пользователей
 # Генерация последующих вопросов
 def next_question(request):
     # Проверяем нажал ли пользователь кнопку "ответить"
@@ -342,24 +342,42 @@ def next_question(request):
                 num_try = user_test_instance[0].num_try
                 num_try -= 1
                 user_test_instance.update(num_try=num_try)
+
                 # Если у пользователя не осталось попыток, отправляем письмо КРС
                 if int(num_try) == 0:
+                    QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(
+                        total_result=total_result, conclusion=False)
                     subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
                     message = f'Пилот {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name} НЕ сдал Тест: {user_test_name}\nКоличетсво набранных баллов: {total_result}%\nПроходной балл: {result_data[0]["pass_score"]}%\nПопыток сделано: {user_test_instance[0].num_try_initial}'
                     to = common.krs_mail_list
                     email_msg = {'subject': subject, 'message': message, 'to': to}
                     common.send_email(request, email_msg)
+                    context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                               'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
+                               'conclusion': False}
+                    QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
+                    return render(request, 'results.html', context=context)
+                else:
+                    context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                               'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
+                               'conclusion': False}
+
+                    QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
+                    QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).delete()
+                    return render(request, 'results.html', context=context)
+                #
                 # Добавляем итоговый результать в отчёт по пользователю
                 # QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(total_result=total_result)
                 # Формируем данные для отправки
-                context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
-                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                           'conclusion': False}
+                # context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                #            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
+                #            'conclusion': False}
+
 
             # Удаляем тест пользователя из базы
-            QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
+            # QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
 
-            return render(request, 'results.html', context=context)
+            # return render(request, 'results.html', context=context)
 
 
 def one_them_q(request):

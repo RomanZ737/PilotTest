@@ -169,8 +169,6 @@ div.list-date {     /* блок Дата в таблице */
     width: 8%;
     margin: 2px;
     text-align: center;
-
-
 }
 
 div.list-position {  /* блок Должность в таблице */
@@ -280,5 +278,4 @@ div.list-other_field {    /* блок для остальных типов да�
     vertical-align: middle;
     margin-bottom: 5px;
     margin-top: 5px;
-
 }

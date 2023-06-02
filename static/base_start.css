@@ -136,7 +136,8 @@ span.mark_up {
 }
 
 span.main_sign {
-    font-size: 19px;
+    font-size: 21px;
+    color: rgb(209, 209,209);
 }
 
 span.positive {
@@ -149,4 +150,99 @@ span.negative{
     color: rgb(142, 23, 11);
     font-size: 20px;
     font-weight: bold;
+}
+
+div.list-test_name {    /* блок названия теста в таблице */
+    position: relative;
+    display: inline-block;
+    left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    width: 30%;
+    vertical-align: middle;
+}
+
+div.list-text_numtry {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    text-align: right;
+    width: 23%;
+    color: black;
+}
+
+div.list-number_num_try {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: 4%;
+    font-weight: bold;
+}
+
+div.list-do_before_text {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    text-align: right;
+    width: 19%;
+    color: black;
+}
+
+
+div.list-date {     /* блок Дата в таблице */
+    position: relative;
+    display: inline-block;
+    width: 11%;
+    text-align: right;
+}
+
+div.block_light_up:hover {  /* блок всей строки данных в таблице ПРИ НАВЕДЕНИИ КУРСОРА*/
+    background-color: #4f93ce;
+}
+
+div.block_light_up {  /* блок всей строки данных в таблице */
+    margin-bottom: -1px;
+}
+
+div.block_light_up a {  /* блок всей строки данных в таблице */
+    text-decoration: none; /* Убирает подчеркивание для ссылок */
+    margin-bottom: -1px;
+}
+
+div.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
+    position: relative;
+    left: 3%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.list-pass_score_text {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    text-align: right;
+    width: 22%;
+}
+
+
+div.list-pass_score_num {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: 6%;
+
+}
+
+div.list-them {  /* блок Тема вопроса в таблице */
+    position: relative;
+    display: inline-block;
+    width: 20%;
+    text-align: right;
+    color: rgb(170, 39, 47);
+    font-size: 18px;
+}
+
+div.list-q_number {
+    position: relative;
+    display: inline-block;
+    width: 17%;
+    text-align: left;
+    font-size: 18px;
 }

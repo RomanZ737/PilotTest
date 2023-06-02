@@ -3,7 +3,6 @@
 {% block content %}
 
 
-<div>
     <fieldset>
         <legend>Профиль тестированя</legend>
         <form  id="data" method='post'>
@@ -16,7 +15,32 @@
             {% if user_tests|length > 0 %}
                 <p>Вам назначены тесты:</p>
                 {% for test in user_tests %}
-            <p><a href="{% url 'quize737:start' test.test_name.id %}">{{test.test_name}}</a> Количество попыток: <span class="mark_up">{{test.num_try}}</span> Выполнить до: <span class="mark_up">{{test.date_before | date:"d.m.Y"}}</span></p>
+            <div class="block_light_up">
+                <a href="{% url 'quize737:start' test.test_name.id %}">
+                    <div class="list-test_name">
+                        <span class="mark_up">{{test.test_name}}</span>
+                    </div>
+                    <div class="list-text_numtry">
+                        <span>Количество попыток: </span>
+                    </div>
+                    <div class="list-number_num_try">
+                        {% if test.num_try >= 2 %}
+                            <span style="color: rgb(148, 192, 74)">{{test.num_try}}</span>
+                        {% elif test.num_try > 0 and test.num_try < 2 %}
+                            <span style="color: rgb(202, 163, 13)">{{test.num_try}}</span>
+                        {% else %}
+                            <span style="color: rgb(142, 23, 11)">{{test.num_try}}</span>
+                        {% endif %}
+                    </div>
+                    <div class="list-do_before_text">
+                        <span>Выполнить до:</span>
+                    </div>
+                    <div class="list-date">
+                        <span class="mark_up">{{test.date_before | date:"d.m.Y"}}</span>
+                    </div>
+                </a>
+            </div>
+
             {% endfor %}
 
             {% else %}
@@ -24,6 +48,6 @@
             {% endif %}
         </form>
     </fieldset>
-</div>
+
 
 {% endblock %}
