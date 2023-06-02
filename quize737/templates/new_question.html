@@ -26,38 +26,58 @@
             {% for error in question_form.errors.values %}
             <p>{{error}}</p>
             {% endfor %}
-            <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
-            <p>{{question_form.question.label}}: <textarea style="font-size: 15px; width: 80%;" id="question"
+            <div class="block_none_light_up">
+                {{question_form.them_name.label}}: {{question_form.them_name}}
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.question.label}}:
+                <textarea style="font-size: 15px; width: 80%;" id="question"
                                                        name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea>
-        </p>
-            <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
-            <p>{{question_form.option_2.label}}: {{question_form.option_2}}</p>
-            <p>{{question_form.option_3.label}}: {{question_form.option_3}}</p>
-            <p>{{question_form.option_4.label}}: {{question_form.option_4}}</p>
-            <p>{{question_form.option_5.label}}: {{question_form.option_5}}</p>
-            <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
-            <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
-            <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5"></p>
-            <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="ex. 1,2,3,4..."></p>
-            <input type="submit" value="Сохранить">
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.option_1.label}}: {{question_form.option_1}}
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.option_2.label}}: {{question_form.option_2}}
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.option_3.label}}: {{question_form.option_3}}
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.option_4.label}}: {{question_form.option_4}}
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.option_5.label}}: {{question_form.option_5}}
+            </div>
+            <div class="block_none_light_up">
+                {{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()">
+            </div>
+
+            <div class="block_none_light_up">
+                {{question_form.q_weight.label}}: {{question_form.q_weight}}
+            </div>
+
+            <div class="block_none_light_up">
+                <span id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5"></span>
+            </div>
+
+            <div class="block_none_light_up">
+                <span id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="ex. 1,2,3,4..."></span>
+            </div>
+            <br>
+            <div class="block_none_light_up">
+                <input type="submit" value="Сохранить">
+            </div>
         </form>
     </div>
 </fieldset>
-<!--        <form method='get' action='{% url "quize737:question_list" %}'>-->
-<!--            <button type="submit" >Вернуться</button>-->
-<!--        </form>-->
 
-<!--<div class="right_side">-->
-<!--        <fieldset>-->
-<!--            <legend>Редактировать</legend>-->
-
-<!--            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>-->
-<!--            <p><a href="{% url 'quize737:theme_editor' %}">Редактировать Темы</a></p>-->
-<!--            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>-->
-<!--            <p><a href="pass">Скачать базу</a></p>-->
-
-<!--        </fieldset>-->
-<!--</div>-->
 <p id="demo"></p>
 
 <script type="text/javascript">

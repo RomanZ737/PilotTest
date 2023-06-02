@@ -63,7 +63,7 @@ class NewTestFormQuestions(forms.ModelForm):
 
         # labels = {'name': _('Writer'),}
         # help_texts = {'name': _('Some useful help text.'),}
-        error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"}, }
+        error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"}}
         widgets = {
             "q_num": NumberInput(attrs={'size': '3', 'min': '1'}),
         }

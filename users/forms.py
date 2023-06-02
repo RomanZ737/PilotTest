@@ -43,6 +43,7 @@ class LoginForm(forms.ModelForm):
 #     #     self.fields['first_name'].disabled = True
 #     #     self.fields['middle_name'].disabled = True
 #     #     self.fields['position'].disabled = True
+
 # Виджеты для выбора даты и времени
 MONTH_CHOICES = {
     1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель',
@@ -58,4 +59,4 @@ class TestsForUser(forms.ModelForm):
         widgets = {
             'date_before': forms.SelectDateWidget(months=MONTH_CHOICES),
         }
-        error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"}, }
+        error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"}, 'test_name': {'required': "Поле 'Название теста' не может быть пустым"}}

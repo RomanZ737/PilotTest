@@ -200,6 +200,8 @@ div.list-them {  /* блок Тема вопроса в таблице */
     display: inline-block;
     width: 9%;
     text-align: right;
+    color: rgb(170, 39, 47);
+    font-size: 18px;
 }
 
 div.list-question {  /* блок Текст вопроса в таблице */
@@ -238,6 +240,13 @@ div.block_light_up {  /* блок всей строки данных в табл
     margin-bottom: -1px;
 }
 
+div.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
+    position: relative;
+    left: 3%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 div.search-form {  /* блок формы поиска */
     display: inline-block;
     position: relative;
@@ -258,5 +267,18 @@ div.list-test_name {    /* блок названия теста в таблиц�
     text-align: left;
     width: 40%;
     vertical-align: middle;
+
+}
+
+div.list-other_field {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    width: 40%;
+    vertical-align: middle;
+    margin-bottom: 5px;
+    margin-top: 5px;
 
 }

@@ -378,23 +378,40 @@ def one_them_q(request):
 @group_required('KRS')
 # Все результаты тестов
 def tests_results_list(request):
+    position_list = Profile.Position.values
     user_search_input = request.GET.get("user_search")
+    filter_input = request.GET.get("position_filter")
+    print('filter_input', filter_input)
     no_search_result = False
-    if user_search_input:
-
-        total_results_list = QuizeResults.objects.filter(Q(user_name__icontains=f'{user_search_input}'))
-
-        if not total_results_list:
-            no_search_result = True
-            results = f'Пилоты по запросу "{user_search_input}" не найдены'
-            context = {'no_search_results': no_search_result, 'results': results}
-            return render(request, 'tests_results_list.html', context=context)
+    if user_search_input or filter_input:
+        if user_search_input:
+            total_results_list = QuizeResults.objects.filter(Q(user_name__icontains=f'{user_search_input}'))
+            if not total_results_list:
+                no_search_result = True
+                results = f'Пилоты по запросу "{user_search_input}" не найдены'
+                context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                return render(request, 'tests_results_list.html', context=context)
+            else:
+                paginator = Paginator(total_results_list, 10)
+                page_number = request.GET.get('page', 1)
+                results_list_pages = paginator.page(page_number)
+                context = {'results': results_list_pages, 'no_search_results': no_search_result, 'position_list': position_list}
+                return render(request, 'tests_results_list.html', context=context)
         else:
-            paginator = Paginator(total_results_list, 10)
-            page_number = request.GET.get('page', 1)
-            results_list_pages = paginator.page(page_number)
-            context = {'results': results_list_pages, 'no_search_results': no_search_result}
-            return render(request, 'tests_results_list.html', context=context)
+            total_user_list = QuizeResults.objects.filter(user_id__profile__position=filter_input)
+            if not total_user_list:
+                no_search_result = True
+                results = f'Результаты тестов пилотов с должностью "{filter_input}" не найдены'
+                context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                return render(request, 'tests_results_list.html', context=context)
+            else:
+                #  Постраничная разбивка
+                print('total_user_list', total_user_list)
+                paginator = Paginator(total_user_list, 10)
+                page_number = request.GET.get('page', 1)
+                users = paginator.page(page_number)
+                context = {'results': users, 'no_search_results': no_search_result, 'position_list': position_list}
+                return render(request, 'tests_results_list.html', context=context)
 
 
     else:
@@ -402,7 +419,7 @@ def tests_results_list(request):
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)
-        context = {'results': results_list_pages}
+        context = {'results': results_list_pages, 'position_list': position_list}
         return render(request, 'tests_results_list.html', context=context)
 
 
@@ -410,7 +427,7 @@ def tests_results_list(request):
 @group_required('KRS')
 # Детали результатов теста
 def test_result_details(request, id):
-    result = QuizeResults.objects.filter(id=id).values()
+    result = QuizeResults.objects.filter(id=id)
     context = {'result': result, 'id': id}
     return render(request, 'test_result_details.html', context=context)
 
@@ -529,13 +546,14 @@ def theme_editor(request, id=None):
         else:
 
             theme_list = Thems.objects.all()
-            paginator = Paginator(theme_list, 7)
+            paginator = Paginator(theme_list, 20)
             page_number = request.GET.get('page', 1)
             themes = paginator.page(page_number)
             context = {'themes': themes}
             return render(request, 'theme_editor.html', context=context)
 
-
+@login_required
+@group_required('KRS')
 #  Создание новой темы
 def new_theme(request):
     form = NewThemeForm()
@@ -893,10 +911,9 @@ def user_detales(request, id):
                                              num_try=test['num_try'],
                                              date_before=test['date_before'])
 
-                    print('USER:', user[0].profile.family_name, user[0].email)
-                    #  Отправляем письмо пользователю
+                    #  Отправляем письмо пользователю о назначенном тесте
                     subject = f"Вам назначен Тест: '{test['test_name']}'"
-                    message = f"<h4>Уважаемый, {user[0].profile.family_name} {user[0].profile.first_name} {user[0].profile.middle_name}.</h4>" \
+                    message = f"<h4>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</h4>" \
                               f"Вам назначен тест: <b>'{test['test_name']}'</b><br>" \
                               f"На портале {config('SITE_URL', default='')}<br>" \
                               f"Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b>"

@@ -4,32 +4,109 @@
 
 {% block content %}
 
-<div class="result_list">
+<div class="result_list" xmlns="http://www.w3.org/1999/html">
     <fieldset>
             <legend>Результаты теста</legend>
         <div class="block-list">
             {% for i in result %}
-                <p>Дата: <span class="mark_up">{{i.timestamp|date:"d.m.Y H:i:s"}}</span></p>
-                <p>ФИО: <span class="mark_up">{{i.user_name}}</span></p>
-                <p>Название теста: <span class="mark_up">{{i.quize_name}}</span></p>
-                <p>Количество вопросов: <span class="mark_up">{{i.total_num_q}}</span></p>
-                <p>Количество правильных ответов: <span class="mark_up">{{i.correct_q_num}}</span></p>
-                <p>Количество баллов: <span class="mark_up">{{i.score_number}}</span></p>
-                <p>Общий результат: <span class="mark_up">{{i.total_result}}%</span></p>
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Дата:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.timestamp|date:"d.m.Y H:i:s"}}</span>
+                </div>
+            </div>
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>ФИО:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.user_name}}</span>
+                </div>
+            </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Должность:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.user_id.profile.get_position_display}}</span>
+                </div>
+            </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Название теста:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.quize_name}}</span>
+                </div>
+            </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Количество вопросов:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.total_num_q}}</span>
+                </div>
+            </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Количество правильных ответов: </span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.correct_q_num}}</span>
+                </div>
+            </div>
+
+<!--            <div class="block_none_light_up">-->
+<!--                Количество баллов: <span class="mark_up">{{i.score_number}}</span>-->
+<!--            </div>-->
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                Минимально-необходимое количество баллов:
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.pass_score}}%</span>
+                </div>
+            </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Общий результат: </span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.total_result}}%</span>
+                </div>
+            </div>
+
+            <br>
+
                 {% if i.conclusion %}
-                <span class="positive">ТЕСТ СДАН</span>
+                <div class="list-other_field">
+                    <span class="positive">ТЕСТ СДАН</span>
+                </div>
                 {% else %}
-                <span class="negative">ТЕСТ НЕ СДАН</span>
+                <div class="list-other_field">
+                    <span class="negative">ТЕСТ НЕ СДАН</span>
+
                 {% endif %}
+            </div>
             {% endfor %}
             <form id="go_back" method='get' action='{% url "quize737:tests_results_list" %}'>
             </form>
             <form id="download_test" action="{% url 'quize737:download_test_result' id %}">
             </form>
 
-            <input type="submit" value="Вернуться" form="go_back">
-            <span style="color: black;"> | </span>
-            <input type="submit" value="Скачать" form="download_test">
+            <div class="list-other_field">
+                <input type="submit" value="Вернуться" form="go_back">
+                <span style="color: black;"> | </span>
+                <input type="submit" value="Скачать" form="download_test">
+            </div>
         </div>
     </fieldset>
 </div>

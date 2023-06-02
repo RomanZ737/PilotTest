@@ -37,7 +37,8 @@
         <br>
         <br>
 
-      <input type="submit" value="Сохранить">
+        <input type="submit" value="Сохранить" id="save_btn">
+        <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
     </form>
 <!--    <form method='get' action='{% url "quize737:user_list" %}'>-->
 <!--        <button type="submit">Вернуться</button>-->
@@ -115,6 +116,14 @@
         }
 
 
+
+        const btn = document.getElementById('save_btn');
+
+        btn.addEventListener('click', () => {
+          btn.style.display = 'none';
+          const box = document.getElementById('wait');
+          box.style.display = 'block';
+        });
 
 </script>
 

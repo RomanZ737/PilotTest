@@ -19,8 +19,21 @@
                     <input type="submit" value="Искать">
                 </form>
             </div>
+
+        <div class="filter-form">
+            <form id="position_filter" action="{% url 'quize737:tests_results_list' %}" method="get">
+                <select name="position_filter">
+                    {% for option in position_list %}
+                        <option value="{{option}}">{{option}}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Фильтр">
+            </form>
+        </div>
             {% if no_search_results %}
+            <div>
                 <span style="color: rgb(209, 209,209);">{{results}}</span>
+            </div>
             {% else %}
 
     <!--                <div id="head_1"><span class="list-title">ФИО</span></div><span style="color: black"> |</span>-->
@@ -54,9 +67,10 @@
                         <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px"></a>
                         </div>
                 {% endfor %}
-            {% endif %}
+
                         <br>
                     {% include "paginator.html" with page=results %}
+            {% endif %}
 
         </div>
     </fieldset>
