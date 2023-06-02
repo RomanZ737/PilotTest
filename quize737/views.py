@@ -411,7 +411,7 @@ def tests_results_list(request):
 # Детали результатов теста
 def test_result_details(request, id):
     result = QuizeResults.objects.filter(id=id).values()
-    context = {'result': result}
+    context = {'result': result, 'id': id}
     return render(request, 'test_result_details.html', context=context)
 
 
@@ -643,12 +643,28 @@ class BaseUserTestFormSet(BaseFormSet):
 @login_required
 @group_required('KRS')
 def test_editor(request):
-    tests_names = TestConstructor.objects.all()
-    paginator = Paginator(tests_names, 7)
-    page_number = request.GET.get('page', 1)
-    tests_names_pages = paginator.page(page_number)
-    context = {'tests_names': tests_names_pages}
-    return render(request, 'test_editor.html', context=context)
+    user_search_input = request.GET.get("test_search")
+    no_search_result = False
+    if user_search_input:
+        total_test_list = TestConstructor.objects.filter(Q(name__icontains=f'{user_search_input}'))
+        if not total_test_list:
+            no_search_result = True
+            results = f'Тесты по запросу "{user_search_input}" не найдены'
+            context = {'no_search_results': no_search_result, 'results': results}
+            return render(request, 'test_editor.html', context=context)
+        else:
+            paginator = Paginator(total_test_list, 10)
+            page_number = request.GET.get('page', 1)
+            results_list_pages = paginator.page(page_number)
+            context = {'tests_names': results_list_pages, 'no_search_results': no_search_result}
+            return render(request, 'test_editor.html', context=context)
+    else:
+        tests_names = TestConstructor.objects.all()
+        paginator = Paginator(tests_names, 10)
+        page_number = request.GET.get('page', 1)
+        tests_names_pages = paginator.page(page_number)
+        context = {'tests_names': tests_names_pages}
+        return render(request, 'test_editor.html', context=context)
 
 
 @login_required
@@ -773,50 +789,63 @@ def del_test(request, id):
 def user_list(request):
     if request.method == 'POST':
         pass
+
     else:
+        position_list = Profile.Position.values
         user_search_input = request.GET.get("user_search")
+        filter_input = request.GET.get("position_filter")
         no_search_result = False
-        if user_search_input:
-            user_search_data = request.GET.get("user_search").split()
+        if user_search_input or filter_input:
+            if user_search_input:
+                user_search_data = request.GET.get("user_search").split()
+                if len(user_search_data) == 3:
+                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
+                                                             Q(first_name__icontains=f'{user_search_data[1]}'),
+                                                             Q(middle_name__icontains=f'{user_search_data[2]}'))
+                elif len(user_search_data) == 2:
+                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
+                                                             Q(first_name__icontains=f'{user_search_data[1]}'))
+                    if not total_user_list:
+                        total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
+                                                                 Q(middle_name__icontains=f'{user_search_data[1]}'))
 
-            if len(user_search_data) == 3:
-                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
-                                                         Q(first_name__icontains=f'{user_search_data[1]}'),
-                                                         Q(middle_name__icontains=f'{user_search_data[2]}'))
-            elif len(user_search_data) == 2:
-                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
-                                                         Q(first_name__icontains=f'{user_search_data[1]}'))
+                elif len(user_search_data) == 1:
+                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}') | Q(
+                        first_name__icontains=f'{user_search_data[0]}') | Q(
+                        middle_name__icontains=f'{user_search_data[0]}'))
+                else:
+                    no_search_result = True
+                    results = f'Пилоты по запросу "{user_search_input}" не найдены'
+                    context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                    return render(request, 'user_list.html', context=context)
                 if not total_user_list:
-                    total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
-                                                             Q(middle_name__icontains=f'{user_search_data[1]}'))
+                    no_search_result = True
+                    results = f'Пилоты по запросу "{user_search_input}" не найдены'
+                    context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                    return render(request, 'user_list.html', context=context)
+                else:
+                    paginator = Paginator(total_user_list, 20)
+                    page_number = request.GET.get('page', 1)
+                    users = paginator.page(page_number)
+                    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
+                    return render(request, 'user_list.html', context=context)
 
-            elif len(user_search_data) == 1:
-                total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}') | Q(
-                    first_name__icontains=f'{user_search_data[0]}') | Q(
-                    middle_name__icontains=f'{user_search_data[0]}'))
             else:
-                no_search_result = True
-                results = f'Пилоты по запросу "{user_search_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results}
-                return render(request, 'user_list.html', context=context)
-            if not total_user_list:
-                no_search_result = True
-                results = f'Пилоты по запросу "{user_search_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results}
-                return render(request, 'user_list.html', context=context)
-            else:
+                total_user_list = Profile.objects.filter(position=filter_input)
+                #  Постраничная разбивка
+                print('total_user_list', total_user_list)
                 paginator = Paginator(total_user_list, 20)
                 page_number = request.GET.get('page', 1)
                 users = paginator.page(page_number)
-                context = {'user_list': users, 'no_search_results': no_search_result}
+                context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
                 return render(request, 'user_list.html', context=context)
         else:
-            total_user_list = Profile.objects.all()
+            total_user_list = Profile.objects.all()  # Вынимаем всех пользователей
             #  Постраничная разбивка
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
             users = paginator.page(page_number)
-            context = {'user_list': users, 'no_search_results': no_search_result}
+            context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
             return render(request, 'user_list.html', context=context)
 
 

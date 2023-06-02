@@ -2,23 +2,51 @@
 
 {% block content %}
 <fieldset>
-    <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
+    <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Пруппы</a>
+    </legend>
 <!--    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>-->
+    <div class="block-list">
+        <div class="search-form">
+            <form id="user_search" action="{% url 'quize737:user_list' %}" method="get">
+                <input type="text" name="user_search" placeholder="Поиск пилота...">
+                <input type="submit" value="Искать">
+            </form>
+        </div>
+
+        <div class="filter-form">
+            <form id="position_filter" name="position_filter" action="{% url 'quize737:user_list' %}" method="get">
+                <select name="position_filter">
+                    {% for option in position_list %}
+                        <option value="{{option}}">{{option}}</option>
+                    {% endfor %}
+                </select>
+                    <input type="submit" value="Фильтр">
+            </form>
+        </div>
 
 
-    <form id="user_search" action="{% url 'quize737:user_list' %}" method="get">
-        <input type="text" name="user_search" placeholder="Поиск пилота...">
-        <input type="submit" value="Искать">
-    </form>
-    {% if no_search_results %}
-        <span style="color: rgb(209, 209,209);">{{results}}</span>
-    {% else %}
-        {% for user in user_list %}
-        <span style="color: black;">{{forloop.counter}}. </span><a href="{{user.id}}">{{user.family_name}} {{user.first_name}} {{user.middle_name}}</a><span style="color: black;"> | </span> <span class="theme_color">{{user.position}}</span>
-        <br>
-        {% endfor %}
-        <br>
-        {% include "paginator.html" with page=user_list %}
-    {% endif %}
+        {% if no_search_results %}
+        <div>
+            <span style="color: rgb(209, 209,209);">{{results}}</span>
+        </div>
+        {% else %}
+            {% for user in user_list %}
+               <div class="block_light_up">
+                   <div class="list-fio">
+                       <span style="color: black;">{{forloop.counter}}.</span>
+                       <a href="{{user.id}}">{{user.family_name}} {{user.first_name}} {{user.middle_name}}</a>
+                   </div>
+                   <span style="color: black;">|</span>
+                   <div class="list-position">
+                       <span class="theme_color">{{user.position}}</span>
+                   </div>
+               </div>
+            {% endfor %}
+            <br>
+            {% include "paginator.html" with page=user_list %}
+        {% endif %}
+    </div>
 </fieldset>
 {% endblock %}

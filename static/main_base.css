@@ -75,18 +75,6 @@ span.theme_color {
     font-size: 18px;
 }
 
-/* span.a_list {
-    text-decoration: none;
-    color: rgb(209, 209,209);
-    font-size: 19px;
-} */
-
-div.left_side {
-    /*position: absolute;
-    display: inline-block;
-    width: 99%; */
-
-}
 
 div.right_side {
     position: absolute;
@@ -95,14 +83,8 @@ div.right_side {
     width: 20%;
 }
 
-div.result_list {
-    /* position: absolute;
-    right: 2%;
-    left: 2% */
-}
 
-
-.result_confirm {
+.result_confirm {  /* Анимация подтверждения действия */
     color: rgb(170, 39, 47);
     font-size: 18px;
     animation: disappear 2s linear 3s 1 forwards;
@@ -156,12 +138,12 @@ span.list-title {
     font-weight: bold;
 }
 
-div.main-list {
+div.block-list {  /* Основной блок таблицы со списком данных */
     position: relative;
 
 }
 
-#head_1 {
+#head_1 {  /* Шапка таблицы данных, пока не используется */
    position: relative;
     display: inline-block;
     left: 0%;
@@ -170,7 +152,7 @@ div.main-list {
     text-align: center;
 }
 
-div.list-fio {
+div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     left: 5%;
@@ -181,7 +163,7 @@ div.list-fio {
 
 }
 
-div.list-date {
+div.list-date {     /* блок Дата в таблице */
     position: relative;
     display: inline-block;
     width: 8%;
@@ -191,17 +173,19 @@ div.list-date {
 
 }
 
-div.list-position {
+div.list-position {  /* блок Должность в таблице */
     position: relative;
     display: inline-block;
-    width: 9%;
-    margin: 2px;
-    text-align: center;
+    width: 4%;
+    margin: 0px;
+    text-align: left;
+    color: rgb(170, 39, 47);
+    font-size: 18px;
 
 
 }
 
-div.list-test_result {
+div.list-test_result {  /* блок Результат сдачи теста в таблице */
     position: relative;
     display: inline-block;
     width: 13%;
@@ -211,33 +195,29 @@ div.list-test_result {
 
 }
 
-div.list-them {
+div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
     width: 9%;
-    margin: 0px;
     text-align: right;
 }
 
-div.list-question {
+div.list-question {  /* блок Текст вопроса в таблице */
     position: relative;
     display: inline-block;
     width: 70%;
-    margin: 0px;
-    margin-bottom: -1px;
     text-align: left;
     vertical-align: middle;
 }
 
-div.list-delete {
+div.list-delete {  /* блок Удалить каки-либо запись в таблице */
     position: relative;
     display: inline-block;
-    width: 12%;
-    margin: 0px;
-    text-align: center;
+    width: 16%;
+    text-align: left;
 }
 
-div.hr {
+div.hr {  /* блок горизонтальная линия, пока не используется */
     /* border: 1px dotted; */
     position: absolute;
     width: 80%;
@@ -245,28 +225,38 @@ div.hr {
 
 }
 
-div.paginator {
+div.paginator {  /* блок списка страниц */
     text-align: center;
 }
 
-div.block_light_up:hover {
+div.block_light_up:hover {  /* блок всей строки данных в таблице ПРИ НАВЕДЕНИИ КУРСОРА*/
     background-color: #4f93ce;
 }
 
-div.block_light_up {
-    margin: 0px;
+div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
-    /*margin-bottom: -3px; */
+    margin-bottom: -1px;
 }
 
-div.search-form {
+div.search-form {  /* блок формы поиска */
     display: inline-block;
     position: relative;
     left: 1%;
 }
 
-div.filter-form {
+div.filter-form {   /* блок формы фильтра */
     position: relative;
     display: inline-block;
     left: 6%;
+}
+
+div.list-test_name {    /* блок названия теста в таблице */
+    position: relative;
+    display: inline-block;
+    left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    width: 40%;
+    vertical-align: middle;
+
 }

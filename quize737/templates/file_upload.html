@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<div class="left_side">
 <fieldset>
     <legend>
         <a href="{% url 'quize737:question_list' %}">Список вопросов</a>
@@ -17,39 +16,42 @@
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
     </legend>
-    {% if uploaded %}
-        <div class="disappear">
-            <p>Файл загружен</p>
-        </div>
-    {% endif%}
-    <form action="{% url 'quize737:file_upload' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <p>{{ upload_form.non_field_errors }}</p>
-        <p>
-        {{ upload_form.docfile.errors }}
-        Выбрать файл {{ upload_form.docfile }}
-        </p>
-        <p><input type="submit" value="Загрузить" /></p>
-    </form>
-</fieldset>
-    {% if reading_errors %}
-    <p>Ошибки в процессе загрузки файла: {{reading_errors}}</p>
-    {% endif%}
-    {% if them_num_created %}
-        <p>Создано тем: {{them_num_created}}</p>
-    {% elif uploaded %}
-        <p>Ни одной темы не создано</p>
-    {% endif %}
-    {% if q_num_created %}
-    <p>Создано вопросов: {{q_num_created}}</p>
-    {% elif uploaded %}
-    <p>Ни одного вопроса не загружено</p>
-    {% endif %}
 
-    {% for data_error in wrong_data%}
-    <p>{{data_error}}</p>
-    {% endfor %}
-</div>
+    <div class="block-list">
+        {% if uploaded %}
+            <div class="disappear">
+                <p>Файл загружен</p>
+            </div>
+        {% endif%}
+        <form action="{% url 'quize737:file_upload' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{ upload_form.non_field_errors }}</p>
+            <p>
+            {{ upload_form.docfile.errors }}
+            Выбрать файл (.csv) {{ upload_form.docfile }}
+            </p>
+            <p><input type="submit" value="Загрузить" /></p>
+        </form>
+
+        {% if reading_errors %}
+        <p>Ошибки в процессе загрузки файла: {{reading_errors}}</p>
+        {% endif%}
+        {% if them_num_created %}
+            <p>Создано тем: {{them_num_created}}</p>
+        {% elif uploaded %}
+            <p>Ни одной темы не создано</p>
+        {% endif %}
+        {% if q_num_created %}
+        <p>Создано вопросов: {{q_num_created}}</p>
+        {% elif uploaded %}
+        <p>Ни одного вопроса не загружено</p>
+        {% endif %}
+
+        {% for data_error in wrong_data%}
+        <p>{{data_error}}</p>
+        {% endfor %}
+    </div>
+</fieldset>
 
 <!--<div class="right_side">-->
 <!--        <fieldset>-->

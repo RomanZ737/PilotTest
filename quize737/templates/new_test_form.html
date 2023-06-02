@@ -5,7 +5,11 @@
 {% load django_template_maths %}
 
 <fieldset>
-    <legend>Создание теста</legend>
+    <legend>
+        <a href="{% url 'quize737:test_editor' %}">Список Тестов</a>
+        <span style="color: black;"> | </span>
+        <a href='{% url "quize737:create_new_test" %}'>ДОБАВИТЬ ТЕСТ</a>
+    </legend>
     <br>
     <h4>{{non_form_errors}}</h4>
 

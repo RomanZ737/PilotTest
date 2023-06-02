@@ -3,21 +3,45 @@
 {% block content %}
 
 <fieldset>
-            <legend>Редактор Тестов</legend>
+    <legend>
+        <a href="{% url 'quize737:test_editor' %}">СПИСОК ТЕСТОВ</a>
+        <span style="color: black;"> | </span>
+        <a href='{% url "quize737:create_new_test" %}'>Добавить тест</a>
+    </legend>
 
-    <h5><a href='{% url "quize737:create_new_test" %}'>+ Добавить тест</a></h5>
-    <br>
-    {% for test in tests_names %}
-    <a href="{{test.id}}"><span style="color: black;">{{forloop.counter}}.</span> {{test.name}}</a>
-    <span style="color: black;"> | </span><a href="{% url 'quize737:del_test' test.id %}">Удалить тест</a>
-    <br>
-    {% endfor %}
-    <br>
-    {% include "paginator.html" with page=tests_names %}
+    <div class="block-list">
+        <div class="search-form">
+                <form id="test_search" action="{% url 'quize737:test_editor' %}" method="get">
+                <input type="text" name="test_search" placeholder="Поиск теста...">
+                <input type="submit" value="Искать">
+                </form>
+        </div>
 
-<!--<form method='get' action='{% url "quize737:start" %}'>-->
-<!--<button type="submit">На главную</button>-->
-<!--</form>-->
+<!--    <h5><a href='{% url "quize737:create_new_test" %}'>+ Добавить тест</a></h5>-->
+
+        {% if no_search_results %}
+            <div>
+                <span style="color: rgb(209, 209,209);">{{results}}</span>
+            </div>
+        {% else %}
+            {% for test in tests_names %}
+                <div class="block_light_up">
+                    <div class="list-test_name">
+                        <a href="{{test.id}}"><span style="color: black;">{{forloop.counter}}.</span> {{test.name}}</a>
+                    </div>
+                    <div class="list-delete">
+                        <span style="color: black;"> | </span><a href="{% url 'quize737:del_test' test.id %}">Удалить тест</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <br>
+        {% include "paginator.html" with page=tests_names %}
+
+    <!--<form method='get' action='{% url "quize737:start" %}'>-->
+    <!--<button type="submit">На главную</button>-->
+    <!--</form>-->
+    </div>
 </fieldset>
 
 {% endblock %}
