@@ -29,9 +29,9 @@ class QuestionSetForm(forms.ModelForm):
         model = QuestionSet
         fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
                   'q_weight', 'answer', 'answers']
-        # widgets = {
-        #     'question': forms.Textarea(attrs={'cols': 20, 'rows': 10})
-        # }
+        widgets = {
+            'q_weight': forms.NumberInput(attrs={'step': 0.5, 'max': 2.0, 'min': 0.0})
+        }
 
 
 # Валидатор для формы NewTestFormName - проверят уникальность имени теста

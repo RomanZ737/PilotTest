@@ -69,18 +69,20 @@ def all_them_q_set():
     pass
 
 
-# Заглавная страница + вопросы по всем темам
+# Заглавная страница
 @login_required  # Только для зарегитсрированных пользователей
 def start(request, id=None):
     user_instance = request.user
     if request.method == 'POST':
-        question_set_id = id
+        question_set_id = id  # ID теста, назначенного пользователю
         test_instance = TestConstructor.objects.filter(id=question_set_id)
+
+        #  Вынимаем объекты Тема и Вопрос, которые принадлежат данному тесту
         q_sets_instances = TestQuestionsBay.objects.filter(test_id=question_set_id).values('theme', 'q_num')
         total_q_number = 0  # Общее количество вопросов в тесте для пользователя
         all_theme_set = []  # Объекты вопросов для пользователя
-        particular_user_questions = []
-        thems_num = Thems.objects.all().count()  # Общее количество тем
+        particular_user_questions = []  # Номера вопросов в сформированном для пользоваетля тесте
+        #thems_num = Thems.objects.all().count()  # Общее количество тем
         max_score_number = 0  # Максимальное количество баллов по сгенерированным вопросам
         # Перебераем темы вопросов
         for q_set in q_sets_instances:
@@ -88,9 +90,9 @@ def start(request, id=None):
             if q_set['theme'] == 5:
                 for theme in Thems.objects.all():
                     if theme.name != 'Все темы':
-                        quiz_set = QuestionSet.objects.filter(them_name=theme.id)
-                        quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
-                        all_theme_set.append(quiz_set)
+                        quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
+                        quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
+                        all_theme_set.append(quiz_set)  #Добавляем выбранные вопросы в список
                         # Считаем количество вопросов
                         total_q_number += int(q_set['q_num'])
             # Сохраняем вопросы для пользователя в базу
@@ -104,45 +106,29 @@ def start(request, id=None):
             for q in q_set:
                 particular_user_questions.append(str(q.id))
                 # Если задан "вес вопроса", учитываем его в максимальном количестве баллов
-                if q.q_weight != 0:
+                if q.q_weight != 0.0:
                     max_score_number = max_score_number + q.q_weight
                 else:
-                    max_score_number = max_score_number + 1
+                    max_score_number = max_score_number + 1.0
 
-        total_q_num_for_user = total_q_number
         test_name = test_instance[0].name
-        #  Формируем объект теста пользователя
-        user_quize_set = QuizeSet.objects.create(
-            test_id=test_instance[0].id,
-            quize_name=test_name,
-            user_under_test=user_instance.username,
+        #  Формируем объект теста пользователя (создаётся на время теста)
+        user_quize_set = QuizeSet.objects.create(   # Объект сформированного теста для пользователя
+            test_id=test_instance[0].id,  # ID теста, назначенного пользователю
+            quize_name=test_name,  #  Название теста
+            user_under_test=user_instance.username,  # Логин (уникальный) пользователя проходящего тест
             # Переводим список номеров вопросов в строку для хранения в поле базы данных
-            questions_ids=' '.join(particular_user_questions),
-            # Вычисляем общее количество вопросов и добавдяем их в поле
-            q_sequence_num=total_q_num_for_user,
-            # Вносим максимально возможное кол-во баллов
-            max_score_amount=max_score_number,
-            pass_score=test_instance[0].pass_score
-
+            questions_ids=' '.join(particular_user_questions),  # Номера вопросов в сформированном для пользоваетля тесте
+            q_sequence_num=total_q_number,  # Общее количество вопросов
+            max_score_amount=max_score_number,  # Масимальное количество баллов по тесту
+            pass_score=test_instance[0].pass_score  #  Минимальный проходной бал по тесту
         )
 
         # -------  В этом месте генерируем первый вопрос теста пользователя
-        # Имя теста конкретного пользователя
-        user_set_name = test_name
-
-        # Выясняем количество сгенерированных вопросов
-        q_amount = QuizeSet.objects.filter(id=user_quize_set.id).values('q_sequence_num')
-
-        # Выясняем сквозные номера вопросов, сгенерированные пользователю
-        q_num_list = QuizeSet.objects.filter(id=user_quize_set.id).values('questions_ids')
-
-        # Создаём список со сгенерированными вопросами
-        q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
 
         # Достаём из базы вопросов первый вопрос с конца
-        sequence_number = (int(q_amount[0][
-                                   'q_sequence_num']) - 1)  # Номер вопроса в списке вопросов пользователя
-        question_pisition = q_num_list[sequence_number]  # Номер вопроса в списке вопросов пользователя
+        sequence_number = (total_q_number - 1)  # Номер вопроса в списке вопросов пользователя
+        question_pisition = particular_user_questions[sequence_number]  # Номер вопроса в списке вопросов пользователя
 
         # Достаём нужный вопрос из базы вопросов по сквозному номеру
         question = QuestionSet.objects.filter(id=question_pisition).values()
@@ -157,17 +143,29 @@ def start(request, id=None):
         result_obj = QuizeResults.objects.create(
             user_id=request.user,
             user_name=user_name_for_h,
-            quize_name=user_set_name,
+            quize_name=test_name,
             total_num_q=sequence_number + 1,
-            questions_ids=', '.join(q_num_list),
+            questions_ids=', '.join(particular_user_questions),
             correct_q_num=0,
             score_number=0,
             pass_score=test_instance[0].pass_score
         )
 
-        context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id,
-                   'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'],
-                   'q_num_left': total_q_num_for_user}
+        #  Создаём словарь с вариантами ответов на вопрос
+        option_dict = {}
+        for option_num in range(1,6):
+            option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+
+
+        # Содержание context:
+            # 'question' - Сам вопрос
+            # 'tmp_test_id' - ID сформированного теста пользователю
+            # 'result_id' - ID сформированных результатов теста
+            # 'option_dict' - Варианты ответов на вопрос
+
+        context = {'question': question[0]['question'], 'question_id': question[0]['id'], 'tmp_test_id': user_quize_set.id, 'result_id': result_obj.id, 'option_dict': option_dict, 'q_num_left': total_q_number}
+
+        #context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id, 'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'], 'q_num_left': total_q_number}
 
         # Проверяем содержит ли вопрос мультивыбор
         if not question[0]['q_kind']:
@@ -196,77 +194,76 @@ def start(request, id=None):
 def next_question(request):
     # Проверяем нажал ли пользователь кнопку "ответить"
     if request.method == 'POST':
-
-        # Сравниваем результат ответа
-        # print("POST: ", request.POST)
-        # print('Q Kind: ', request.POST.get('q_kind'))
-        # print('user_set_id: ', request.POST.get('user_set_id'))
-        # print('correct_answers: ', request.POST.get('answers'), 'type: ', type(request.POST.get('answers')))
-        # print('user_answer:', request.POST.get('user_answer'))
-        # print('results_object_id:', request.POST.get('results_object_id'))
-        # print('q_weight: ', request.POST.get('q_weight'))
-
+        #  Вынимаем объект отвеченного ответа
+        answered_q_instance = QuestionSet.objects.get(id=request.POST.get('question_id'))
         # Проверяем вид вопроса
-        if request.POST.get('q_kind') == 'True':
-            user_answers_list = []
-            for a in request.POST.keys():
-                if 'user_answer' in a:
-                    user_answers_list.append(request.POST[a][0])
-
+        if answered_q_instance.q_kind:
+            # Преобразуем ответы пользователя во множество
+            user_answers_set = set()
+            for answer in request.POST.getlist('user_answer'):
+                user_answers_set.add(int(answer.replace('option_', '')))
+            # Вынимаем правильные ответы из вопроса и преобразуем во множество чисел
+            correct_answers_set = set(map(int, (answered_q_instance.answers).split(',')))
             # Если ответ пользователя правильный
-            if request.POST.get('answers') == ','.join(user_answers_list):
+            if user_answers_set == correct_answers_set:
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
-                user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
+                user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                     'correct_q_num', 'score_number')
 
                 # Увеличиваем количество правильных ответов на единицу и записыввем в базу
-                QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
+                QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
                 # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
-                if float(request.POST.get('q_weight')) != 0.0:
-                    updated_score_number = user_result_data[0]['score_number'] + float(request.POST.get('q_weight'))
+                print('answered_q_instance.q_weight', answered_q_instance.q_weight)
+                if answered_q_instance.q_weight != 0:
 
+                    updated_score_number = user_result_data[0]['score_number'] + answered_q_instance.q_weight
                 else:
                     updated_score_number = user_result_data[0]['score_number'] + 1
+                print('updated_score_number', updated_score_number)
 
                 # Обновляем количетво баллов
-                QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
+                QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     score_number=updated_score_number)
             else:
                 print('Не правильный ответ')
 
         else:
+
+            user_aswer=request.POST.get('user_answer').replace('option_', '')
             # Если пользователь правильно ответил на вопрос:
-            if request.POST.get('answer') == request.POST.get('user_answer'):
+            if int(answered_q_instance.answer) == int(user_aswer):
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
-                user_result_data = QuizeResults.objects.filter(id=request.POST.get('results_object_id')).values(
+                user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                     'correct_q_num', 'score_number')
 
                 # Увеличиваем количество правильных ответов на единицу и записыввем в базу
-                QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
+                QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
                 # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
-                if float(request.POST.get('q_weight')) != 0.0:
-                    updated_score_number = user_result_data[0]['score_number'] + float(request.POST.get('q_weight'))
+                print('answered_q_instance.q_weight', answered_q_instance.q_weight)
+                if float(answered_q_instance.q_weight) != 0:
+                    updated_score_number = user_result_data[0]['score_number'] + float(answered_q_instance.q_weight)
 
                 else:
                     updated_score_number = user_result_data[0]['score_number'] + 1
+                print('updated_score_number', updated_score_number)
 
                 # Обновляем количетво баллов
-                QuizeResults.objects.filter(id=request.POST.get('results_object_id')).update(
+                QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     score_number=updated_score_number)
             else:
                 print('Не правильный ответ')
 
         # Количество оставшихся у пользователя вопросов
-        q_amount = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('q_sequence_num')
+        q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
 
         # Номера вопросов сгенерированные пользователю
-        q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('questions_ids')
+        q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('questions_ids')
 
         # Проверяем остались ли ещё вопросы в тесте пользователя
         if int(q_amount[0]['q_sequence_num']) > 0:
@@ -279,13 +276,25 @@ def next_question(request):
             # Достаём нужный вопрос из базы вопросов по сквозному номеру
             question = QuestionSet.objects.filter(id=question_pisition).values()
 
+            #  Создаём словарь с вариантами ответов на вопрос
+            option_dict = {}
+            for option_num in range(1, 6):
+                option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+
+            # Содержание context:
+            # 'question' - Сам вопрос
+            # 'tmp_test_id' - ID сформированного теста пользователю
+            # 'result_id' - ID сформированных результатов теста
+            # 'option_dict' - Варианты ответов на вопрос
+
+            context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                       'tmp_test_id': request.POST.get('tmp_test_id'), 'result_id': request.POST.get('result_id'), 'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num']}
+
             # Формируем данные для отправки на страницу тестирования
-            context = {'user_name': request.POST.get("user_name"), 'user_set_id': request.POST.get('user_set_id'),
-                       'question': question, 'results_object_id': request.POST.get('results_object_id'),
-                       'q_kind': question[0]['q_kind'], 'q_num_left': q_amount[0]['q_sequence_num']}
+            #context = {'user_name': request.POST.get("user_name"), 'user_set_id': request.POST.get('user_set_id'), 'question': question, 'results_object_id': request.POST.get('results_object_id'), 'q_kind': question[0]['q_kind'], 'q_num_left': q_amount[0]['q_sequence_num']}
 
             # Обновляем количество оставшихся вопросов
-            QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).update(q_sequence_num=question_sequence)
+            QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).update(q_sequence_num=question_sequence)
 
             # Проверяем содержит ли вопрос мультивыбор
             if question[0]['q_kind'] == False:
@@ -297,11 +306,11 @@ def next_question(request):
 
         else:
             # Вынимаем количество правильных ответов, число вопросов и количество баллов
-            result_data = QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).values(
+            result_data = QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).values(
                 'correct_q_num', 'score_number', 'total_num_q', 'pass_score')
 
             # Вынимаем количество максимально возможных баллов
-            max_score_num = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).values('max_score_amount')
+            max_score_num = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('max_score_amount')
 
             # Вычисляем процент прохождения теста и округляем результат до десятой
             total_result = ('%.0f' % ((result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
@@ -309,19 +318,19 @@ def next_question(request):
             # Если пользователь сдал тест
             if int(total_result) >= int(result_data[0]['pass_score']):
                 #  Вынимаем объект набора вопросов (QuizeSet) для исфользования в фильтре удаления теста польхователя, если он сдал тест
-                set_instance = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id')))
-                QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(
-                    total_result=total_result, conclusion=True)
+                set_instance = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id')))
+                results_instance = QuizeResults.objects.filter(id=int(request.POST.get('result_id')))
+                results_instance.update(total_result=total_result, conclusion=True)
                 # Вынимаем id теста для удаления теста у пользователя
                 user_test_id = set_instance[0].test_id  # ID теста пользователя
                 user_test_name = set_instance[0].quize_name  # Название теста пользователя
                 #  Удаляем тест у пользователя
                 UserTests.objects.filter(user=request.user, test_name=user_test_id).delete()
-                context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                            'conclusion': True}
                 # Удаляем тест пользователя из базы тестов пользователя
-                QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
+                QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
 
                 # Отправляем письмо КРС
                 subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал тест'
@@ -334,7 +343,8 @@ def next_question(request):
 
             # Если пользователь тест НЕ сдал
             else:
-                set_instance = QuizeSet.objects.filter(id=int(request.POST.get('user_set_id')))
+                results_instance = QuizeResults.objects.filter(id=int(request.POST.get('result_id')))
+                set_instance = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id')))
                 user_test_id = set_instance[0].test_id
                 user_test_name = set_instance[0].quize_name  # Название теста пользователя
                 user_test_instance = UserTests.objects.filter(user=request.user, test_name=user_test_id)
@@ -345,25 +355,25 @@ def next_question(request):
 
                 # Если у пользователя не осталось попыток, отправляем письмо КРС
                 if int(num_try) == 0:
-                    QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(
+                    QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).update(
                         total_result=total_result, conclusion=False)
                     subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
                     message = f'Пилот {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name} НЕ сдал Тест: {user_test_name}\nКоличетсво набранных баллов: {total_result}%\nПроходной балл: {result_data[0]["pass_score"]}%\nПопыток сделано: {user_test_instance[0].num_try_initial}'
                     to = common.krs_mail_list
                     email_msg = {'subject': subject, 'message': message, 'to': to}
                     common.send_email(request, email_msg)
-                    context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                    context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                                'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                                'conclusion': False}
-                    QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
+                    QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
                     return render(request, 'results.html', context=context)
                 else:
-                    context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
+                    context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                                'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                                'conclusion': False}
 
-                    QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
-                    QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).delete()
+                    QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
+                    QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).delete()
                     return render(request, 'results.html', context=context)
                 #
                 # Добавляем итоговый результать в отчёт по пользователю
@@ -399,7 +409,6 @@ def tests_results_list(request):
     position_list = Profile.Position.values
     user_search_input = request.GET.get("user_search")
     filter_input = request.GET.get("position_filter")
-    print('filter_input', filter_input)
     no_search_result = False
     if user_search_input or filter_input:
         if user_search_input:
@@ -424,7 +433,6 @@ def tests_results_list(request):
                 return render(request, 'tests_results_list.html', context=context)
             else:
                 #  Постраничная разбивка
-                print('total_user_list', total_user_list)
                 paginator = Paginator(total_user_list, 10)
                 page_number = request.GET.get('page', 1)
                 users = paginator.page(page_number)
@@ -706,6 +714,20 @@ def test_editor(request):
 @login_required
 @group_required('KRS')
 def create_new_test(request):
+    thems = Thems.objects.all()
+    total_q_num_per_them = {}
+    totla_q_num = 0
+    min_q_them = []
+    for them_name in thems:
+        # Считаем количество вопросов в каждой теме, кроме "Все темы"
+        if them_name.id != 5:
+            q_num = QuestionSet.objects.filter(them_name=them_name).count()
+            total_q_num_per_them[f'{them_name.id}'] = q_num
+            totla_q_num += 1
+            min_q_them.append(q_num)
+    min_q_them.sort()
+    total_q_num_per_them['5'] = min_q_them[0]
+
     QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
@@ -725,6 +747,7 @@ def create_new_test(request):
                                                 q_num=question['q_num'], )
             return redirect('quize737:test_editor')
         else:
+
             form_errors = []  # Ошибки при валидации формы
             for error in test_q_set.errors:
                 if len(error) > 0:
@@ -732,27 +755,13 @@ def create_new_test(request):
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors}
+                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them}
             return render(request, 'new_test_form.html', context=context)
     else:
-        thems = Thems.objects.all()
-        total_q_num_per_them = {}
-        totla_q_num = 0
-        min_q_them = []
-        for them_name in thems:
-            # Считаем количество вопросов в каждой теме, кроме "Все темы"
-            if them_name.id != 5:
-                q_num = QuestionSet.objects.filter(them_name=them_name).count()
-                total_q_num_per_them[f'{them_name.id}'] = q_num
-                totla_q_num += 1
-                min_q_them.append(q_num)
-        min_q_them.sort()
-        total_q_num_per_them['5'] = min_q_them[0]
-        print("Q_NUM DICT:", total_q_num_per_them)
+
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
         test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
-        # print('form_set:', dir(test_q_set[0]))
         context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them}
         return render(request, 'new_test_form.html', context=context)
 
@@ -869,7 +878,6 @@ def user_list(request):
             else:
                 total_user_list = Profile.objects.filter(position=filter_input)
                 #  Постраничная разбивка
-                print('total_user_list', total_user_list)
                 paginator = Paginator(total_user_list, 20)
                 page_number = request.GET.get('page', 1)
                 users = paginator.page(page_number)
@@ -1021,7 +1029,6 @@ def file_upload(request):
                                 else:
                                     q_weight = row['q_weight']
                                 # проверяем наличие вопроса
-                                # TODO: доделать проверку если в фале в вопросе были зменены параметры, а сам вопрос остался прежним
                                 if not QuestionSet.objects.filter(question=row['question']):
                                     question = QuestionSet.objects.get_or_create(them_name=them[0],
                                                                                  question=row['question'],

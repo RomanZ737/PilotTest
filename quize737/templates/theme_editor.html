@@ -8,7 +8,9 @@
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:new_question' %}">Добавить вопрос</a>
             <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:theme_editor' %}">РЕДАКТОР ТЕМЫ</a>
+            <a href="{% url 'quize737:theme_editor' %}">СПИСОК ТЕМ</a>
+            <span style="color: black;"> | </span>
+            <a href="{% url 'quize737:new_theme' %}">Добавить Тему</a>
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
             <span style="color: black;"> | </span>
@@ -18,7 +20,7 @@
     </legend>
 
     <div class="block-list">
-        <p><a href="{% url 'quize737:new_theme' %}">+ Добавить тему</a></p>
+<!--        <p><a href="{% url 'quize737:new_theme' %}">+ Добавить тему</a></p>-->
             {% for theme in themes %}
                 {% if theme.name != 'Все темы'%}
             <div class="block_light_up">

@@ -41,8 +41,15 @@ form {
 
 /* Текст вопроса */
 label.question {
+    position: relative;
+    word-wrap: break-word;
+    left: 4%;
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 20px;
     color: black;
-    font-size: 30px;
+    font-size: 26px;
+    width: 95%;
 }
 
 label.option {
@@ -50,12 +57,12 @@ label.option {
     font-size: 25px;
 }
 
-button {
-    background-color: rgb(209, 209,209); /* Цвет NWS Dark Gray */
-    text-align: center;
-    display: inline-block;
-    font-size: 15px;
-    color: black;
+div.button_answer {
+    position: relative;
+    left: 4%;
+    display: block;
+    margin-top: 40px;
+    margin-bottom: 5px;
 
 }
 
@@ -66,6 +73,14 @@ button {
 input[type='radio']{
     width: 20px;
     height: 20px;
+}
+
+div.radiobuttons {
+  position: relative;
+  display: block;
+  left: 7%;
+  margin-bottom: 12px;
+  word-wrap: break-word;
 }
 
 a {
@@ -107,4 +122,18 @@ span.negative{
     color: rgb(142, 23, 11);
     font-size: 20px;
     font-weight: bold;
+}
+
+div.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
+    position: relative;
+    left: 3%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.options_block {
+    position: relative;
+    left: 3%;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

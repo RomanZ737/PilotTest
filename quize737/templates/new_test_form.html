@@ -32,7 +32,7 @@
         {{ test_q_set.management_form }}
         {% for form in test_q_set.forms %}
         <div class="q_forms">
-            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span><span id="max_q_{{ forloop.counter|sub:'1' }}">Max. </span>
+            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span><span id="max_q_{{ forloop.counter|sub:'1' }}"> Max. </span>
 
         </div>
         <br>
@@ -131,16 +131,18 @@
             container.insertBefore(newForm, addButton)
             var sp1 = document.createElement("br")
             container.insertBefore(sp1, addButton)
-            newForm.addEventListener('change', ThemSelection); // Вешаем listener на объект select
+
+            //newForm.addEventListener('change', ThemSelection); // Вешаем listener на объект select
 
 
 
             totalForms.setAttribute('value', `${formNum+1}`)
 
-            // Устанавливаем начальные значения
+            // Устанавливаем начальные значения и listener
             let q_field = document.getElementById(`id_questions-${formNum}-q_num`) // Ищем новое поле с количеством вопросов
             q_field.setAttribute('value', '1')
             let them_field = document.getElementById(`id_questions-${formNum}-theme`) // Ищем новое поле с темой
+            them_field.addEventListener('change', ThemSelection);
             them_field.value = '5'
             let numOfqAct = document.getElementById('5').value
             document.getElementById("max_q_" + formNum).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов

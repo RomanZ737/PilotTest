@@ -28,7 +28,7 @@ class QuestionSet(models.Model):
     option_5 = models.CharField(max_length=500, verbose_name='Вариант 5', blank=True, null=True)
     q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
                                  help_text='Если вопрос подразумевает несколько правильных ответов')
-    q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0,
+    q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0.0,
                                  help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
     answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа',
                                  help_text='Поле используется если вопрос подразумевает один ответ, True - если один ответ, False - если несколько ответов', blank=True,
@@ -48,7 +48,7 @@ class QuestionSet(models.Model):
 # Сгенерированнный Тест для конекретного пользователя
 class QuizeSet(models.Model):
     """Варианты тестов"""
-    test_id = models.IntegerField(verbose_name='id теста из которого сформирован QuizeSet')
+    test_id = models.IntegerField(verbose_name='id теста из которого сформирован QuizeSet', null=True)
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
@@ -58,9 +58,9 @@ class QuizeSet(models.Model):
                                      help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
-    max_score_amount = models.IntegerField(default=0, verbose_name='Максимальное кол-во баллов',
+    max_score_amount = models.FloatField(verbose_name='Максимальное кол-во баллов',
                                            help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
-    pass_score = models.IntegerField(verbose_name='Количество правильных ответов',
+    pass_score = models.IntegerField(default=0, verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
 
     def __str__(self):
@@ -70,7 +70,7 @@ class QuizeSet(models.Model):
 # Объект результат теста конкретного пользователя
 class QuizeResults(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID пользователя',
-                                help_text='ID пользователя, для упрощённого поиска результатов')
+                                help_text='ID пользователя, для упрощённого поиска результатов', null=True)
     user_name = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                  help_text='Имя пользователя, который проходил тест')
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
@@ -79,9 +79,9 @@ class QuizeResults(models.Model):
     timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=datetime.now)
     questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True)
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
-    score_number = models.IntegerField(verbose_name='Количество баллов')
+    score_number = models.FloatField(verbose_name='Количество баллов')
     total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
-    pass_score = models.IntegerField(verbose_name='Количество правильных ответов',
+    pass_score = models.IntegerField(default=0, verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
     conclusion = models.BooleanField(verbose_name='Итоговый результат', null=True, help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
 
