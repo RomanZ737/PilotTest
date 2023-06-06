@@ -82,7 +82,7 @@ def start(request, id=None):
         total_q_number = 0  # Общее количество вопросов в тесте для пользователя
         all_theme_set = []  # Объекты вопросов для пользователя
         particular_user_questions = []  # Номера вопросов в сформированном для пользоваетля тесте
-        #thems_num = Thems.objects.all().count()  # Общее количество тем
+        # thems_num = Thems.objects.all().count()  # Общее количество тем
         max_score_number = 0  # Максимальное количество баллов по сгенерированным вопросам
         # Перебераем темы вопросов
         for q_set in q_sets_instances:
@@ -91,8 +91,9 @@ def start(request, id=None):
                 for theme in Thems.objects.all():
                     if theme.name != 'Все темы':
                         quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
-                        quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
-                        all_theme_set.append(quiz_set)  #Добавляем выбранные вопросы в список
+                        quiz_set = random.sample(list(quiz_set), int(
+                            q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
+                        all_theme_set.append(quiz_set)  # Добавляем выбранные вопросы в список
                         # Считаем количество вопросов
                         total_q_number += int(q_set['q_num'])
             # Сохраняем вопросы для пользователя в базу
@@ -113,15 +114,16 @@ def start(request, id=None):
 
         test_name = test_instance[0].name
         #  Формируем объект теста пользователя (создаётся на время теста)
-        user_quize_set = QuizeSet.objects.create(   # Объект сформированного теста для пользователя
+        user_quize_set = QuizeSet.objects.create(  # Объект сформированного теста для пользователя
             test_id=test_instance[0].id,  # ID теста, назначенного пользователю
-            quize_name=test_name,  #  Название теста
+            quize_name=test_name,  # Название теста
             user_under_test=user_instance.username,  # Логин (уникальный) пользователя проходящего тест
             # Переводим список номеров вопросов в строку для хранения в поле базы данных
-            questions_ids=' '.join(particular_user_questions),  # Номера вопросов в сформированном для пользоваетля тесте
+            questions_ids=' '.join(particular_user_questions),
+            # Номера вопросов в сформированном для пользоваетля тесте
             q_sequence_num=total_q_number,  # Общее количество вопросов
             max_score_amount=max_score_number,  # Масимальное количество баллов по тесту
-            pass_score=test_instance[0].pass_score  #  Минимальный проходной бал по тесту
+            pass_score=test_instance[0].pass_score  # Минимальный проходной бал по тесту
         )
 
         # -------  В этом месте генерируем первый вопрос теста пользователя
@@ -153,19 +155,20 @@ def start(request, id=None):
 
         #  Создаём словарь с вариантами ответов на вопрос
         option_dict = {}
-        for option_num in range(1,6):
+        for option_num in range(1, 6):
             option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
 
-
         # Содержание context:
-            # 'question' - Сам вопрос
-            # 'tmp_test_id' - ID сформированного теста пользователю
-            # 'result_id' - ID сформированных результатов теста
-            # 'option_dict' - Варианты ответов на вопрос
+        # 'question' - Сам вопрос
+        # 'tmp_test_id' - ID сформированного теста пользователю
+        # 'result_id' - ID сформированных результатов теста
+        # 'option_dict' - Варианты ответов на вопрос
 
-        context = {'question': question[0]['question'], 'question_id': question[0]['id'], 'tmp_test_id': user_quize_set.id, 'result_id': result_obj.id, 'option_dict': option_dict, 'q_num_left': total_q_number}
+        context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                   'tmp_test_id': user_quize_set.id, 'result_id': result_obj.id, 'option_dict': option_dict,
+                   'q_num_left': total_q_number}
 
-        #context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id, 'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'], 'q_num_left': total_q_number}
+        # context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id, 'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'], 'q_num_left': total_q_number}
 
         # Проверяем содержит ли вопрос мультивыбор
         if not question[0]['q_kind']:
@@ -188,6 +191,7 @@ def start(request, id=None):
             user_tests = UserTests.objects.filter(user=request.user)
             context = {'user_tests': user_tests}
             return render(request, 'start.html', context=context)
+
 
 @login_required  # Только для зарегитсрированных пользователей
 # Генерация последующих вопросов
@@ -232,7 +236,7 @@ def next_question(request):
 
         else:
 
-            user_aswer=request.POST.get('user_answer').replace('option_', '')
+            user_aswer = request.POST.get('user_answer').replace('option_', '')
             # Если пользователь правильно ответил на вопрос:
             if int(answered_q_instance.answer) == int(user_aswer):
 
@@ -288,10 +292,11 @@ def next_question(request):
             # 'option_dict' - Варианты ответов на вопрос
 
             context = {'question': question[0]['question'], 'question_id': question[0]['id'],
-                       'tmp_test_id': request.POST.get('tmp_test_id'), 'result_id': request.POST.get('result_id'), 'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num']}
+                       'tmp_test_id': request.POST.get('tmp_test_id'), 'result_id': request.POST.get('result_id'),
+                       'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num']}
 
             # Формируем данные для отправки на страницу тестирования
-            #context = {'user_name': request.POST.get("user_name"), 'user_set_id': request.POST.get('user_set_id'), 'question': question, 'results_object_id': request.POST.get('results_object_id'), 'q_kind': question[0]['q_kind'], 'q_num_left': q_amount[0]['q_sequence_num']}
+            # context = {'user_name': request.POST.get("user_name"), 'user_set_id': request.POST.get('user_set_id'), 'question': question, 'results_object_id': request.POST.get('results_object_id'), 'q_kind': question[0]['q_kind'], 'q_num_left': q_amount[0]['q_sequence_num']}
 
             # Обновляем количество оставшихся вопросов
             QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).update(q_sequence_num=question_sequence)
@@ -334,11 +339,11 @@ def next_question(request):
 
                 # Отправляем письмо КРС
                 subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал Тест'
-                message = f'<p>Пилот <b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p>' \
-                          f'<p style="color: rgb(148, 192, 74); font-size: 25px;"> СДАЛ ТЕСТ</p>' \
-                          f'<p style="font-size: 20px;">Название теста: {user_test_name}</p>' \
-                          f'<p style="font-size: 20px;">Количетсво набранных баллов: {total_result}%</p>' \
-                          f'<p style="font-size: 20px;">Проходной балл: {result_data[0]["pass_score"]}%</p>'
+                message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                          f'<p style="color: rgb(148, 192, 74); font-size: 20px;"><b>СДАЛ ТЕСТ</b></p>' \
+                          f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
+                          f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
+                          f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>'
                 to = common.krs_mail_list
                 email_msg = {'subject': subject, 'message': message, 'to': to}
                 common.send_email(request, email_msg)
@@ -362,7 +367,11 @@ def next_question(request):
                     QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).update(
                         total_result=total_result, conclusion=False)
                     subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
-                    message = f'Пилот {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name} НЕ сдал Тест: {user_test_name}\nКоличетсво набранных баллов: {total_result}%\nПроходной балл: {result_data[0]["pass_score"]}%\nПопыток сделано: {user_test_instance[0].num_try_initial}'
+                    message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                              f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>НЕ СДАЛ ТЕСТ</b></p>' \
+                              f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
+                              f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
+                              f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>'
                     to = common.krs_mail_list
                     email_msg = {'subject': subject, 'message': message, 'to': to}
                     common.send_email(request, email_msg)
@@ -386,7 +395,6 @@ def next_question(request):
                 # context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
                 #            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                 #            'conclusion': False}
-
 
             # Удаляем тест пользователя из базы
             # QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
@@ -426,7 +434,8 @@ def tests_results_list(request):
                 paginator = Paginator(total_results_list, 10)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
-                context = {'results': results_list_pages, 'no_search_results': no_search_result, 'position_list': position_list}
+                context = {'results': results_list_pages, 'no_search_results': no_search_result,
+                           'position_list': position_list}
                 return render(request, 'tests_results_list.html', context=context)
         else:
             total_user_list = QuizeResults.objects.filter(user_id__profile__position=filter_input)
@@ -482,7 +491,8 @@ def question_list(request):
                 paginator = Paginator(total_questions_list, 15)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
-                context = {'questions': results_list_pages, 'no_search_results': no_search_result, 'them_list': them_list}
+                context = {'questions': results_list_pages, 'no_search_results': no_search_result,
+                           'them_list': them_list}
                 return render(request, 'question_list.html', context=context)
         else:
             them_q_list = QuestionSet.objects.filter(them_name=filter_input)
@@ -539,7 +549,7 @@ def question_list_details(request, id):
     else:
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
                                                           'option_4', 'option_5', 'q_kind', 'q_weight', 'answer',
-                                                          'answers', 'id')
+                                                          'answers', 'id', 'ac_type')
         question_form = QuestionSetForm(result[0])
 
         context = {'question_form': question_form, 'q_id': result[0]['id']}
@@ -581,6 +591,7 @@ def theme_editor(request, id=None):
             themes = paginator.page(page_number)
             context = {'themes': themes}
             return render(request, 'theme_editor.html', context=context)
+
 
 @login_required
 @group_required('KRS')
@@ -865,18 +876,21 @@ def user_list(request):
                 else:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
-                    context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                    context = {'no_search_results': no_search_result, 'results': results,
+                               'position_list': position_list}
                     return render(request, 'user_list.html', context=context)
                 if not total_user_list:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
-                    context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                    context = {'no_search_results': no_search_result, 'results': results,
+                               'position_list': position_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     paginator = Paginator(total_user_list, 20)
                     page_number = request.GET.get('page', 1)
                     users = paginator.page(page_number)
-                    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
+                    context = {'user_list': users, 'no_search_results': no_search_result,
+                               'position_list': position_list}
                     return render(request, 'user_list.html', context=context)
 
             else:
@@ -943,7 +957,7 @@ def user_detales(request, id):
 
                     #  Отправляем письмо пользователю о назначенном тесте
                     subject = f"Вам назначен Тест: '{test['test_name']}'"
-                    message = f"<h4>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</h4>" \
+                    message = f"<p style='font-size: 25px;'><b>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</b></p><br>" \
                               f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
                               f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
                               f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
@@ -1001,7 +1015,7 @@ def file_upload(request):
                 #  Пропускаем первую строку (заголовок)
                 heading = next(csvfile)
                 fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
-                              'q_weight', 'answer', 'answers']
+                              'q_weight', 'answer', 'answers', 'ac_type']
                 reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
                 try:
                     for row in reader:
@@ -1033,7 +1047,7 @@ def file_upload(request):
                                 else:
                                     q_weight = row['q_weight']
                                 # проверяем наличие вопроса
-                                if not QuestionSet.objects.filter(question=row['question']):
+                                if not QuestionSet.objects.filter(Q(question__icontains=row['question'])):
                                     question = QuestionSet.objects.get_or_create(them_name=them[0],
                                                                                  question=row['question'],
                                                                                  option_1=row['option_1'],
@@ -1044,7 +1058,8 @@ def file_upload(request):
                                                                                  q_kind=q_kind,
                                                                                  q_weight=q_weight,
                                                                                  answer=answer,
-                                                                                 answers=answers
+                                                                                 answers=answers,
+                                                                                 ac_type=row['ac_type']
                                                                                  )
                                     if question[1]:
                                         questions_created += 1

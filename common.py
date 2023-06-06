@@ -6,6 +6,7 @@ from decouple import config  # позволяет скрывать критич�
 import os
 
 krs_mail_list = ['pomanz@mail.ru', 'roman.v@zfamily.aero']  #  Список адресов для рассылки сообщений КРС
+fixed_groups = ['KRS B737']
 
 
 def send_email(request, email_msg):

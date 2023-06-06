@@ -17,8 +17,14 @@ class Thems(models.Model):
 
 # Вся база вопросов по всем темам
 class QuestionSet(models.Model):
-    # Имя темы связано с классом Nhem
 
+    class ACType(models.TextChoices):
+        B737 = 'B737', 'Boeing 737'
+        B777 = 'B777', 'Boeing 777'
+        A32X = 'A32X', 'Airbus 32X'
+        A33X = 'A33X', 'Airbus 33X'
+
+    # Имя темы связано с классом Them
     them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
     question = models.CharField(unique=True, max_length=255, verbose_name='Вопрос')
     option_1 = models.CharField(max_length=500, verbose_name='Вариант 1')
@@ -36,6 +42,7 @@ class QuestionSet(models.Model):
     answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос',
                                help_text='Поле используется если вопрос подразумевает несколько правильных ответов',
                                blank=True, null=True)
+    ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACType.choices, null=True)
 
     class Meta:
         ordering = ['-them_name']

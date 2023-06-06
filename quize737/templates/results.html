@@ -2,29 +2,47 @@
 
 {% block content %}
 <section>
-<fieldset>
-    <legend>Результат теста</legend>
+    <div class="result_list">
+        <fieldset>
+                <legend>Результат теста</legend>
+                    <h1>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</h1>
+                    <br>
+                    <div class="list-other_field">
+                        <span>Общее количество вопросов:</span>
+                    </div>
+                    <div class="list-other_field">
+                        <span class="mark_up">{{total_num_q}}</span>
+                    </div>
+                    <div class="list-other_field">
+                        <span>Количество правильных ответов:</span>
+                    </div>
+                    <div class="list-other_field">
+                        <span class="mark_up">{{correct_q_num}}</span>
+                    </div>
+                    <div class="list-other_field">
+                        <span>Результать теста с учётом "веса" вопросов</span>
+                    </div>
+                    <div class="list-other_field">
+                        <span class="mark_up">{{total_result}}%</span>
+                    </div>
 
-<h1>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</h1>
-<br>
-    <h2>Общее количество вопросов: <span class="mark_up">{{total_num_q}}</span></h2>
+                        {% if conclusion%}
+                            <div class="list-other_field">
+                                <span class="positive">ТЕСТ СДАН</span>
+                            </div>
+                        {% else %}
+                            <div class="list-other_field">
+                                <span class="negative">ТЕСТ НЕ СДАН</span>
+                            </div>
+                        {% endif %}
 
-    <h2>Количество правильных ответов: <span class="mark_up">{{correct_q_num}}</span></h2>
-
-    <h2>Результать теста с учётом "веса" вопросов <span class="mark_up">{{total_result}}%</span></h2>
-
-    {% if conclusion%}
-    <span class="positive">ТЕСТ СДАН</span>
-    {% else %}
-    <span class="negative">ТЕСТ НЕ СДАН</span>
-    {% endif %}
-
-<br>
-<form method='get' action='{% url "start" %}'>
-    <br>
-    <br>
-<input type="submit" value="На главную">
-</form>
-</fieldset>
+                    <br>
+                    <form method='get' action='{% url "start" %}'>
+                        <br>
+                        <br>
+                    <input type="submit" value="На главную">
+                    </form>
+        </fieldset>
+    </div>
 </section>
 {% endblock %}

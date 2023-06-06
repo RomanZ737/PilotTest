@@ -140,7 +140,7 @@ span.list-title {
 
 div.block-list {  /* Основной блок таблицы со списком данных */
     position: relative;
-
+    padding: 1%;
 }
 
 #head_1 {  /* Шапка таблицы данных, пока не используется */
@@ -197,7 +197,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
     width: 9%;
-    text-align: right;
+    text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
 }
@@ -213,7 +213,6 @@ div.list-question {  /* блок Текст вопроса в таблице */
 div.list-delete {  /* блок Удалить каки-либо запись в таблице */
     position: relative;
     display: inline-block;
-    width: 16%;
     text-align: left;
 }
 
@@ -227,6 +226,7 @@ div.hr {  /* блок горизонтальная линия, пока не и�
 
 div.paginator {  /* блок списка страниц */
     text-align: center;
+    margin: 5px;
 }
 
 div.block_light_up:hover {  /* блок всей строки данных в таблице ПРИ НАВЕДЕНИИ КУРСОРА*/
@@ -236,6 +236,10 @@ div.block_light_up:hover {  /* блок всей строки данных в т
 div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
     margin-bottom: -1px;
+}
+
+spot.block_light_up:hover {  /* блок всей строки данных в таблице */
+    background-color: #4f93ce;
 }
 
 div.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
@@ -278,4 +282,23 @@ div.list-other_field {    /* блок для остальных типов да�
     vertical-align: middle;
     margin-bottom: 5px;
     margin-top: 5px;
+}
+
+div.list-group {  /* блок группа в таблице */
+    position: relative;
+    display: inline-block;
+    width: 20%;
+    text-align: left;
+    color: rgb(170, 39, 47);
+    font-size: 18px;
+    word-wrap: break-word;
+}
+
+div.list-group_description { /* блок описание группы в таблице */
+    position: relative;
+    display: inline-block;
+    width: 60%;
+    text-align: left;
+    font-size: 18px;
+    word-wrap: break-word;
 }

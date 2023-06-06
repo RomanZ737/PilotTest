@@ -21,22 +21,25 @@
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
         </legend>
+    <div class="block-list">
         <form id="question_data" method='post'>
             {% csrf_token %}
 <!--            {% for error in question_form.errors %}-->
 <!--            <p>{{error}}</p>-->
 <!--            {% endfor %}-->
-            <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
-            <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
-            <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
-            <p>{{question_form.option_2.label}}: {{question_form.option_2}}</p>
-            <p>{{question_form.option_3.label}}: {{question_form.option_3}}</p>
-            <p>{{question_form.option_4.label}}: {{question_form.option_4}}</p>
-            <p>{{question_form.option_5.label}}: {{question_form.option_5}}</p>
-            <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
-            <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
-            <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
-            <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
+
+                <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
+                <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
+                <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
+                <p>{{question_form.option_2.label}}: {{question_form.option_2}}</p>
+                <p>{{question_form.option_3.label}}: {{question_form.option_3}}</p>
+                <p>{{question_form.option_4.label}}: {{question_form.option_4}}</p>
+                <p>{{question_form.option_5.label}}: {{question_form.option_5}}</p>
+                <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
+                <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
+                <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
+                <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
+                <p id="ac_type">{{question_form.ac_type.label}}: {{question_form.ac_type}}</p>
         </form>
 
         <form method="post" action="{% url 'quize737:question_del' q_id %}" id="del_question_form">
@@ -50,7 +53,7 @@
         <input type="submit" value="Удалить вопрос" form="del_question_form" onclick="return confirm('Удалить Вопрос?') || event.preventDefault()">
 <!--        <br>-->
 <!--        <input type="submit" value="Вернуться" form="back_to_list">-->
-
+    </div>
 </fieldset>
 </div>
 <!--<div class="right_side">-->

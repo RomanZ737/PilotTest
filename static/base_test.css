@@ -137,3 +137,15 @@ div.options_block {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+div.list-other_field {    /* блок для остальных типов данным в списке */
+    position: relative;
+    display: inline-block;
+    left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    width: 40%;
+    vertical-align: middle;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
