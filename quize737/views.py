@@ -333,8 +333,12 @@ def next_question(request):
                 QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
 
                 # Отправляем письмо КРС
-                subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал тест'
-                message = f'Пилот {request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name} Сдал Тест: {user_test_name}\nКоличетсво набранных баллов: {total_result}%\nПроходной балл: {result_data[0]["pass_score"]}%'
+                subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал Тест'
+                message = f'<p>Пилот <b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p>' \
+                          f'<p style="color: rgb(148, 192, 74); font-size: 25px;"> СДАЛ ТЕСТ</p>' \
+                          f'<p style="font-size: 20px;">Название теста: {user_test_name}</p>' \
+                          f'<p style="font-size: 20px;">Количетсво набранных баллов: {total_result}%</p>' \
+                          f'<p style="font-size: 20px;">Проходной балл: {result_data[0]["pass_score"]}%</p>'
                 to = common.krs_mail_list
                 email_msg = {'subject': subject, 'message': message, 'to': to}
                 common.send_email(request, email_msg)
@@ -940,9 +944,9 @@ def user_detales(request, id):
                     #  Отправляем письмо пользователю о назначенном тесте
                     subject = f"Вам назначен Тест: '{test['test_name']}'"
                     message = f"<h4>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</h4>" \
-                              f"Вам назначен тест: <b>'{test['test_name']}'</b><br>" \
-                              f"На портале {config('SITE_URL', default='')}<br>" \
-                              f"Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b>"
+                              f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
+                              f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
+                              f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
 
                     email_msg = {'subject': subject, 'message': message, 'to': user[0].email}
                     send_email(request, email_msg)
