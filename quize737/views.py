@@ -8,6 +8,8 @@ import re
 import sys
 
 import common
+
+from django.core.exceptions import ObjectDoesNotExist
 from common import send_email
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 from django.contrib.auth.models import User
@@ -901,6 +903,8 @@ def user_list(request):
                 users = paginator.page(page_number)
                 context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
                 return render(request, 'user_list.html', context=context)
+
+
         else:
             total_user_list = Profile.objects.all()  # Вынимаем всех пользователей
             #  Постраничная разбивка
@@ -910,11 +914,32 @@ def user_list(request):
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
             return render(request, 'user_list.html', context=context)
 
+# Список пользователей конуретной группы
+@login_required
+@group_required('KRS')
+def group_users(request, id):
+    position_list = Profile.Position.values
+    no_search_result = False
+    total_user_list = Profile.objects.filter(user_id__groups=id)
+    if not total_user_list:
+        no_search_result = True
+        group_name = Group.objects.get(id=id).values('name')
+        results = f'Пилоты в группе "{group_name}" не найдены'
+        context = {'no_search_results': no_search_result, 'results': results,
+                   'position_list': position_list}
+        return render(request, 'user_list.html', context=context)
+    paginator = Paginator(total_user_list, 20)
+    page_number = request.GET.get('page', 1)
+    users = paginator.page(page_number)
+    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
+    return render(request, 'user_list.html', context=context)
 
 @login_required
 @group_required('KRS')
-def group_list(request):
+def group_list(request, id=None):
     if request.method == 'POST':
+        pass
+    if id:
         pass
     else:
         groups = Group.objects.all()
@@ -923,6 +948,75 @@ def group_list(request):
         groups_pages = paginator.page(page_number)
         context = {'groups': groups_pages}
         return render(request, 'group_list.html', context=context)
+
+
+# Обрабатываем вызов деталей конкретной группы для назначения тестов
+@login_required
+@group_required('KRS')
+def group_details(request, id):
+    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet, can_delete=True)  # Extra - количество строк формы
+    group = Group.objects.get(id=id)
+    if request.method == 'POST':
+        tests_for_group_form = UserTestForm(request.POST, request.FILES)
+        if tests_for_group_form.is_valid():
+            for test in tests_for_group_form.cleaned_data:
+                #  Удаляем все объекты
+                # Проверяем было ли указано имя объекта
+                try:
+                    if UserTests.objects.get(test_name=test['test_name']):
+                        UserTests.objects.filter(test_name=test['test_name']).delete()
+                except Exception:
+                    pass
+                # Создаём только те объекты, которые не помечены для удаления
+                if not test['DELETE']:
+                    #  Вынимаем всех пользователей группы
+                    total_user_list = Profile.objects.filter(user_id__groups=id)
+                    #  Перебираем всех пользователей группы
+                    for user in total_user_list:
+                        # Проверяем есть ли у пользователя этот тест
+                        try:
+                            user_test_exists = UserTests.objects.get(test_name=test['test_name'])
+                        except UserTests.DoesNotExist:
+                            user_test_exists = None
+                        if not user_test_exists:
+                            UserTests.objects.create(user=user,
+                                                     test_name=test['test_name'],
+                                                     num_try_initial=test['num_try'],
+                                                     num_try=test['num_try'],
+                                                     date_before=test['date_before'])
+
+                            #  Отправляем письмо пользователю о назначенном тесте
+                            subject = f"Вам назначен Тест: '{test['test_name']}'"
+                            message = f"<p style='font-size: 25px;'><b>Уважаемый, {user.profile.first_name} {user.profile.middle_name}.</b></p><br>" \
+                                      f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
+                                      f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
+                                      f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
+
+                            email_msg = {'subject': subject, 'message': message, 'to': user.email}
+                            send_email(request, email_msg)
+
+            # Загружаем новые данные в форму
+            # user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
+            # tests_for_user_form = UserTestForm(initial=user_tests)
+            context = {'group': group, 'test_and_data_saved': True}
+            return render(request, 'user_ditales.html', context=context)
+
+        else:
+            form_errors = []  # Ошибки при валидации формы
+            for error in tests_for_group_form.errors:
+                if len(error) > 0:
+                    for value in error.values():
+                        form_errors.append(value)
+            errors_non_form = tests_for_group_form.non_form_errors
+            context = {'group': group, 'group_tests': tests_for_group_form,
+                       'non_form_errors': errors_non_form,
+                       'form_errors': form_errors, 'group_id': id}
+            return render(request, 'user_ditales.html', context=context)
+    else:
+        tests_for_group_form = UserTestForm()
+        print('tests_for_group_form', tests_for_group_form)
+        context = {'group': group, 'group_tests': tests_for_group_form, 'group_id': id}
+        return render(request, 'group_details.html', context=context)
 
 
 @login_required

@@ -11,13 +11,18 @@
             <div>
                 <spot class="block_light_up">
                     <div class="list-group">
-                        <a href="{{group.id}}"><span class="theme_color">{{group}}</span></a>
+                        <a href="{% url 'quize737:group_details' group.id %}"><span class="theme_color">{{group}}</span></a>
                     </div>
                     <span style="color: black;">|</span>
                     <div class="list-group_description">
                         {{group.groupsdescription.discription}}
                     </div>
-                        <span style="color: black;">|</span>
+                    <span style="color: black;">|</span>
+                    <div class="list-group_users">
+                        <a href="{% url 'quize737:group_users' group.id %}">Список группы</a>
+                    </div>
+
+                    <span style="color: black;">|</span>
                     <div class="list-delete">
                         <a href="" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="theme_del">Удалить Группу</a>
                     </div>
@@ -25,7 +30,7 @@
             </div>
         {% endfor %}
 
-
+            <br>
             {% include "paginator.html" with page=groups %}
 
     </div>

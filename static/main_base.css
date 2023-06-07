@@ -297,7 +297,15 @@ div.list-group {  /* блок группа в таблице */
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 60%;
+    width: 35%;
+    text-align: left;
+    font-size: 18px;
+}
+
+div.list-group_users {
+    position: relative;
+    display: inline-block;
+    width: 25%;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;

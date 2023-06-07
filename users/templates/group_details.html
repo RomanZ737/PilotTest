@@ -1,0 +1,125 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<fieldset>
+    <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">ГРУППЫ</a></legend>
+
+
+    <h1> {{group.name}}</h1>
+    <p>{{group.groupsdescription.discription}}</p>
+
+    <h4>{{non_form_errors}}</h4>
+    {% for error in form_errors%}
+        <h4>{{error}}</h4>
+    {% endfor %}
+
+
+    {% if test_and_data_saved %}
+    <p class="result_confirm">Данные сохранены, тесты пользователям группы назначены</p>
+    {% endif %}
+
+<form id="user_tests_form" method='post'>
+      {% csrf_token %}
+        {{ user_tests.management_form }}
+        {% for form in group_tests %}
+        <div class="form_set">
+            <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>
+        </div>
+        <br>
+        {% endfor %}
+
+        <input id="add-form" type="submit" value="+ Назначить новый тест">
+        <br>
+        <br>
+
+        <input type="submit" value="Сохранить" id="save_btn">
+        <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+    </form>
+<!--    <form method='get' action='{% url "quize737:user_list" %}'>-->
+<!--        <button type="submit">Вернуться</button>-->
+<!--    </form>-->
+    <div class="form_set" style="display:none">
+        <span class="empty_form">Название теста: {{ group_tests.empty_form.test_name }} Количество попыток: {{ group_tests.empty_form.num_try }} Выполнить до: {{group_tests.empty_form.date_before}}</span><span>{{group_tests.empty_form.DELETE}} Удалить тест </span>
+    </div>
+
+</fieldset>
+
+<p id="demo_0"></p>
+<p id="demo_1"></p>
+<p id="demo_2"></p>
+
+<script type="text/javascript">
+
+        let qForm = document.querySelectorAll(".form_set")  // Подсчитывем изначальное количество форм
+        let container = document.querySelector("#user_tests_form")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+
+
+        let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
+
+        addButton.addEventListener('click', addForm)
+
+        function addForm(e){
+            e.preventDefault()
+
+            qForm = document.querySelectorAll(".form_set")
+
+            formNum = qForm.length-1
+
+            //document.getElementById("demo_1").innerHTML = 'AFTER: ' + ' formNum: ' + formNum
+
+            if (formNum > 0) {
+                let newForm = qForm[0].cloneNode(true)
+                let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+                container.insertBefore(newForm, addButton)
+                var sp1 = document.createElement("br")
+                container.insertBefore(sp1, addButton)
+                formNum++
+
+                newForm.setAttribute('style', 'display')
+
+                totalForms.setAttribute('value', `${formNum}`)
+
+                //let test_name = document.getElementById(`id_form-${formNum}-test_name`) // Ищем новое поле с количеством вопросов
+                //test_name.setAttribute('value', '1')
+                //let them_field = document.querySelector(`#id_form-${formNum}-num_try`) // Ищем новое поле с темой
+                //them_field.value = '3'
+                //let form_vis = document.getElementById
+
+            } else {
+
+                let newForm = qForm[0].cloneNode(true)
+                let formRegex = RegExp('__prefix__', 'g')
+
+                formNum++
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `0`)
+                container.insertBefore(newForm, addButton)
+                var sp1 = document.createElement("br")
+                container.insertBefore(sp1, addButton)
+
+                newForm.setAttribute('style', 'display')
+
+
+                totalForms.setAttribute('value', `${formNum}`)
+            }
+
+
+
+        }
+
+
+
+        const btn = document.getElementById('save_btn');
+
+        btn.addEventListener('click', () => {
+          btn.style.display = 'none';
+          const box = document.getElementById('wait');
+          box.style.display = 'block';
+        });
+
+</script>
+
+{% endblock %}

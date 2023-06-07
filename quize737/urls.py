@@ -27,6 +27,7 @@ urlpatterns = [
     path('test_editor/<int:id>/del_test/', views.del_test, name='test_details'),
     path('user_list/', views.user_list, name='user_list'),
     path('group_list/', views.group_list, name='group_list'),
+    path('group_list/<int:id>', views.group_list, name='group_list'),
     path('user_list/<int:id>', views.user_detales, name='user_detales'),
     path('file_upload/', views.file_upload, name='file_upload'),
     path('question_list/question_del/<int:id>', views.question_del, name='question_del'),
@@ -35,6 +36,7 @@ urlpatterns = [
     path('theme_editor/<int:id>/', views.theme_editor, name='theme_editor'),
     path('theme_editor/<int:id>/theme_del/', views.theme_del, name='theme_del'),
     path('new_theme/', views.new_theme, name='new_theme'),
-    path('question_form_file_download/', views.question_form_file_download, name='question_form_file_download')
-
+    path('question_form_file_download/', views.question_form_file_download, name='question_form_file_download'),
+    path('group_users/<int:id>', views.group_users, name='group_users'),
+    path('group_details/<int:id>', views.group_details, name='group_details')
     ]
