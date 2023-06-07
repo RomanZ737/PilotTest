@@ -1045,6 +1045,12 @@ def new_group(request):
         context = {'form': group_form}
         return render(request, 'new_group.html', context=context)
 
+#  Удаление группы
+@login_required
+@group_required('KRS')
+def group_del(request, id):
+    Group.objects.get(id=id).delete()
+    return redirect('quize737:group_list')
 
 @login_required
 @group_required('KRS')

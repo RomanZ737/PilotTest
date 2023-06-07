@@ -39,5 +39,6 @@ urlpatterns = [
     path('question_form_file_download/', views.question_form_file_download, name='question_form_file_download'),
     path('group_users/<int:id>', views.group_users, name='group_users'),
     path('group_details/<int:id>', views.group_details, name='group_details'),
-    path('new_group/', views.new_group, name='new_group')
+    path('new_group/', views.new_group, name='new_group'),
+    path('group_list/<int:id>/group_del', views.group_del, name='group_del')
     ]

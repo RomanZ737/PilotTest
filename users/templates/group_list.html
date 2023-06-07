@@ -26,7 +26,7 @@
 
                     <span style="color: black;">|</span>
                     <div class="list-delete">
-                        <a href="" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить Группу</a>
+                        <a href="{% url 'quize737:group_del' group.id %}" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить Группу</a>
                     </div>
                 </spot>
             </div>
