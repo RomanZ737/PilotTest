@@ -2,7 +2,13 @@
 
 {% block content %}
 <fieldset>
-    <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">Пруппы</a></legend>
+    <legend>
+        <a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Пруппы</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+    </legend>
 
 
     <h1> {{user_profile.family_name}} {{user_profile.first_name}} {{user_profile.middle_name}}</h1>
@@ -13,15 +19,17 @@
         <h4>{{error}}</h4>
     {% endfor %}
 
+    {% if test_and_data_saved %}
+        <p class="result_confirm">Данные сохранены</p>
+    {% endif %}
+
     {% if user_tests|length > 0 %}
     <p>Назначенные тесты:</p>
     {% else %}
     <p>Назначенные тесты отсутствуют</p>
     {% endif %}
 
-    {% if test_and_data_saved %}
-    <p class="result_confirm">Данные сохранены</p>
-    {% endif %}
+
 
 <form id="user_tests_form" method='post'>
       {% csrf_token %}

@@ -1,0 +1,29 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+
+<fieldset>
+    <legend>
+        <a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Группы</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+    </legend>
+
+ <form id="new_group" method='post'>
+        {% csrf_token %}
+        {% for error in form.errors.values %}
+        <p>{{error}}</p>
+        {% endfor %}
+        <p>Название Группы: {{form.group_name}} </p>
+        <p>Описание группы: {{form.discription}} </p>
+        <br>
+        <input type="submit" value="Добавить">
+    </form>
+<!--    <form method='get' action='{% url "quize737:theme_editor" %}'>-->
+<!--        <button type="submit" >Вернуться</button>-->
+<!--    </form>-->
+</fieldset>
+
+{% endblock %}

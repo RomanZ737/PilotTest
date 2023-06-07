@@ -5,6 +5,8 @@
     <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:group_list' %}">ГРУППЫ</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
     </legend>
     <div class="block-list">
         {% for group in groups %}
@@ -24,7 +26,7 @@
 
                     <span style="color: black;">|</span>
                     <div class="list-delete">
-                        <a href="" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="theme_del">Удалить Группу</a>
+                        <a href="" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить Группу</a>
                     </div>
                 </spot>
             </div>

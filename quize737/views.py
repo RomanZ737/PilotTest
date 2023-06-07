@@ -28,12 +28,12 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
     NewThemeForm
-from users.forms import TestsForUser
+from users.forms import TestsForUser, GroupForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
 from reportlab.pdfbase.ttfonts import TTFont
-from users.models import Profile, UserTests
+from users.models import Profile, UserTests, GroupsDescription
 
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -914,6 +914,7 @@ def user_list(request):
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
             return render(request, 'user_list.html', context=context)
 
+
 # Список пользователей конуретной группы
 @login_required
 @group_required('KRS')
@@ -923,8 +924,8 @@ def group_users(request, id):
     total_user_list = Profile.objects.filter(user_id__groups=id)
     if not total_user_list:
         no_search_result = True
-        group_name = Group.objects.get(id=id).values('name')
-        results = f'Пилоты в группе "{group_name}" не найдены'
+        group_name = Group.objects.get(id=id)#.values('name')
+        results = f'Пилоты в группе "{group_name.name}" не найдены'
         context = {'no_search_results': no_search_result, 'results': results,
                    'position_list': position_list}
         return render(request, 'user_list.html', context=context)
@@ -933,6 +934,7 @@ def group_users(request, id):
     users = paginator.page(page_number)
     context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
     return render(request, 'user_list.html', context=context)
+
 
 @login_required
 @group_required('KRS')
@@ -954,7 +956,8 @@ def group_list(request, id=None):
 @login_required
 @group_required('KRS')
 def group_details(request, id):
-    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet, can_delete=True)  # Extra - количество строк формы
+    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
+                                   can_delete=True)  # Extra - количество строк формы
     group = Group.objects.get(id=id)
     if request.method == 'POST':
         tests_for_group_form = UserTestForm(request.POST, request.FILES)
@@ -970,15 +973,16 @@ def group_details(request, id):
                 # Создаём только те объекты, которые не помечены для удаления
                 if not test['DELETE']:
                     #  Вынимаем всех пользователей группы
-                    total_user_list = Profile.objects.filter(user_id__groups=id)
+                    total_user_list = User.objects.filter(groups=id)
+                    print('total_user_list', total_user_list)
                     #  Перебираем всех пользователей группы
                     for user in total_user_list:
                         # Проверяем есть ли у пользователя этот тест
                         try:
-                            user_test_exists = UserTests.objects.get(test_name=test['test_name'])
+                            user_test_exists = UserTests.objects.get(user=user, test_name=test['test_name'])
                         except UserTests.DoesNotExist:
                             user_test_exists = None
-                        if not user_test_exists:
+                        if user_test_exists is None:
                             UserTests.objects.create(user=user,
                                                      test_name=test['test_name'],
                                                      num_try_initial=test['num_try'],
@@ -999,7 +1003,7 @@ def group_details(request, id):
             # user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             # tests_for_user_form = UserTestForm(initial=user_tests)
             context = {'group': group, 'test_and_data_saved': True}
-            return render(request, 'user_ditales.html', context=context)
+            return render(request, 'group_details.html', context=context)
 
         else:
             form_errors = []  # Ошибки при валидации формы
@@ -1011,12 +1015,35 @@ def group_details(request, id):
             context = {'group': group, 'group_tests': tests_for_group_form,
                        'non_form_errors': errors_non_form,
                        'form_errors': form_errors, 'group_id': id}
-            return render(request, 'user_ditales.html', context=context)
+            return render(request, 'group_details.html', context=context)
     else:
         tests_for_group_form = UserTestForm()
         print('tests_for_group_form', tests_for_group_form)
         context = {'group': group, 'group_tests': tests_for_group_form, 'group_id': id}
         return render(request, 'group_details.html', context=context)
+
+
+#  Создание новой группы
+@login_required
+@group_required('KRS')
+def new_group(request):
+    if request.method == 'POST':
+        group_form = GroupForm(request.POST)
+        if group_form.is_valid():
+            group = Group.objects.create(name=group_form.cleaned_data.get('group_name'))  # Добавить группу разрешений
+            #group.save()
+            GroupsDescription.objects.create(group=group,
+                                             discription=group_form.cleaned_data.get('discription')
+            )
+
+            return redirect('quize737:group_list')
+        else:
+            context = {'form': group_form}
+            return render(request, 'new_group.html', context=context)
+    else:
+        group_form = GroupForm()
+        context = {'form': group_form}
+        return render(request, 'new_group.html', context=context)
 
 
 @login_required

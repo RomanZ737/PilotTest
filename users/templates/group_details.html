@@ -2,7 +2,13 @@
 
 {% block content %}
 <fieldset>
-    <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a><span style="color: black;"> | </span><a href="{% url 'quize737:group_list' %}">ГРУППЫ</a></legend>
+    <legend>
+        <a href="{% url 'quize737:user_list' %}">Пилоты</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">ГРУППЫ</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+    </legend>
 
 
     <h1> {{group.name}}</h1>
@@ -20,7 +26,7 @@
 
 <form id="user_tests_form" method='post'>
       {% csrf_token %}
-        {{ user_tests.management_form }}
+        {{ group_tests.management_form }}
         {% for form in group_tests %}
         <div class="form_set">
             <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>

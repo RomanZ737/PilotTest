@@ -1,11 +1,14 @@
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 # from models import Profile
 from django.contrib.auth.forms import UserCreationForm
-from .models import UserTests
+from .models import UserTests, GroupsDescription
 from django.contrib.admin.widgets import AdminDateWidget
+from django.core.exceptions import ValidationError
 
 import users.models
+
+
 
 
 class ProfileForm(forms.ModelForm):
@@ -52,6 +55,7 @@ MONTH_CHOICES = {
 }
 
 
+# Форма теста для пользователя
 class TestsForUser(forms.ModelForm):
     class Meta:
         model = UserTests
@@ -59,4 +63,26 @@ class TestsForUser(forms.ModelForm):
         widgets = {
             'date_before': forms.SelectDateWidget(months=MONTH_CHOICES),
         }
-        error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"}, 'test_name': {'required': "Поле 'Название теста' не может быть пустым"}}
+        error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"},
+                          'test_name': {'required': "Поле 'Название теста' не может быть пустым"}}
+
+
+# Валидатор для формы GroupForm - проверят уникальность имени группы
+def similar_group_name(value):
+    group_name = Group.objects.filter(name=value)
+    if len(group_name) > 0:
+        raise ValidationError('Группа с таким именем уже существует')
+
+
+# Форма группы для пользователя
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = GroupsDescription
+        # fields = {'group', 'discription'}
+        exclude = ('group',)
+
+    def __init__(self, *args, **kwargs):
+        super(GroupForm, self).__init__(*args, **kwargs)
+        #self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
+        self.fields['group_name'] = forms.CharField(max_length=15)
+        self.fields['group_name'].validators = [similar_group_name]
