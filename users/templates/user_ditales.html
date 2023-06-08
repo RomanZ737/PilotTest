@@ -12,28 +12,53 @@
 
 
     <h1> {{user_profile.family_name}} {{user_profile.first_name}} {{user_profile.middle_name}}</h1>
-    <p>{{user_profile.get_position_display}}</p>
+
+        {% if test_and_data_saved %}
+        <span class="result_confirm">Данные сохранены</span>
+        {% endif %}
+    </p>
 
     <h4>{{non_form_errors}}</h4>
     {% for error in form_errors%}
         <h4>{{error}}</h4>
     {% endfor %}
 
-    {% if test_and_data_saved %}
-        <p class="result_confirm">Данные сохранены</p>
-    {% endif %}
-
-    {% if user_tests|length > 0 %}
-    <p>Назначенные тесты:</p>
-    {% else %}
-    <p>Назначенные тесты отсутствуют</p>
-    {% endif %}
-
 
 
 <form id="user_tests_form" method='post'>
+
+    <p>Должность:
+        <select name="position_filter">
+            {% for option in position_list %}
+                {% if option == user_profile.position %}
+<!--            get_position_display -->
+                    <option value="{{option}}" selected>{{option}}</option>
+                {% else %}
+                    <option value="{{option}}">{{option}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>Группы пользователя:</p>
+    {% for group in all_groups %}
+
+        {% if group in user_obj.groups.all %}
+            <input type="checkbox" id="group" name="group" value="{{group}}" checked>{{group}}
+        {% else %}
+            <input type="checkbox" id="group" name="group" value="{{group}}">{{group}}
+        {% endif %}
+    {% endfor %}
+    <br>
+    <br>
       {% csrf_token %}
         {{ user_tests.management_form }}
+        {% if user_tests|length > 0 %}
+            <p>Назначенные тесты:</p>
+        {% else %}
+            <p>Назначенные тесты отсутствуют</p>
+        {% endif %}
+
         {% for form in user_tests %}
         <div class="form_set">
             <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>
@@ -44,10 +69,11 @@
         <input id="add-form" type="submit" value="+ Назначить новый тест">
         <br>
         <br>
-
-        <input type="submit" value="Сохранить" id="save_btn">
+    <input type="submit" value="Сохранить" id="save_btn">
         <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+
     </form>
+
 <!--    <form method='get' action='{% url "quize737:user_list" %}'>-->
 <!--        <button type="submit">Вернуться</button>-->
 <!--    </form>-->
@@ -62,6 +88,11 @@
 <p id="demo_2"></p>
 
 <script type="text/javascript">
+        //Отправка данных нескольких форм
+        submitForms = function(){
+        document.getElementById("user_tests_form").submit();
+        document.getElementById("user_groups").submit();
+        }
 
         let qForm = document.querySelectorAll(".form_set")  // Подсчитывем изначальное количество форм
         let container = document.querySelector("#user_tests_form")

@@ -1056,6 +1056,10 @@ def group_del(request, id):
 @group_required('KRS')
 # Обрабатываем вызов деталей конкретного пользователя для назначения тестов
 def user_detales(request, id):
+    position_list = Profile.Position  #  Вырианты выбора должности пилота
+    print('Test:', Profile.Position)
+    user_obj = User.objects.get(id=id)
+    all_groups = Group.objects.all()
     UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
                                    can_delete=True)  # Extra - количество строк формы
     user_profile = Profile.objects.filter(id=id)
@@ -1063,14 +1067,15 @@ def user_detales(request, id):
     # sent = False  # Переменная для отправки письма
 
     if request.method == 'POST':
+        print("post:", request.POST)
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
         if tests_for_user_form.is_valid():
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
                 # Проверяем было ли указано имя объекта
                 try:
-                    if UserTests.objects.get(test_name=test['test_name']):
-                        UserTests.objects.filter(test_name=test['test_name']).delete()
+                    if UserTests.objects.get(user=id, test_name=test['test_name']):
+                        UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
                 except Exception:
                     pass
                 # Создаём только те объекты, которые не помечены для удаления
@@ -1095,7 +1100,7 @@ def user_detales(request, id):
             # Загружаем новые данные в форму
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             tests_for_user_form = UserTestForm(initial=user_tests)
-            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True}
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True, 'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list}
             return render(request, 'user_ditales.html', context=context)
 
         else:
@@ -1107,12 +1112,15 @@ def user_detales(request, id):
             errors_non_form = tests_for_user_form.non_form_errors
             context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form,
                        'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'user_id': id}
+                       'form_errors': form_errors, 'user_id': id, 'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list}
             return render(request, 'user_ditales.html', context=context)
     else:
         user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
         tests_for_user_form = UserTestForm(initial=user_tests)
-        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
+
+        #user_groups = user_obj.groups.all()
+        #print('user_groups', user_groups)
+        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list}
         return render(request, 'user_ditales.html', context=context)
 
 
