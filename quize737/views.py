@@ -28,7 +28,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
     NewThemeForm
-from users.forms import TestsForUser, GroupForm
+from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
@@ -924,7 +924,7 @@ def group_users(request, id):
     total_user_list = Profile.objects.filter(user_id__groups=id)
     if not total_user_list:
         no_search_result = True
-        group_name = Group.objects.get(id=id)#.values('name')
+        group_name = Group.objects.get(id=id)  # .values('name')
         results = f'Пилоты в группе "{group_name.name}" не найдены'
         context = {'no_search_results': no_search_result, 'results': results,
                    'position_list': position_list}
@@ -1031,10 +1031,10 @@ def new_group(request):
         group_form = GroupForm(request.POST)
         if group_form.is_valid():
             group = Group.objects.create(name=group_form.cleaned_data.get('group_name'))  # Добавить группу разрешений
-            #group.save()
+            # group.save()
             GroupsDescription.objects.create(group=group,
                                              discription=group_form.cleaned_data.get('discription')
-            )
+                                             )
 
             return redirect('quize737:group_list')
         else:
@@ -1045,6 +1045,7 @@ def new_group(request):
         context = {'form': group_form}
         return render(request, 'new_group.html', context=context)
 
+
 #  Удаление группы
 @login_required
 @group_required('KRS')
@@ -1052,14 +1053,74 @@ def group_del(request, id):
     Group.objects.get(id=id).delete()
     return redirect('quize737:group_list')
 
+
+@login_required
+@group_required('KRS')
+def edit_user(request, id):
+    position_list = Profile.Position.labels  # Вырианты выбора должности пилота
+    user_obj = User.objects.get(id=id)  # Объект пользователя
+    all_groups = Group.objects.all()  # Все существующие группы
+    if request.method == 'POST':
+        form_user = EditUserForm(request.POST, instance=user_obj)
+        new_position = request.POST.get('position')  # Новая должность
+        changed_groups = request.POST.getlist('group')  # Новые группы
+        old_position = user_obj.profile.position
+        for j in Profile.Position.choices:  # Выясняем соответсвие названию выбора и самому выбору
+            if j[1] == new_position:
+                new_position = j[0]
+                break
+        position_name_group = ''
+        if old_position != new_position:
+            user_obj.profile.position = new_position
+            user_obj.profile.save()
+            position_name_group = new_position + ' ' + user_obj.profile.ac_type
+
+        all_groups_set = set()  # Множество для хранения стринговых названий групп
+        for group in all_groups:  # Составляем множество из существующих групп
+            all_groups_set.add(str(group.name))
+        to_del_groups = list(set(all_groups_set) - set(changed_groups))  # Группы, в которых пользователь не участвует
+
+        # Устанавливаем группу в соответствии с выбранной должностью, если она была изменена
+        if position_name_group:  # Если поменяли должность, то переменная новой группы пользователя будет заполнена
+            if position_name_group in to_del_groups:  #  Убираем новую группу из удаляемых групп
+                to_del_groups.remove(position_name_group)
+            if position_name_group not in changed_groups:  #  Добавляем новую группу в назначаемые группы
+                changed_groups.append(position_name_group)
+            #  Выясняем старую группу пользователя
+            position_name_group_old = old_position + ' ' + user_obj.profile.ac_type
+            if position_name_group_old not in to_del_groups:  #  Добавляем старую группу в удаляемые, если ее там нет
+                to_del_groups.append(position_name_group_old)
+            if position_name_group_old in changed_groups:  #  Удаляем старую группу из назначенных, если она там есть
+                changed_groups.remove(position_name_group_old)
+
+        for del_group in to_del_groups:  # Удаляем пользователя из групп
+            group_obj = Group.objects.get(name=del_group)
+            user_obj.groups.remove(group_obj)
+        for add_group in changed_groups:  # Добавляем пользователя в группы
+            group_obj = Group.objects.get(name=add_group)
+            user_obj.groups.add(group_obj)
+
+        if form_user.is_valid():
+            form_user.save()
+            return redirect('quize737:user_list')
+        else:
+            form_user = EditUserForm(request.POST, instance=user_obj)
+            form_profile = ProfileForm()
+            context = {'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list,
+                       'form_user': form_user, 'form_profile': form_profile}
+            return render(request, 'edit_user.html', context=context)
+    else:
+        form_user = EditUserForm(initial={"username": user_obj.username, 'email': user_obj.email})
+        form_profile = ProfileForm()
+        context = {'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list,
+                   'form_user': form_user, 'form_profile': form_profile}
+        return render(request, 'edit_user.html', context=context)
+
+
 @login_required
 @group_required('KRS')
 # Обрабатываем вызов деталей конкретного пользователя для назначения тестов
 def user_detales(request, id):
-    position_list = Profile.Position  #  Вырианты выбора должности пилота
-    print('Test:', Profile.Position)
-    user_obj = User.objects.get(id=id)
-    all_groups = Group.objects.all()
     UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
                                    can_delete=True)  # Extra - количество строк формы
     user_profile = Profile.objects.filter(id=id)
@@ -1100,7 +1161,7 @@ def user_detales(request, id):
             # Загружаем новые данные в форму
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             tests_for_user_form = UserTestForm(initial=user_tests)
-            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True, 'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list}
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True}
             return render(request, 'user_ditales.html', context=context)
 
         else:
@@ -1112,16 +1173,23 @@ def user_detales(request, id):
             errors_non_form = tests_for_user_form.non_form_errors
             context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form,
                        'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'user_id': id, 'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list}
+                       'form_errors': form_errors, 'user_id': id, 'user_obj': user_obj, 'all_groups': all_groups,
+                       'position_list': position_list}
             return render(request, 'user_ditales.html', context=context)
     else:
         user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
         tests_for_user_form = UserTestForm(initial=user_tests)
 
-        #user_groups = user_obj.groups.all()
-        #print('user_groups', user_groups)
-        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list}
+        # user_groups = user_obj.groups.all()
+        # print('user_groups', user_groups)
+        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
         return render(request, 'user_ditales.html', context=context)
+
+
+@login_required
+@group_required('KRS')
+def del_user(request, id):
+    pass
 
 
 @login_required

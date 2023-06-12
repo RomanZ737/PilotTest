@@ -1,0 +1,54 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<fieldset>
+    <legend>
+        <a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Пруппы</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+    </legend>
+
+   <h1> {{user_obj.profile.family_name}} {{user_obj.profile.first_name}} {{user_obj.profile.middle_name}}</h1>
+
+    {% for error in form_user.errors.values %}
+        {{error}}
+    {% endfor %}
+  <form id="user_edit_form" method='post'>
+      {% csrf_token %}
+    <p>Должность:
+        <select name="position">
+            {% for option in position_list %}
+                {% if option == user_obj.profile.get_position_display %}
+<!--            get_position_display -->
+                    <option value="{{option}}" selected>{{option}}</option>
+                {% else %}
+                    <option value="{{option}}">{{option}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>Группы пользователя:</p>
+    {% for group in all_groups %}
+
+        {% if group in user_obj.groups.all %}
+            <input type="checkbox" id="group" name="group" value="{{group}}" checked>{{group}}
+        {% else %}
+            <input type="checkbox" id="group" name="group" value="{{group}}">{{group}}
+        {% endif %}
+    {% endfor %}
+    <br>
+
+    <p>Логин: {{form_user.username}}</p>
+      <p>Email: {{form_user.email}}</p>
+  </form>
+    <form id="user_del_form" action="{% url 'quize737:del_user' user_obj.id %}">
+    </form>
+    <input type="submit" form="user_edit_form" value="Сохранить">
+    <span style="color: black;"> | </span>
+    <input type="submit" form="user_del_form" value="Удалить" onclick="return confirm('Удалить Пилота?') || event.preventDefault()">
+</fieldset>
+
+    {% endblock %}

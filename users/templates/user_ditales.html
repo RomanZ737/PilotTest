@@ -26,29 +26,10 @@
 
 
 <form id="user_tests_form" method='post'>
+    <p>Должность: {{user_profile.get_position_display}}
 
-    <p>Должность:
-        <select name="position_filter">
-            {% for option in position_list %}
-                {% if option == user_profile.position %}
-<!--            get_position_display -->
-                    <option value="{{option}}" selected>{{option}}</option>
-                {% else %}
-                    <option value="{{option}}">{{option}}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
     </p>
 
-    <p>Группы пользователя:</p>
-    {% for group in all_groups %}
-
-        {% if group in user_obj.groups.all %}
-            <input type="checkbox" id="group" name="group" value="{{group}}" checked>{{group}}
-        {% else %}
-            <input type="checkbox" id="group" name="group" value="{{group}}">{{group}}
-        {% endif %}
-    {% endfor %}
     <br>
     <br>
       {% csrf_token %}

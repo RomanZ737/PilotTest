@@ -26,12 +26,12 @@ class QuestionSet(models.Model):
 
     # Имя темы связано с классом Them
     them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
-    question = models.CharField(unique=True, max_length=255, verbose_name='Вопрос')
-    option_1 = models.CharField(max_length=500, verbose_name='Вариант 1')
-    option_2 = models.CharField(max_length=500, verbose_name='Вариант 2')
-    option_3 = models.CharField(max_length=500, verbose_name='Вариант 3', blank=True, null=True)
-    option_4 = models.CharField(max_length=500, verbose_name='Вариант 4', blank=True, null=True)
-    option_5 = models.CharField(max_length=500, verbose_name='Вариант 5', blank=True, null=True)
+    question = models.TextField(verbose_name='Вопрос')
+    option_1 = models.TextField(verbose_name='Вариант 1')
+    option_2 = models.TextField(verbose_name='Вариант 2')
+    option_3 = models.TextField(verbose_name='Вариант 3', blank=True, null=True)
+    option_4 = models.TextField(verbose_name='Вариант 4', blank=True, null=True)
+    option_5 = models.TextField(verbose_name='Вариант 5', blank=True, null=True)
     q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
                                  help_text='Если вопрос подразумевает несколько правильных ответов')
     q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0.0,
@@ -46,7 +46,7 @@ class QuestionSet(models.Model):
 
     class Meta:
         ordering = ['-them_name']
-        indexes = [models.Index(fields=['question'])]
+        #indexes = [models.Index(fields=['question'])]
 
     def __str__(self):
         return f'{self.them_name}, {self.question}'

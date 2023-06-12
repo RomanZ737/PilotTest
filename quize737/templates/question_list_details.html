@@ -30,11 +30,11 @@
 
                 <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
                 <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
-                <p>{{question_form.option_1.label}}: {{question_form.option_1}}</p>
-                <p>{{question_form.option_2.label}}: {{question_form.option_2}}</p>
-                <p>{{question_form.option_3.label}}: {{question_form.option_3}}</p>
-                <p>{{question_form.option_4.label}}: {{question_form.option_4}}</p>
-                <p>{{question_form.option_5.label}}: {{question_form.option_5}}</p>
+                <p>{{question_form.option_1.label}}: <textarea style="font-size: 15px;" id="option_1" name="option_1" oninput="autoGrow()">{{question_form.option_1.value}}</textarea></p>
+                <p>{{question_form.option_2.label}}: <textarea style="font-size: 15px;" id="option_2" name="option_1" oninput="autoGrow()">{{question_form.option_2.value}}</textarea></p>
+                <p>{{question_form.option_3.label}}: <textarea style="font-size: 15px;" id="option_3" name="option_1" oninput="autoGrow()">{{question_form.option_3.value}}</textarea></p>
+                <p>{{question_form.option_4.label}}: <textarea style="font-size: 15px;" id="option_4" name="option_1" oninput="autoGrow()">{{question_form.option_4.value}}</textarea></p>
+                <p>{{question_form.option_5.label}}: <textarea style="font-size: 15px;" id="option_5" name="option_1" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></p>
                 <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
                 <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
                 <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
@@ -81,6 +81,53 @@ if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
 var q_field = document.getElementById("question");
 q_field.setAttribute("cols", q_text_Length);
 q_field.setAttribute("rows", q_rows_length);
+//----------------------------------------------------
+var option_1_text_Length = "{{question_form.option_1.value}}".length;
+var option_1_rows_length = 1
+if ( option_1_text_Length > 100 ) { option_1_rows_length = Math.ceil(option_1_text_Length/100);
+                              option_1_text_Length = 100 };
+var option_1_field = document.getElementById("option_1");
+option_1_field.setAttribute("cols", option_1_text_Length);
+option_1_field.setAttribute("rows", option_1_rows_length);
+
+//----------------------------------------------------
+var option_2_text_Length = "{{question_form.option_2.value}}".length;
+var option_2_rows_length = 1
+if ( option_2_text_Length > 100 ) { option_2_rows_length = Math.ceil(option_2_text_Length/100);
+                              option_2_text_Length = 100 };
+var option_2_field = document.getElementById("option_2");
+option_2_field.setAttribute("cols", option_2_text_Length);
+option_2_field.setAttribute("rows", option_2_rows_length);
+
+//----------------------------------------------------
+var option_3_text_Length = "{{question_form.option_3.value}}".length;
+var option_3_rows_length = 1
+if ( option_3_text_Length > 100 ) { option_3_rows_length = Math.ceil(option_3_text_Length/100);
+                              option_3_text_Length = 100 };
+var option_3_field = document.getElementById("option_3");
+option_3_field.setAttribute("cols", option_3_text_Length);
+option_3_field.setAttribute("rows", option_3_rows_length);
+
+//----------------------------------------------------
+var option_4_text_Length = "{{question_form.option_4.value}}".length;
+var option_4_rows_length = 1
+if ( option_4_text_Length > 100 ) { option_4_rows_length = Math.ceil(option_4_text_Length/100);
+                              option_4_text_Length = 100 };
+var option_4_field = document.getElementById("option_4");
+option_4_field.setAttribute("cols", option_4_text_Length);
+option_4_field.setAttribute("rows", option_4_rows_length);
+
+//----------------------------------------------------
+var option_5_text_Length = "{{question_form.option_5.value}}".length;
+var option_5_rows_length = 1
+if ( option_5_text_Length > 100 ) { option_5_rows_length = Math.ceil(option_5_text_Length/100);
+                              option_5_text_Length = 100 };
+var option_5_field = document.getElementById("option_5");
+option_5_field.setAttribute("cols", option_5_text_Length);
+option_5_field.setAttribute("rows", option_5_rows_length);
+
+
+
 
 //Скрипт определяет изначальную видимость полей, в зависимости от вида вопроса
 var checkBox = document.getElementById("q_kind");
@@ -116,8 +163,9 @@ function hideFunc() {
     }
 
 //Динамическое изменение поля воода текста вопроса
-var q_text = document.getElementById("question");
+//var q_text = document.getElementById("question");
 function autoGrow() {
+    var q_text=document.getElementById(event.target.id)
   if (q_text.scrollHeight > q_text.clientHeight) {
     q_text.style.height = `${q_text.scrollHeight}px`;
   }

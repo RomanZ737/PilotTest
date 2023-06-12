@@ -9,12 +9,18 @@ from django.core.exceptions import ValidationError
 import users.models
 
 
-
-
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = users.models.Profile
         fields = ('family_name', 'first_name', 'middle_name', 'position')
+
+
+#  Редактируем параметры польхователя
+class EditUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = {'username', 'email'}
+        error_messages = {'email': {'invalid': "Не правильный формат поля 'Email'"}}
 
 
 class UserRegisterForm(UserCreationForm):
@@ -83,6 +89,6 @@ class GroupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)
-        #self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
+        # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
         self.fields['group_name'] = forms.CharField(max_length=15)
         self.fields['group_name'].validators = [similar_group_name]

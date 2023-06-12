@@ -174,7 +174,7 @@ div.list-date {     /* блок Дата в таблице */
 div.list-position {  /* блок Должность в таблице */
     position: relative;
     display: inline-block;
-    width: 4%;
+    width: 14%;
     margin: 0px;
     text-align: left;
     color: rgb(170, 39, 47);
@@ -200,6 +200,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
+    word-wrap: break-word;
 }
 
 div.list-question {  /* блок Текст вопроса в таблице */
@@ -208,6 +209,7 @@ div.list-question {  /* блок Текст вопроса в таблице */
     width: 70%;
     text-align: left;
     vertical-align: middle;
+    word-wrap: break-word;
 }
 
 div.list-delete {  /* блок Удалить каки-либо запись в таблице */
@@ -303,6 +305,15 @@ div.list-group_description { /* блок описание группы в таб
 }
 
 div.list-group_users {
+    position: relative;
+    display: inline-block;
+    width: 25%;
+    text-align: left;
+    font-size: 18px;
+    word-wrap: break-word;
+}
+
+div.list-edit {
     position: relative;
     display: inline-block;
     width: 25%;

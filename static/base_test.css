@@ -55,6 +55,16 @@ label.question {
 label.option {
     color: rgb(209, 209,209);
     font-size: 25px;
+
+}
+
+div.option {
+    display: block;
+    position: relative;
+    color: rgb(209, 209,209);
+    font-size: 25px;
+    word-wrap: break-word;
+    width: 90%;
 }
 
 div.button_answer {

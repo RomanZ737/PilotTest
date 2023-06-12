@@ -44,6 +44,14 @@
                    <div class="list-position">
                        <span class="theme_color">{{user.position}}</span>
                    </div>
+                   <span style="color: black;">|</span>
+                   <div class="list-edit">
+                       <a href="{% url 'quize737:edit_user' user.id %}">Редактировать</a>
+                   </div>
+                   <span style="color: black;">|</span>
+                   <div class="list-delete">
+                       <a href="{% url 'quize737:del_user' user.id %}" onclick="return confirm('Удалить Пилота?') || event.preventDefault()">Удалить</a>
+                   </div>
                </div>
             {% endfor %}
             <br>
