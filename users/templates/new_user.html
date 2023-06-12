@@ -1,0 +1,38 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<fieldset>
+    <legend>
+        <a href="{% url 'quize737:user_list' %}"> Список Пилотов </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_user' %}">ДОБАВИТЬ ПИЛОТА</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Список Прупп</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+    </legend>
+    {% for err_form_user in form_user.errors.values %}
+        {{err_form_user}}
+    {% endfor %}
+
+    {% for err_form_profile in form_profile.errors.values %}
+        {{err_form_profile}}
+    {% endfor %}
+
+  <form method="POST" id="new_user">
+      {% csrf_token %}
+    <p>Логин: </p><p>{{ form_user.username }}</p>
+            <p>Пароль: </p><p>{{form_user.password1}}</p>
+            <p>Минимальная длина пароля 3 символа</p>
+            <p>Пароль повторно: </p><p>{{ form_user.password2 }}</p>
+            <p>Email: </p><p>{{form_user.email}}</p>
+            <p>Фамилия: </p><p>{{ form_profile.family_name }}</p>
+            <p>Имя: </p><p>{{ form_profile.first_name }}</p>
+            <p>Отчество: </p><p>{{ form_profile.middle_name }}</p>
+            <p>Должность: </p><p>{{ form_profile.position }}</p>
+<!--            <p>Тип ВС: {{ form_profile.ac_type}}</p>-->
+
+</form>
+    <input type="submit" value="Сохранить" form="new_user">
+</fieldset>
+{% endblock content %}

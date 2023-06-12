@@ -28,7 +28,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
     NewThemeForm
-from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm
+from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
@@ -861,20 +861,20 @@ def user_list(request):
             if user_search_input:
                 user_search_data = request.GET.get("user_search").split()
                 if len(user_search_data) == 3:
-                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
-                                                             Q(first_name__icontains=f'{user_search_data[1]}'),
-                                                             Q(middle_name__icontains=f'{user_search_data[2]}'))
+                    total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}'),
+                                                             Q(profile__first_name__icontains=f'{user_search_data[1]}'),
+                                                             Q(profile__middle_name__icontains=f'{user_search_data[2]}'))
                 elif len(user_search_data) == 2:
-                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}'),
-                                                             Q(first_name__icontains=f'{user_search_data[1]}'))
+                    total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}'),
+                                                             Q(profile__first_name__icontains=f'{user_search_data[1]}'))
                     if not total_user_list:
-                        total_user_list = Profile.objects.filter(Q(first_name__icontains=f'{user_search_data[0]}'),
-                                                                 Q(middle_name__icontains=f'{user_search_data[1]}'))
+                        total_user_list = User.objects.filter(Q(profile__first_name__icontains=f'{user_search_data[0]}'),
+                                                                 Q(profile__middle_name__icontains=f'{user_search_data[1]}'))
 
                 elif len(user_search_data) == 1:
-                    total_user_list = Profile.objects.filter(Q(family_name__icontains=f'{user_search_data[0]}') | Q(
-                        first_name__icontains=f'{user_search_data[0]}') | Q(
-                        middle_name__icontains=f'{user_search_data[0]}'))
+                    total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}') | Q(
+                        profile__first_name__icontains=f'{user_search_data[0]}') | Q(
+                        profile__middle_name__icontains=f'{user_search_data[0]}'))
                 else:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
@@ -896,7 +896,7 @@ def user_list(request):
                     return render(request, 'user_list.html', context=context)
 
             else:
-                total_user_list = Profile.objects.filter(position=filter_input)
+                total_user_list = User.objects.filter(profile__position=filter_input)
                 #  Постраничная разбивка
                 paginator = Paginator(total_user_list, 20)
                 page_number = request.GET.get('page', 1)
@@ -906,7 +906,7 @@ def user_list(request):
 
 
         else:
-            total_user_list = Profile.objects.all()  # Вынимаем всех пользователей
+            total_user_list = User.objects.all()  # Вынимаем всех пользователей
             #  Постраничная разбивка
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
@@ -921,7 +921,7 @@ def user_list(request):
 def group_users(request, id):
     position_list = Profile.Position.values
     no_search_result = False
-    total_user_list = Profile.objects.filter(user_id__groups=id)
+    total_user_list = User.objects.filter(groups=id)
     if not total_user_list:
         no_search_result = True
         group_name = Group.objects.get(id=id)  # .values('name')
@@ -945,10 +945,12 @@ def group_list(request, id=None):
         pass
     else:
         groups = Group.objects.all()
+        fixed_groups = common.fixed_groups
+        print('fixed_groups:', fixed_groups)
         paginator = Paginator(groups, 20)
         page_number = request.GET.get('page', 1)
         groups_pages = paginator.page(page_number)
-        context = {'groups': groups_pages}
+        context = {'groups': groups_pages, 'fixed_groups': fixed_groups}
         return render(request, 'group_list.html', context=context)
 
 
@@ -1046,6 +1048,29 @@ def new_group(request):
         return render(request, 'new_group.html', context=context)
 
 
+@login_required
+@group_required('KRS')
+def edit_group(request, id):
+    group_obj = Group.objects.get(id=id)
+
+    if request.method == 'POST':
+        group_form = EditGroupForm(request.POST, instance=group_obj)
+        discript_obj = GroupsDescription.objects.get(group=group_obj)
+        if group_form.is_valid():
+            group_obj.name = group_form.cleaned_data['group_name']
+            group_obj.save()
+            discript_obj.discription = group_form.cleaned_data['discription']
+            discript_obj.save()
+
+            return redirect('quize737:group_list')
+        else:
+            context = {'group_form': group_form}
+            return render(request, 'edit_group.html', context=context)
+    else:
+        group_form = EditGroupForm(initial={"group_name": group_obj.name, 'discription': group_obj.groupsdescription.discription})
+        context = {'group_form': group_form}
+        return render(request, 'edit_group.html', context=context)
+
 #  Удаление группы
 @login_required
 @group_required('KRS')
@@ -1123,7 +1148,8 @@ def edit_user(request, id):
 def user_detales(request, id):
     UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
                                    can_delete=True)  # Extra - количество строк формы
-    user_profile = Profile.objects.filter(id=id)
+    user_object = User.objects.get(id=id)
+    user_profile = Profile.objects.filter(user=user_object)
 
     # sent = False  # Переменная для отправки письма
 
@@ -1173,8 +1199,7 @@ def user_detales(request, id):
             errors_non_form = tests_for_user_form.non_form_errors
             context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form,
                        'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'user_id': id, 'user_obj': user_obj, 'all_groups': all_groups,
-                       'position_list': position_list}
+                       'form_errors': form_errors, 'user_id': id}
             return render(request, 'user_ditales.html', context=context)
     else:
         user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
@@ -1188,8 +1213,43 @@ def user_detales(request, id):
 
 @login_required
 @group_required('KRS')
+def new_user(request):
+    form_user = UserRegisterForm()
+    form_profile = ProfileForm()
+    if request.method == 'POST':
+        form_user = UserRegisterForm(request.POST)
+        form_profile = ProfileForm(request.POST)
+        if form_user.is_valid() and form_profile.is_valid():
+            group = Group.objects.get(name=form_profile.cleaned_data['position'] + ' ' + 'B737')#form_profile.cleaned_data['ac_type'])  - раскоментить и убрать 'B737'
+            new_user = form_user.save(commit=False)
+            new_user.set_password(form_user.cleaned_data['password1'])
+            new_user.first_name = form_profile.cleaned_data['first_name']
+            new_user.last_name = form_profile.cleaned_data['family_name']
+            new_user.save()
+            new_user.groups.add(group)
+            Profile.objects.create(
+                user=new_user,
+                family_name=form_profile.cleaned_data['family_name'],
+                first_name=form_profile.cleaned_data['first_name'],
+                middle_name=form_profile.cleaned_data['middle_name'],
+                position=form_profile.cleaned_data['position'],
+                ac_type='B737'#form_profile.cleaned_data['ac_type']  - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
+            )
+            return redirect('quize737:user_list')
+
+        else:
+            context = {'form_user': form_user, 'form_profile': form_profile}
+            return render(request, 'new_user.html', context=context)
+    else:
+        context = {'form_profile': form_profile, 'form_user': form_user}
+        return render(request, 'new_user.html', context=context)
+
+
+@login_required
+@group_required('KRS')
 def del_user(request, id):
-    pass
+    User.objects.get(id=id).delete()
+    return redirect('quize737:user_list')
 
 
 @login_required

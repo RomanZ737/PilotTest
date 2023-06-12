@@ -2,13 +2,17 @@
 
 {% block content %}
 <fieldset>
-    <legend><a href="{% url 'quize737:user_list' %}"> Пилоты </a>
+    <legend>
+     <a href="{% url 'quize737:user_list' %}"> Список Пилотов </a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">ГРУППЫ</a>
+        <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+        <a href="{% url 'quize737:group_list' %}">СПИСОК ГРУПП</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
     </legend>
     <div class="block-list">
+
         {% for group in groups %}
             <div>
                 <spot class="block_light_up">
@@ -24,10 +28,29 @@
                         <a href="{% url 'quize737:group_users' group.id %}">Список группы</a>
                     </div>
 
-                    <span style="color: black;">|</span>
-                    <div class="list-delete">
-                        <a href="{% url 'quize737:group_del' group.id %}" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить Группу</a>
+                    {% if group.name not in fixed_groups %}
+                        <span style="color: black;">|</span>
+                        <div class="list-edit">
+                           <a href="{% url 'quize737:edit_group' group.id %}">Редактировать</a>
+                        </div>
+                    {% else %}
+                        <span class="mark_up_transparent">|</span>
+                        <div class="list-edit">
+                            <span class="mark_up_transparent">No edit</span>
+                        </div>
+                    {% endif %}
+
+                    {% if group.name not in fixed_groups %}
+                        <span style="color: black;">|</span>
+                        <div class="list-delete">
+                            <a href="{% url 'quize737:group_del' group.id %}" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить</a>
+                        </div>
+                    {% else %}
+                    <span class="mark_up_transparent">|</span>
+                    <div class="list-edit">
+                        <span class="mark_up_transparent">No edit</span>
                     </div>
+                    {% endif %}
                 </spot>
             </div>
         {% endfor %}

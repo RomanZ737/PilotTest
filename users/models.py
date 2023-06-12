@@ -37,10 +37,12 @@ class Profile(models.Model):
     #     return f'{self.family_name} {self.first_name}'
 
     def __str__(self):
-        return "{family_name} {first_name} {value} ({display_value})".format(family_name=self.family_name,
-                                                                             first_name=self.first_name,
-                                                                             value=self.position,
-                                                                             display_value=self.get_position_display())
+        return "{id}, {profile_id}, {family_name} {first_name} {value} ({display_value})".format(  profile_id=self.id,
+                                                                                    id=self.user.id,
+                                                                                    family_name=self.family_name,
+                                                                                    first_name=self.first_name,
+                                                                                    value=self.position,
+                                                                                    display_value=self.get_position_display())
 
 
 #  Модель для описания группы

@@ -117,6 +117,13 @@ span.mark_up {
     font-size: 19px;
 }
 
+
+span.mark_up_transparent {
+    color: rgba(209, 209,209, 0.4);
+    font-size: 19px;
+}
+
+
 span.main_sign {
     font-size: 19px;
 }
@@ -289,7 +296,7 @@ div.list-other_field {    /* блок для остальных типов да�
 div.list-group {  /* блок группа в таблице */
     position: relative;
     display: inline-block;
-    width: 20%;
+    width: 23%;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -299,7 +306,7 @@ div.list-group {  /* блок группа в таблице */
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 35%;
+    width: 30%;
     text-align: left;
     font-size: 18px;
 }
@@ -307,7 +314,7 @@ div.list-group_description { /* блок описание группы в таб
 div.list-group_users {
     position: relative;
     display: inline-block;
-    width: 25%;
+    width: 14%;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;
@@ -316,7 +323,7 @@ div.list-group_users {
 div.list-edit {
     position: relative;
     display: inline-block;
-    width: 25%;
+    width: 13%;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;

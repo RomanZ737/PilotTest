@@ -1,0 +1,27 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<fieldset>
+    <legend>
+       <a href="{% url 'quize737:user_list' %}"> Список Пилотов </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Список Групп</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
+    </legend>
+    <form id="new_group" method='post'>
+        {% csrf_token %}
+        {% for error in group_form.errors.values %}
+        <p>{{error}}</p>
+        {% endfor %}
+        <p>Название Группы: {{group_form.group_name}} </p>
+        <p>Описание группы: {{group_form.discription}} </p>
+        <br>
+        <input type="submit" value="Сохранить">
+    </form>
+
+    </fieldset>
+
+{% endblock %}

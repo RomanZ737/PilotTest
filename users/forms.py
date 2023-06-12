@@ -12,7 +12,7 @@ import users.models
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = users.models.Profile
-        fields = ('family_name', 'first_name', 'middle_name', 'position')
+        fields = ('family_name', 'first_name', 'middle_name', 'position')#, 'ac_type')
 
 
 #  Редактируем параметры польхователя
@@ -80,7 +80,7 @@ def similar_group_name(value):
         raise ValidationError('Группа с таким именем уже существует')
 
 
-# Форма группы для пользователя
+# Форма группы новой для пользователя
 class GroupForm(forms.ModelForm):
     class Meta:
         model = GroupsDescription
@@ -92,3 +92,18 @@ class GroupForm(forms.ModelForm):
         # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
         self.fields['group_name'] = forms.CharField(max_length=15)
         self.fields['group_name'].validators = [similar_group_name]
+
+# Форма для редактирования существующей группы
+class EditGroupForm(forms.ModelForm):
+    class Meta:
+        model = GroupsDescription
+        #fields = {'group', 'discription'}
+        exclude = ('group',)
+
+    def __init__(self, *args, **kwargs):
+            super(EditGroupForm, self).__init__(*args, **kwargs)
+            # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
+            self.fields['group_name'] = forms.CharField(max_length=15)
+        # widgets = {
+        #     'group': forms.TextInput(),
+        #     'discription': forms.TextInput()}

@@ -4,9 +4,12 @@
 <fieldset>
     <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">Группы</a>
+        <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+        <a href="{% url 'quize737:group_list' %}">Список Групп</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
+
     </legend>
 <!--    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>-->
     <div class="block-list">
@@ -38,11 +41,11 @@
                <div class="block_light_up">
                    <div class="list-fio">
 
-                       <a href="{{user.id}}">{{user.family_name}} {{user.first_name}} {{user.middle_name}}</a>
+                       <a href="{{user.id}}">{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</a>
                    </div>
                    <span style="color: black;">|</span>
                    <div class="list-position">
-                       <span class="theme_color">{{user.position}}</span>
+                       <span class="theme_color">{{user.profile.position}}</span>
                    </div>
                    <span style="color: black;">|</span>
                    <div class="list-edit">
