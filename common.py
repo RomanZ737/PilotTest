@@ -9,6 +9,7 @@ krs_mail_list = ['pomanz@mail.ru', 'roman.v@zfamily.aero']  #  Список ад
 fixed_groups = ['KRS', 'ВП B737', 'КВС B737', 'ПИ B737']
 
 
+
 def send_email(request, email_msg):
     # email_msg: словарь с содержанием: {'subject': subject, 'message': message, 'to': request.user.email}
     msg = EmailMessage()

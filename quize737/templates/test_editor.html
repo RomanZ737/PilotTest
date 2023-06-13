@@ -27,10 +27,10 @@
             {% for test in tests_names %}
                 <div class="block_light_up">
                     <div class="list-test_name">
-                        <a href="{{test.id}}"><span style="color: black;">{{forloop.counter}}.</span> {{test.name}}</a>
+                        <a href="{{test.id}}"><span style="color: black;"></span> {{test.name}}</a>
                     </div>
                     <div class="list-delete">
-                        <span style="color: black;"> | </span><a href="{% url 'quize737:del_test' test.id %}">Удалить тест</a>
+                        <span style="color: black;"> | </span><a href="{% url 'quize737:del_test' test.id %}" onclick="return confirm('Удалить Тест: {{test.name}}?') || event.preventDefault()">Удалить</a>
                     </div>
                 </div>
             {% endfor %}

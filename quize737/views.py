@@ -421,9 +421,16 @@ def one_them_q(request):
 @group_required('KRS')
 # Все результаты тестов
 def tests_results_list(request):
+    groups = Group.objects.all().values()
+    results_list_options = ['ТЕСТ СДАН', 'ТЕСТ НЕ СДАН', 'Все']
+    group_list = []
+    for group in groups:
+        group_list.append(group)
+    group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
     position_list = Profile.Position.values
+    position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
     user_search_input = request.GET.get("user_search")
-    filter_input = request.GET.get("position_filter")
+    filter_input = request.GET.getlist("filter")
     no_search_result = False
     if user_search_input or filter_input:
         if user_search_input:
@@ -431,28 +438,44 @@ def tests_results_list(request):
             if not total_results_list:
                 no_search_result = True
                 results = f'Пилоты по запросу "{user_search_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
             else:
                 paginator = Paginator(total_results_list, 10)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
-                context = {'results': results_list_pages, 'no_search_results': no_search_result,
-                           'position_list': position_list}
+                context = {'results': results_list_pages, 'no_search_results': no_search_result, 'filter_input': filter_input,
+                           'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
         else:
-            total_user_list = QuizeResults.objects.filter(user_id__profile__position=filter_input)
+            print('filter_input', filter_input)
+            position = ''
+            group = ''
+            result = ''
+            if filter_input[0] != 'Все':
+                position = filter_input[0]
+            if filter_input[1] != 'Все':
+                group = filter_input[1]
+            if filter_input[2] != 'Все':
+                if filter_input[2] == 'ТЕСТ СДАН':
+                    result = True
+                else:
+                    result = False
+                total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position, user_id__groups__name__icontains=group, conclusion__exact=result)
+            else:
+                total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position, user_id__groups__name__icontains=group, conclusion__icontains=result)
+            print('DATA:', position, group, result)
             if not total_user_list:
                 no_search_result = True
-                results = f'Результаты тестов пилотов с должностью "{filter_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results, 'position_list': position_list}
+                results = f'Результаты тестов не найдены'
+                context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
             else:
                 #  Постраничная разбивка
                 paginator = Paginator(total_user_list, 10)
                 page_number = request.GET.get('page', 1)
                 users = paginator.page(page_number)
-                context = {'results': users, 'no_search_results': no_search_result, 'position_list': position_list}
+                context = {'results': users, 'no_search_results': no_search_result, 'filter_input': filter_input, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
 
 
@@ -461,7 +484,7 @@ def tests_results_list(request):
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)
-        context = {'results': results_list_pages, 'position_list': position_list}
+        context = {'results': results_list_pages, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
         return render(request, 'tests_results_list.html', context=context)
 
 

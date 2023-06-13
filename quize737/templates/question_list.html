@@ -32,7 +32,7 @@
 
         <div class="filter-form">
             <form id="theme_filter" action="{% url 'quize737:question_list' %}" method="get">
-                <select name="theme_filter">
+                <select class="theme_filter" name="theme_filter">
                     {% for option in them_list %}
                             {% if filter_input %}
                                 {% if option.id == filter_input %}
@@ -69,7 +69,7 @@
                 </div>
                     <span style="color: black;"> | </span>
                 <div class="list-delete">
-                    <a href="{% url 'quize737:question_del' i.id %}" onclick="return confirm('Удалить вопрос?') || event.preventDefault()">Удалить вопрос</a>
+                    <a href="{% url 'quize737:question_del' i.id %}" onclick="return confirm('Удалить вопрос?') || event.preventDefault()">Удалить</a>
                 </div>
             </div>
             {% empty %}
