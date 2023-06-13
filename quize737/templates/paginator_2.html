@@ -1,0 +1,28 @@
+{% load tags %}
+
+
+<div class="paginator">
+        <span class="paginator">
+
+
+
+
+  {% if page.has_previous %}
+
+      <a href="?{% param_replace page=page.previous_page_number %}">Предыдущая</a>
+
+  {% endif %}
+
+  Страница {{ page.number }} из {{ page.paginator.num_pages }}
+
+  {% if page.has_next %}
+
+      <a href="?{% param_replace page=page.next_page_number %}">Следующая</a>
+
+  {% endif %}
+
+<!--  <span>Всего {{ page.start_index }}—{{ page.end_index }}</span>-->
+
+
+        </span>
+</div>

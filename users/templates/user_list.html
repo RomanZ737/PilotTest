@@ -13,6 +13,7 @@
     </legend>
 <!--    <h1><a href="{% url 'quize737:user_list' %}"> Пилоты </a> | <a href="{% url 'quize737:group_list' %}">Пруппы</a></h1>-->
     <div class="block-list">
+        <div class="block_none_light_up">
         <div class="search-form">
             <form id="user_search" action="{% url 'quize737:user_list' %}" method="get">
                 <input type="text" name="user_search" placeholder="Поиск пилота...">
@@ -20,17 +21,53 @@
             </form>
         </div>
 
+
         <div class="filter-form">
             <form id="position_filter" name="position_filter" action="{% url 'quize737:user_list' %}" method="get">
-                <select name="position_filter">
-                    {% for option in position_list %}
-                        <option value="{{option}}">{{option}}</option>
-                    {% endfor %}
-                </select>
-                    <input type="submit" value="Фильтр">
-            </form>
-        </div>
+                <div class="block_none_light_up">
+                    <div class="filter_sign_position"> Должность: </div>
+                    <select class="position_filter" name="position_filter">
+                        {% for option in position_list %}
+                            {% if filter_input %}
+                                {% if option == filter_input.0 %}
+                                    <option value="{{option}}" selected>{{option}}</option>
+                                {% else %}
+                                    <option value="{{option}}">{{option}}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if option == "Все" %}
+                                    <option value="{{option}}" selected>{{option}}</option>
+                                {% else %}
+                                    <option value="{{option}}">{{option}}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <div class="filter_sign_group"> Группа: </div>
+                    <select class="position_filter" name="position_filter">
+                        {% for group in group_list %}
+                            {% if filter_input %}
+                                {% if group.name == filter_input.1 %}
+                                    <option value="{{group.name}}" selected>{{group.name}}</option>
+                                {% else %}
+                                    <option value="{{group.name}}">{{group.name}}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if group.name == "Все" %}
+                                    <option value="{{group.name}}" selected>{{group.name}}</option>
+                                {% else %}
+                                    <option value="{{group.name}}">{{group.name}}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input class="submit_filter" type="submit" value="Фильтр" form="position_filter">
+                </div>
 
+            </form>
+
+        </div>
+    </div>
 
         {% if no_search_results %}
         <div>
@@ -58,7 +95,7 @@
                </div>
             {% endfor %}
             <br>
-            {% include "paginator.html" with page=user_list %}
+            {% include "paginator_2.html" with page=user_list %}
         {% endif %}
     </div>
 </fieldset>

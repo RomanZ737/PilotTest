@@ -34,9 +34,19 @@
             <form id="theme_filter" action="{% url 'quize737:question_list' %}" method="get">
                 <select name="theme_filter">
                     {% for option in them_list %}
-                        {% if option.name != 'Все темы'%}
-                            <option value="{{option.id}}">{{option.name}}</option>
-                        {% endif %}
+                            {% if filter_input %}
+                                {% if option.id == filter_input %}
+                                    <option value="{{option.id}}" selected>{{option.name}}</option>
+                                {% else %}
+                                    <option value="{{option.id}}">{{option.name}}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if option.id == 5 %}
+                                    <option value="{{option.id}}" selected>{{option.name}}</option>
+                                {% else %}
+                                    <option value="{{option.id}}">{{option.name}}</option>
+                                {% endif %}
+                            {% endif %}
                     {% endfor %}
                 </select>
                 <input type="submit" value="Фильтр">
@@ -69,7 +79,7 @@
 
             {% endfor %}
             <br>
-            {% include "paginator.html" with page=questions %}
+            {% include "paginator_2.html" with page=questions %}
 
         {% endif %}
     </div>

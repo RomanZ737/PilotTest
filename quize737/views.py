@@ -239,6 +239,7 @@ def next_question(request):
         else:
 
             user_aswer = request.POST.get('user_answer').replace('option_', '')
+            print('request.POST', request.POST)
             # Если пользователь правильно ответил на вопрос:
             if int(answered_q_instance.answer) == int(user_aswer):
 
@@ -480,8 +481,11 @@ def question_list(request):
     them_list = Thems.objects.all()
     user_search_input = request.GET.get("question_search")
     filter_input = request.GET.get("theme_filter")
+    filter_flag = request.GET.get("filter_flag")
+
+    print('request.GET', request.GET)
     no_search_result = False
-    if user_search_input or filter_input:
+    if user_search_input or filter_input or filter_flag:
         if user_search_input:
             total_questions_list = QuestionSet.objects.filter(Q(question__icontains=f'{user_search_input}'))
             if not total_questions_list:
@@ -497,18 +501,24 @@ def question_list(request):
                            'them_list': them_list}
                 return render(request, 'question_list.html', context=context)
         else:
-            them_q_list = QuestionSet.objects.filter(them_name=filter_input)
-            paginator = Paginator(them_q_list, 15)
-            page_number = request.GET.get('page', 1)
-            results_list_pages = paginator.page(page_number)
-            context = {'questions': results_list_pages, 'no_search_results': no_search_result, 'them_list': them_list}
-            return render(request, 'question_list.html', context=context)
+            print('filter_input', filter_input)
+            if filter_input == '5':
+                return redirect('quize737:question_list')
+            else:
+                them_q_list = QuestionSet.objects.filter(them_name=filter_input)
+                paginator = Paginator(them_q_list, 15)
+                page_number = request.GET.get('page', 1)
+                results_list_pages = paginator.page(page_number)
+                context = {'questions': results_list_pages, 'no_search_results': no_search_result,
+                           'them_list': them_list, 'filter_input': int(filter_input)}
+                return render(request, 'question_list.html', context=context)
     else:
         question_list = QuestionSet.objects.all()
         paginator = Paginator(question_list, 15)
         page_number = request.GET.get('page', 1)
         questions = paginator.page(page_number)
-        context = {'questions': questions, 'them_list': them_list}
+        filtered = None
+        context = {'questions': questions, 'them_list': them_list, 'filtered': filtered}
         return render(request, 'question_list.html', context=context)
 
 
@@ -853,65 +863,99 @@ def user_list(request):
         pass
 
     else:
+        groups = Group.objects.all().values()
+
+        group_list = []
+        for group in groups:
+            group_list.append(group)
+        group_list.append({'name': 'Все'}) #  Добавляем выбор всех групп
         position_list = Profile.Position.values
+        position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
+
         user_search_input = request.GET.get("user_search")
-        filter_input = request.GET.get("position_filter")
+        filter_input = request.GET.getlist("position_filter")
+        print('filter_input', filter_input)
         no_search_result = False
         if user_search_input or filter_input:
             if user_search_input:
                 user_search_data = request.GET.get("user_search").split()
                 if len(user_search_data) == 3:
                     total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}'),
-                                                             Q(profile__first_name__icontains=f'{user_search_data[1]}'),
-                                                             Q(profile__middle_name__icontains=f'{user_search_data[2]}'))
+                                                          Q(profile__first_name__icontains=f'{user_search_data[1]}'),
+                                                          Q(profile__middle_name__icontains=f'{user_search_data[2]}'))
                 elif len(user_search_data) == 2:
                     total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}'),
-                                                             Q(profile__first_name__icontains=f'{user_search_data[1]}'))
+                                                          Q(profile__first_name__icontains=f'{user_search_data[1]}'))
                     if not total_user_list:
-                        total_user_list = User.objects.filter(Q(profile__first_name__icontains=f'{user_search_data[0]}'),
-                                                                 Q(profile__middle_name__icontains=f'{user_search_data[1]}'))
+                        total_user_list = User.objects.filter(
+                            Q(profile__first_name__icontains=f'{user_search_data[0]}'),
+                            Q(profile__middle_name__icontains=f'{user_search_data[1]}'))
 
                 elif len(user_search_data) == 1:
-                    total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}') | Q(
-                        profile__first_name__icontains=f'{user_search_data[0]}') | Q(
-                        profile__middle_name__icontains=f'{user_search_data[0]}'))
+                    total_user_list = User.objects.filter(
+                        Q(profile__family_name__icontains=f'{user_search_data[0]}') | Q(
+                            profile__first_name__icontains=f'{user_search_data[0]}') | Q(
+                            profile__middle_name__icontains=f'{user_search_data[0]}'))
                 else:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
-                               'position_list': position_list}
+                               'position_list': position_list, 'group_list': group_list}
                     return render(request, 'user_list.html', context=context)
                 if not total_user_list:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
-                               'position_list': position_list}
+                               'position_list': position_list, 'group_list': group_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     paginator = Paginator(total_user_list, 20)
                     page_number = request.GET.get('page', 1)
                     users = paginator.page(page_number)
                     context = {'user_list': users, 'no_search_results': no_search_result,
-                               'position_list': position_list}
+                               'position_list': position_list, 'group_list': group_list}
                     return render(request, 'user_list.html', context=context)
 
             else:
-                total_user_list = User.objects.filter(profile__position=filter_input)
-                #  Постраничная разбивка
-                paginator = Paginator(total_user_list, 20)
-                page_number = request.GET.get('page', 1)
-                users = paginator.page(page_number)
-                context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
-                return render(request, 'user_list.html', context=context)
-
-
+                if filter_input[0] == "Все" and filter_input[1] == "Все":
+                    return redirect('quize737:user_list')
+                else:
+                    if filter_input[1] == "Все":
+                        total_user_list = User.objects.filter(profile__position=filter_input[0])
+                        #  Постраничная разбивка
+                        paginator = Paginator(total_user_list, 20)
+                        page_number = request.GET.get('page', 1)
+                        users = paginator.page(page_number)
+                        context = {'user_list': users, 'no_search_results': no_search_result,
+                                   'position_list': position_list, 'filter_input': filter_input, 'group_list': group_list}
+                        return render(request, 'user_list.html', context=context)
+                    elif filter_input[0] == "Все":
+                        total_user_list = User.objects.filter(groups__name=filter_input[1])
+                        #  Постраничная разбивка
+                        paginator = Paginator(total_user_list, 20)
+                        page_number = request.GET.get('page', 1)
+                        users = paginator.page(page_number)
+                        context = {'user_list': users, 'no_search_results': no_search_result,
+                                   'position_list': position_list, 'filter_input': filter_input,
+                                   'group_list': group_list}
+                        return render(request, 'user_list.html', context=context)
+                    else:
+                        total_user_list = User.objects.filter(profile__position=filter_input[0], groups__name=filter_input[1])
+                        #  Постраничная разбивка
+                        paginator = Paginator(total_user_list, 20)
+                        page_number = request.GET.get('page', 1)
+                        users = paginator.page(page_number)
+                        context = {'user_list': users, 'no_search_results': no_search_result,
+                                   'position_list': position_list, 'filter_input': filter_input,
+                                   'group_list': group_list}
+                        return render(request, 'user_list.html', context=context)
         else:
             total_user_list = User.objects.all()  # Вынимаем всех пользователей
             #  Постраничная разбивка
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
             users = paginator.page(page_number)
-            context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
+            context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list, 'group_list': group_list}
             return render(request, 'user_list.html', context=context)
 
 
@@ -1067,9 +1111,11 @@ def edit_group(request, id):
             context = {'group_form': group_form}
             return render(request, 'edit_group.html', context=context)
     else:
-        group_form = EditGroupForm(initial={"group_name": group_obj.name, 'discription': group_obj.groupsdescription.discription})
+        group_form = EditGroupForm(
+            initial={"group_name": group_obj.name, 'discription': group_obj.groupsdescription.discription})
         context = {'group_form': group_form}
         return render(request, 'edit_group.html', context=context)
+
 
 #  Удаление группы
 @login_required
@@ -1107,15 +1153,15 @@ def edit_user(request, id):
 
         # Устанавливаем группу в соответствии с выбранной должностью, если она была изменена
         if position_name_group:  # Если поменяли должность, то переменная новой группы пользователя будет заполнена
-            if position_name_group in to_del_groups:  #  Убираем новую группу из удаляемых групп
+            if position_name_group in to_del_groups:  # Убираем новую группу из удаляемых групп
                 to_del_groups.remove(position_name_group)
-            if position_name_group not in changed_groups:  #  Добавляем новую группу в назначаемые группы
+            if position_name_group not in changed_groups:  # Добавляем новую группу в назначаемые группы
                 changed_groups.append(position_name_group)
             #  Выясняем старую группу пользователя
             position_name_group_old = old_position + ' ' + user_obj.profile.ac_type
-            if position_name_group_old not in to_del_groups:  #  Добавляем старую группу в удаляемые, если ее там нет
+            if position_name_group_old not in to_del_groups:  # Добавляем старую группу в удаляемые, если ее там нет
                 to_del_groups.append(position_name_group_old)
-            if position_name_group_old in changed_groups:  #  Удаляем старую группу из назначенных, если она там есть
+            if position_name_group_old in changed_groups:  # Удаляем старую группу из назначенных, если она там есть
                 changed_groups.remove(position_name_group_old)
 
         for del_group in to_del_groups:  # Удаляем пользователя из групп
@@ -1220,7 +1266,8 @@ def new_user(request):
         form_user = UserRegisterForm(request.POST)
         form_profile = ProfileForm(request.POST)
         if form_user.is_valid() and form_profile.is_valid():
-            group = Group.objects.get(name=form_profile.cleaned_data['position'] + ' ' + 'B737')#form_profile.cleaned_data['ac_type'])  - раскоментить и убрать 'B737'
+            group = Group.objects.get(name=form_profile.cleaned_data[
+                                               'position'] + ' ' + 'B737')  # form_profile.cleaned_data['ac_type'])  - раскоментить и убрать 'B737'
             new_user = form_user.save(commit=False)
             new_user.set_password(form_user.cleaned_data['password1'])
             new_user.first_name = form_profile.cleaned_data['first_name']
@@ -1233,7 +1280,8 @@ def new_user(request):
                 first_name=form_profile.cleaned_data['first_name'],
                 middle_name=form_profile.cleaned_data['middle_name'],
                 position=form_profile.cleaned_data['position'],
-                ac_type='B737'#form_profile.cleaned_data['ac_type']  - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
+                ac_type='B737'
+                # form_profile.cleaned_data['ac_type']  - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
             )
             return redirect('quize737:user_list')
 

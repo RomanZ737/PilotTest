@@ -42,7 +42,6 @@ form {
 /* Текст вопроса */
 label.question {
     position: relative;
-    word-wrap: break-word;
     left: 4%;
     display: block;
     margin-top: 5px;
@@ -50,6 +49,8 @@ label.question {
     color: black;
     font-size: 26px;
     width: 95%;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 label.option {
@@ -63,9 +64,25 @@ div.option {
     position: relative;
     color: rgb(209, 209,209);
     font-size: 25px;
-    word-wrap: break-word;
     width: 90%;
+    text-align: justify;
+    text-justify: inter-word;
+    padding: 10px;
 }
+
+div.option-choice {
+    display: inline-block;
+    position: relative;
+    width: 3%;
+}
+
+div.option-value {
+    display: inline-block;
+    position: relative;
+    width: 90%;
+    vertical-align: middle;
+}
+
 
 div.button_answer {
     position: relative;
@@ -81,6 +98,11 @@ div.button_answer {
 }
 
 input[type='radio']{
+    width: 20px;
+    height: 20px;
+}
+
+input[type='checkbox']{
     width: 20px;
     height: 20px;
 }
@@ -158,4 +180,8 @@ div.list-other_field {    /* блок для остальных типов да�
     vertical-align: middle;
     margin-bottom: 5px;
     margin-top: 5px;
+}
+
+span.static_sign {
+    font-size: 24px;
 }

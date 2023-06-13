@@ -24,17 +24,17 @@
     <div class="block-list">
         <form id="question_data" method='post'>
             {% csrf_token %}
-<!--            {% for error in question_form.errors %}-->
-<!--            <p>{{error}}</p>-->
-<!--            {% endfor %}-->
+            {% for error in question_form.errors.items %}
+            <p>{{error}}</p>
+            {% endfor %}
 
                 <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
                 <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
                 <p>{{question_form.option_1.label}}: <textarea style="font-size: 15px;" id="option_1" name="option_1" oninput="autoGrow()">{{question_form.option_1.value}}</textarea></p>
-                <p>{{question_form.option_2.label}}: <textarea style="font-size: 15px;" id="option_2" name="option_1" oninput="autoGrow()">{{question_form.option_2.value}}</textarea></p>
-                <p>{{question_form.option_3.label}}: <textarea style="font-size: 15px;" id="option_3" name="option_1" oninput="autoGrow()">{{question_form.option_3.value}}</textarea></p>
-                <p>{{question_form.option_4.label}}: <textarea style="font-size: 15px;" id="option_4" name="option_1" oninput="autoGrow()">{{question_form.option_4.value}}</textarea></p>
-                <p>{{question_form.option_5.label}}: <textarea style="font-size: 15px;" id="option_5" name="option_1" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></p>
+                <p>{{question_form.option_2.label}}: <textarea style="font-size: 15px;" id="option_2" name="option_2" oninput="autoGrow()">{{question_form.option_2.value}}</textarea></p>
+                <p>{{question_form.option_3.label}}: <textarea style="font-size: 15px;" id="option_3" name="option_3" oninput="autoGrow()">{{question_form.option_3.value}}</textarea></p>
+                <p>{{question_form.option_4.label}}: <textarea style="font-size: 15px;" id="option_4" name="option_4" oninput="autoGrow()">{{question_form.option_4.value}}</textarea></p>
+                <p>{{question_form.option_5.label}}: <textarea style="font-size: 15px;" id="option_5" name="option_5" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></p>
                 <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
                 <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
                 <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>

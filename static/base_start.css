@@ -160,6 +160,7 @@ div.list-test_name {    /* блок названия теста в таблиц�
     text-align: left;
     width: 30%;
     vertical-align: middle;
+    padding-bottom: 18px;
 }
 
 div.list-text_numtry {    /* блок для остальных типов данным в списке */

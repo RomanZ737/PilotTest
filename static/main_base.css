@@ -203,7 +203,7 @@ div.list-test_result {  /* блок Результат сдачи теста в 
 div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
-    width: 9%;
+    width: 13%;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -213,10 +213,12 @@ div.list-them {  /* блок Тема вопроса в таблице */
 div.list-question {  /* блок Текст вопроса в таблице */
     position: relative;
     display: inline-block;
-    width: 70%;
-    text-align: left;
+    width: 75%;
     vertical-align: middle;
-    word-wrap: break-word;
+    text-align: justify;
+    text-justify: inter-word;
+    padding-left: 5px;
+    padding-right: 6px;
 }
 
 div.list-delete {  /* блок Удалить каки-либо запись в таблице */
@@ -267,7 +269,8 @@ div.search-form {  /* блок формы поиска */
 div.filter-form {   /* блок формы фильтра */
     position: relative;
     display: inline-block;
-    left: 6%;
+    left: 5%;
+    width: 50%;
 }
 
 div.list-test_name {    /* блок названия теста в таблице */
@@ -306,7 +309,7 @@ div.list-group {  /* блок группа в таблице */
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 30%;
+    width: 38%;
     text-align: left;
     font-size: 18px;
 }
@@ -336,8 +339,6 @@ div.new_user-field {
     text-align: left;
     font-size: 20px;
     margin: 7px;
-
-
 }
 
 div.note_in_list {
@@ -347,13 +348,57 @@ div.note_in_list {
     font-size: 19px;
 }
 
-div.profile_statick_field {
+div.statick_field_sign {
+    position: relative;
+    display: inline-block;
+    width: 24%;
+    font-size: 22px;
+}
+
+div.dynamic_field_sign {
+    position: relative;
+    display: inline-block;
+    width: 50%;
+    font-size: 22px;
+    color: rgb(209, 209,209);
+}
+
+input.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
+    position: relative;
+    left: 3%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+span.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
+    position: relative;
+    left: 3%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.filter_sign_position {
+    position: relative;
+    display: inline-block;
+    width: 14%;
+    padding-left: 20px;
+}
+
+div.filter_sign_group {
+    position: relative;
+    display: inline-block;
+    width: 9%;
+    padding-left: 20px;
+}
+
+select.position_filter {
     position: relative;
     display: inline-block;
 }
 
-div.profile_dynamic_field {
+input.submit_filter {
     position: relative;
     display: inline-block;
-    color: rgb(209, 209,209);
+    margin-left: 40px;
+    width: 100px;
 }

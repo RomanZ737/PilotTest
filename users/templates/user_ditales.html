@@ -3,20 +3,26 @@
 {% block content %}
 <fieldset>
     <legend>
-        <a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+        <a href="{% url 'quize737:user_list' %}">СПИСОК ПИЛОТОВ</a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">Пруппы</a>
+        <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Список Прупп</a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
     </legend>
 
+    <div class="block_none_light_up">
+        <div class="statick_field_sign">ФИО:</div>
+        <div class="dynamic_field_sign">{{user_profile.family_name}} {{user_profile.first_name}} {{user_profile.middle_name}}</div>
+    </div>
 
-    <h1> {{user_profile.family_name}} {{user_profile.first_name}} {{user_profile.middle_name}}</h1>
+    <div class="block_none_light_up">
+        <div class="statick_field_sign">Должность:</div>
+        <div class="dynamic_field_sign">{{user_profile.get_position_display}}</div>
+    </div>
 
-        {% if test_and_data_saved %}
-        <span class="result_confirm">Данные сохранены</span>
-        {% endif %}
-    </p>
+
 
     <h4>{{non_form_errors}}</h4>
     {% for error in form_errors%}
@@ -26,32 +32,38 @@
 
 
 <form id="user_tests_form" method='post'>
-    <p>Должность: {{user_profile.get_position_display}}
-
-    </p>
-
-    <br>
-    <br>
       {% csrf_token %}
         {{ user_tests.management_form }}
-        {% if user_tests|length > 0 %}
-            <p>Назначенные тесты:</p>
-        {% else %}
-            <p>Назначенные тесты отсутствуют</p>
-        {% endif %}
 
+        {% if user_tests|length > 0 %}
+            <div class="block_none_light_up">
+                <div class="statick_field_sign">Назначенные тесты:</div>
+                {% if test_and_data_saved %}
+                    <span class="result_confirm">Данные сохранены</span>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="block_none_light_up">
+                <div class="statick_field_sign">Назначенные тесты отсутствуют</div>
+            </div>
+        {% endif %}
+        <br>
         {% for form in user_tests %}
         <div class="form_set">
-            <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>
+            <div class="block_none_light_up">
+                <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>
+            </div>
         </div>
         <br>
         {% endfor %}
 
-        <input id="add-form" type="submit" value="+ Назначить новый тест">
-        <br>
-        <br>
-    <input type="submit" value="Сохранить" id="save_btn">
-        <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+
+            <input class="block_none_light_up" id="add-form" type="submit" value="+ Назначить новый тест">
+            <br>
+            <br>
+            <input class="block_none_light_up" type="submit" value="Сохранить" id="save_btn">
+            <span class="block_none_light_up" id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+
 
     </form>
 
@@ -59,7 +71,9 @@
 <!--        <button type="submit">Вернуться</button>-->
 <!--    </form>-->
     <div class="form_set" style="display:none">
-        <span class="empty_form">Название теста: {{ user_tests.empty_form.test_name }} Количество попыток: {{ user_tests.empty_form.num_try }} Выполнить до: {{user_tests.empty_form.date_before}}</span><span>{{user_tests.empty_form.DELETE}} Удалить тест </span>
+        <div class="block_none_light_up">
+            <span class="empty_form">Название теста: {{ user_tests.empty_form.test_name }} Количество попыток: {{ user_tests.empty_form.num_try }} Выполнить до: {{user_tests.empty_form.date_before}}</span><span>{{user_tests.empty_form.DELETE}} Удалить тест </span>
+        </div>
     </div>
 
 </fieldset>
