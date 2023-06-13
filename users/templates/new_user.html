@@ -21,18 +21,45 @@
 
   <form method="POST" id="new_user">
       {% csrf_token %}
-    <p>Логин: </p><p>{{ form_user.username }}</p>
-            <p>Пароль: </p><p>{{form_user.password1}}</p>
-            <p>Минимальная длина пароля 3 символа</p>
-            <p>Пароль повторно: </p><p>{{ form_user.password2 }}</p>
-            <p>Email: </p><p>{{form_user.email}}</p>
-            <p>Фамилия: </p><p>{{ form_profile.family_name }}</p>
-            <p>Имя: </p><p>{{ form_profile.first_name }}</p>
-            <p>Отчество: </p><p>{{ form_profile.middle_name }}</p>
-            <p>Должность: </p><p>{{ form_profile.position }}</p>
-<!--            <p>Тип ВС: {{ form_profile.ac_type}}</p>-->
+      <div class="block_none_light_up">
+          <div class="new_user-field">Фамилия:</div>
+          <div class="new_user-field">Имя:</div>
+          <div class="new_user-field">Отчество:</div>
+      </div>
+      <div class="block_none_light_up">
+        <div class="new_user-field">{{ form_profile.family_name }}</div>
+        <div class="new_user-field">{{ form_profile.first_name }}</div>
+        <div class="new_user-field">{{ form_profile.middle_name }}</div>
+      </div>
+      <div class="block_none_light_up">
+          <div class="new_user-field">Логин:</div>
+          <div class="new_user-field">Пароль:</div>
+          <div class="new_user-field">Пароль повторно:</div>
+      </div>
+
+      <div class="block_none_light_up">
+          <div class="new_user-field">{{ form_user.username }}</div>
+          <div class="new_user-field">{{form_user.password1}}</div>
+          <div class="new_user-field">{{ form_user.password2 }}</div>
+      </div>
+
+      <div class="note_in_list">
+          Минимальная длина пароля 3 символа
+      </div>
+      <div class="block_none_light_up">
+          <div class="new_user-field">Email:</div>
+          <div class="new_user-field">Должность:</div>
+<!--          <div class="new_user-field">Тип ВС:</div>-->
+      </div>
+      <div class="block_none_light_up">
+          <div class="new_user-field">{{form_user.email}}</div>
+          <div class="new_user-field">{{ form_profile.position }}</div>
+<!--          <div class="new_user-field">{{ form_profile.ac_type}}</div>-->
+      </div>
 
 </form>
-    <input type="submit" value="Сохранить" form="new_user">
+    <div class="block_none_light_up">
+        <input type="submit" value="Сохранить" form="new_user">
+    </div>
 </fieldset>
 {% endblock content %}

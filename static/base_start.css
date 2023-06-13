@@ -246,3 +246,29 @@ div.list-q_number {
     text-align: left;
     font-size: 18px;
 }
+
+div.note_in_list {
+    position: relative;
+    left: 25%;
+    color: rgba(209, 209,209, 0.4);
+    font-size: 19px;
+}
+
+div.profile_statick_field {
+    position: relative;
+    display: inline-block;
+    width: 12%;
+}
+
+div.profile_dynamic_field {
+    position: relative;
+    display: inline-block;
+    width: 36%;
+    color: rgb(209, 209,209);
+}
+
+div.profile_input_field {
+    position: relative;
+    display: inline-block;
+    width: 25%;
+}

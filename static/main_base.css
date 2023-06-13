@@ -328,3 +328,32 @@ div.list-edit {
     font-size: 18px;
     word-wrap: break-word;
 }
+
+div.new_user-field {
+    position: relative;
+    display: inline-block;
+    width: 13%;
+    text-align: left;
+    font-size: 20px;
+    margin: 7px;
+
+
+}
+
+div.note_in_list {
+    position: relative;
+    left: 19%;
+    color: rgba(209, 209,209, 0.4);
+    font-size: 19px;
+}
+
+div.profile_statick_field {
+    position: relative;
+    display: inline-block;
+}
+
+div.profile_dynamic_field {
+    position: relative;
+    display: inline-block;
+    color: rgb(209, 209,209);
+}

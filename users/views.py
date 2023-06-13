@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserRegisterForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from .models import Profile
+from .models import Profile, UserTests
 from django.contrib.auth import login
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordChangeDoneView
@@ -64,11 +66,28 @@ def register(request):
 
 @login_required
 def profile(request):
+    user_tests = UserTests.objects.filter(user=request.user)
     chang_pass_form = PasswordChangeView()
     print('chang_pass_form:', dir(chang_pass_form))
     print('chang_pass_form:', chang_pass_form)
-    context = {'change_pass_form': chang_pass_form}
+    context = {'change_pass_form': chang_pass_form, 'user_tests': user_tests}
     return render(request, 'profile.html', context=context)
+
+@login_required
+def password_change(request):
+    user_tests = UserTests.objects.filter(user=request.user)
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, request.user)   # Обновляем данные сессии пользователя, что бы он сотавался залогиненым после смены пароля
+            test_and_data_saved = True
+            context = {'form': form, 'user_tests': user_tests, 'test_and_data_saved': test_and_data_saved}
+            return render(request, 'password_change.html', context=context)
+    else:
+        form = PasswordChangeForm(request.user)
+        context = {'form': form, 'user_tests': user_tests}
+        return render(request, 'password_change.html', context=context)
 
 
 
