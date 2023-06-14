@@ -76,8 +76,8 @@ class QuizeSet(models.Model):
 
 # Объект результат теста конкретного пользователя
 class QuizeResults(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID пользователя',
-                                help_text='ID пользователя, для упрощённого поиска результатов', null=True)
+    user_id = models.ForeignKey(User, on_delete=models.SET_DEFAULT, verbose_name='ID пользователя',
+                                help_text='ID пользователя, для упрощённого поиска результатов', null=True, default='User Deleted')
     user_name = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                  help_text='Имя пользователя, который проходил тест')
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
