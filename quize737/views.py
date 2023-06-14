@@ -12,8 +12,7 @@ import common
 from django.core.exceptions import ObjectDoesNotExist
 from common import send_email
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from users.models import Profile
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
@@ -944,7 +943,7 @@ def user_list(request):
                     return redirect('quize737:user_list')
                 else:
                     if filter_input[1] == "Все":
-                        total_user_list = User.objects.filter(profile__position=filter_input[0])
+                        total_user_list = User.objects.filter(profile__position=filter_input[0]).order_by('last_name')
                         #  Постраничная разбивка
                         paginator = Paginator(total_user_list, 20)
                         page_number = request.GET.get('page', 1)
@@ -953,7 +952,7 @@ def user_list(request):
                                    'position_list': position_list, 'filter_input': filter_input, 'group_list': group_list}
                         return render(request, 'user_list.html', context=context)
                     elif filter_input[0] == "Все":
-                        total_user_list = User.objects.filter(groups__name=filter_input[1])
+                        total_user_list = User.objects.filter(groups__name=filter_input[1]).order_by('last_name')
                         #  Постраничная разбивка
                         paginator = Paginator(total_user_list, 20)
                         page_number = request.GET.get('page', 1)
@@ -963,7 +962,7 @@ def user_list(request):
                                    'group_list': group_list}
                         return render(request, 'user_list.html', context=context)
                     else:
-                        total_user_list = User.objects.filter(profile__position=filter_input[0], groups__name=filter_input[1])
+                        total_user_list = User.objects.filter(profile__position=filter_input[0], groups__name=filter_input[1]).order_by('last_name')
                         #  Постраничная разбивка
                         paginator = Paginator(total_user_list, 20)
                         page_number = request.GET.get('page', 1)
@@ -973,7 +972,7 @@ def user_list(request):
                                    'group_list': group_list}
                         return render(request, 'user_list.html', context=context)
         else:
-            total_user_list = User.objects.all()  # Вынимаем всех пользователей
+            total_user_list = User.objects.all().order_by('last_name')  # Вынимаем всех пользователей
             #  Постраничная разбивка
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
@@ -986,20 +985,26 @@ def user_list(request):
 @login_required
 @group_required('KRS')
 def group_users(request, id):
+    groups = Group.objects.all().values()
+    group_list = []
+    for group in groups:
+        group_list.append(group)
+    group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
     position_list = Profile.Position.values
+    position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
     no_search_result = False
-    total_user_list = User.objects.filter(groups=id)
+    total_user_list = User.objects.filter(groups=id).order_by('last_name')
     if not total_user_list:
         no_search_result = True
         group_name = Group.objects.get(id=id)  # .values('name')
         results = f'Пилоты в группе "{group_name.name}" не найдены'
         context = {'no_search_results': no_search_result, 'results': results,
-                   'position_list': position_list}
+                   'position_list': position_list, 'group_list': group_list}
         return render(request, 'user_list.html', context=context)
     paginator = Paginator(total_user_list, 20)
     page_number = request.GET.get('page', 1)
     users = paginator.page(page_number)
-    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list}
+    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list, 'group_list': group_list}
     return render(request, 'user_list.html', context=context)
 
 
@@ -1228,30 +1233,35 @@ def user_detales(request, id):
         if tests_for_user_form.is_valid():
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
-                # Проверяем было ли указано имя объекта
-                try:
-                    if UserTests.objects.get(user=id, test_name=test['test_name']):
-                        UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
-                except Exception:
-                    pass
-                # Создаём только те объекты, которые не помечены для удаления
-                if not test['DELETE']:
-                    user = User.objects.filter(id=id)
-                    UserTests.objects.create(user=user[0],
-                                             test_name=test['test_name'],
-                                             num_try_initial=test['num_try'],
-                                             num_try=test['num_try'],
-                                             date_before=test['date_before'])
+                if test['DELETE']:
+                    UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
+                else:
+                    try:
+                        if UserTests.objects.get(user=id, test_name=test['test_name']):
+                            instance = UserTests.objects.get(user=id, test_name=test['test_name'])
+                            instance.num_try = test['num_try']
+                            instance.date_before = test['date_before']
+                            instance.save()
+                            #UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
+                    except Exception:
+                        # Создаём только те объекты, которые не помечены для удаления
+                        if not test['DELETE']:
+                            user = User.objects.filter(id=id)
+                            UserTests.objects.create(user=user[0],
+                                                     test_name=test['test_name'],
+                                                     num_try_initial=test['num_try'],
+                                                     num_try=test['num_try'],
+                                                     date_before=test['date_before'])
 
-                    #  Отправляем письмо пользователю о назначенном тесте
-                    subject = f"Вам назначен Тест: '{test['test_name']}'"
-                    message = f"<p style='font-size: 25px;'><b>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</b></p><br>" \
-                              f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
-                              f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
-                              f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
+                            #  Отправляем письмо пользователю о назначенном тесте
+                            subject = f"Вам назначен Тест: '{test['test_name']}'"
+                            message = f"<p style='font-size: 25px;'><b>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</b></p><br>" \
+                                      f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
+                                      f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
+                                      f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
 
-                    email_msg = {'subject': subject, 'message': message, 'to': user[0].email}
-                    send_email(request, email_msg)
+                            email_msg = {'subject': subject, 'message': message, 'to': user[0].email}
+                            send_email(request, email_msg)
 
             # Загружаем новые данные в форму
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')

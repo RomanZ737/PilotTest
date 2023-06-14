@@ -2,6 +2,7 @@ from django.urls import path
 
 
 from . import views
+from PilotLoad import views as PLView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -45,4 +46,5 @@ urlpatterns = [
     path('del_user/<int:id>', views.del_user, name='del_user'),
     path('new_user/', views.new_user, name='new_user'),
     path('edit_group/<int:id>', views.edit_group, name='edit_group'),
+    path('pilotload/', PLView.pilotload, name='pilotload'),
     ]

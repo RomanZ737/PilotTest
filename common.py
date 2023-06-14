@@ -1,4 +1,4 @@
-import smtplib
+import smtplib, ssl
 
 from email.message import EmailMessage
 from email.utils import make_msgid
@@ -77,8 +77,15 @@ def send_email(request, email_msg):
                                          cid=logo_cid)
 
     # Send the mail
-
-    server = smtplib.SMTP_SSL(host=config('EMAIL_HOST', default=''), port=config('EMAIL_PORT', default=''))
+    context = ssl.create_default_context()
+    server = smtplib.SMTP(host=config('EMAIL_HOST', default=''), port=config('EMAIL_PORT', default=''))
+    server.connect(host=config('EMAIL_HOST', default=''), port=config('EMAIL_PORT', default=''))
+    server.ehlo()  # Can be omitted
+    server.starttls()  # Secure the connection
+    server.ehlo()  # Can be omitted
+    #-----------------------
+    #server = smtplib.SMTP_SSL(host=config('EMAIL_HOST', default=''), port=config('EMAIL_PORT', default=''))
+    # -----------------------
     server.login(config('EMAIL_HOST_USER', default=''), config('EMAIL_HOST_PASSWORD', default=''))
     # server.sendmail(FROM, TO, message.encode('utf-8'))
     server.send_message(msg)
