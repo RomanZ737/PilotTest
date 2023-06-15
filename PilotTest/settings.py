@@ -49,7 +49,7 @@ ALLOWED_HOSTS = ['*']
 DATE_FORMAT = ['%d %M %Y']
 
 INSTALLED_APPS = [
-
+    'django_cron',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -168,3 +168,14 @@ MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = 'start'
 LOGIN_URL = 'login'
+
+
+CRON_CLASSES = [
+    "quize737.cron.MyCronJob",
+]
+
+REST_FRAMEWORK = {
+  'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.AllowAny',
+  ],
+}

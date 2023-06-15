@@ -68,3 +68,13 @@ class UserTests(models.Model):
 
     def __str__(self):
         return f'Пилот {self.user.last_name} {self.user.first_name}, --> {self.test_name}, попыток {self.num_try}, закончить до {self.date_before.strftime("%d.%m.%Y %H:%M")}'
+
+
+#  Модель просроченных тестов пользователя
+class TestExpired(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Модель пользователя')
+    test = models.ForeignKey(UserTests, on_delete=models.CASCADE, verbose_name='Модель теста пользователя')
+    date_before = models.DateTimeField(verbose_name='Дата до которой необходимо выполнить тест')
+
+    def __str__(self):
+        return f'{self.user.last_name} {self.user.first_name}, Test: {self.test.test_name}, Дата: {self.date_before.strftime("%d.%m.%Y %H:%M")}'

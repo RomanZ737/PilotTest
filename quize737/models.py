@@ -17,7 +17,6 @@ class Thems(models.Model):
 
 # Вся база вопросов по всем темам
 class QuestionSet(models.Model):
-
     class ACType(models.TextChoices):
         B737 = 'B737', 'Boeing 737'
         B777 = 'B777', 'Boeing 777'
@@ -37,7 +36,8 @@ class QuestionSet(models.Model):
     q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0.0,
                                  help_text='Если вопрос сложный или лёгкий, кол-во баллов за вопрос можно увеличить или уменьшить')
     answer = models.IntegerField(verbose_name='Ответ, в виде номера строки ответа',
-                                 help_text='Поле используется если вопрос подразумевает один ответ, True - если один ответ, False - если несколько ответов', blank=True,
+                                 help_text='Поле используется если вопрос подразумевает один ответ, True - если один ответ, False - если несколько ответов',
+                                 blank=True,
                                  null=True)
     answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос',
                                help_text='Поле используется если вопрос подразумевает несколько правильных ответов',
@@ -46,7 +46,7 @@ class QuestionSet(models.Model):
 
     class Meta:
         ordering = ['-them_name']
-        #indexes = [models.Index(fields=['question'])]
+        # indexes = [models.Index(fields=['question'])]
 
     def __str__(self):
         return f'{self.them_name}, {self.question}'
@@ -66,7 +66,7 @@ class QuizeSet(models.Model):
     q_sequence_num = models.IntegerField(default=0,
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
     max_score_amount = models.FloatField(verbose_name='Максимальное кол-во баллов',
-                                           help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
+                                         help_text='Максимально возможное количество баллов, если в вопроса был указан вес')
     pass_score = models.IntegerField(default=0, verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
 
@@ -77,7 +77,8 @@ class QuizeSet(models.Model):
 # Объект результат теста конкретного пользователя
 class QuizeResults(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.SET_DEFAULT, verbose_name='ID пользователя',
-                                help_text='ID пользователя, для упрощённого поиска результатов', null=True, default='User Deleted')
+                                help_text='ID пользователя, для упрощённого поиска результатов', null=True,
+                                default='User Deleted')
     user_name = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                  help_text='Имя пользователя, который проходил тест')
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
@@ -90,7 +91,8 @@ class QuizeResults(models.Model):
     total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
     pass_score = models.IntegerField(default=0, verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
-    conclusion = models.BooleanField(verbose_name='Итоговый результат', null=True, help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
+    conclusion = models.BooleanField(verbose_name='Итоговый результат', null=True,
+                                     help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
 
     class Meta:
         ordering = ['-timestamp']
@@ -118,7 +120,8 @@ class TestQuestionsBay(models.Model):
     test_id = models.ForeignKey(TestConstructor, on_delete=models.CASCADE, verbose_name='id теста',
                                 help_text='id теста которому принадлежит вопрос')
     q_num = models.IntegerField(verbose_name='Количество вопросов по теме')
-    #max_q_num = models.IntegerField(verbose_name='Максимальное Количество вопросов по теме', null=True)
+
+    # max_q_num = models.IntegerField(verbose_name='Максимальное Количество вопросов по теме', null=True)
 
     class Meta:
         unique_together = ('theme', 'test_id')
@@ -129,3 +132,5 @@ class TestQuestionsBay(models.Model):
 
 class FileUpload(models.Model):
     docfile = models.FileField(upload_to='documents/')
+
+
