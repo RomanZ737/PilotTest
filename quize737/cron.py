@@ -1,6 +1,6 @@
 from django_cron import CronJobBase, Schedule
 import requests
-#from .models import TestExpired
+from users.models import TestExpired
 import django_cron
 
 
