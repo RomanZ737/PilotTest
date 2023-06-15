@@ -74,7 +74,10 @@ class UserTests(models.Model):
 class TestExpired(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Модель пользователя')
     test = models.ForeignKey(UserTests, on_delete=models.CASCADE, verbose_name='Модель теста пользователя')
-    date_before = models.DateTimeField(verbose_name='Дата до которой необходимо выполнить тест')
+    days_left = models.IntegerField(verbose_name='Количество дней до истечения', null=True)
+
+    class Meta:
+        unique_together = ('user', 'test')
 
     def __str__(self):
-        return f'{self.user.last_name} {self.user.first_name}, Test: {self.test.test_name}, Дата: {self.date_before.strftime("%d.%m.%Y %H:%M")}'
+        return f'{self.user.last_name} {self.user.first_name}, Test: {self.test.test_name}, Дата: {self.test.date_before.strftime("%d.%m.%Y %H:%M")}'

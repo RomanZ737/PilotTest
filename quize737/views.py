@@ -24,7 +24,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload
 from django.contrib.auth.decorators import login_required, user_passes_test
-from datetime import datetime
+import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
     NewThemeForm
 from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm
@@ -32,7 +32,7 @@ from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
 from reportlab.pdfbase.ttfonts import TTFont
-from users.models import Profile, UserTests, GroupsDescription
+from users.models import Profile, UserTests, GroupsDescription, TestExpired
 
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -437,14 +437,18 @@ def tests_results_list(request):
             if not total_results_list:
                 no_search_result = True
                 results = f'Пилоты по запросу "{user_search_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
+                context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
+                           'position_list': position_list, 'group_list': group_list,
+                           'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
             else:
                 paginator = Paginator(total_results_list, 10)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
-                context = {'results': results_list_pages, 'no_search_results': no_search_result, 'filter_input': filter_input,
-                           'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
+                context = {'results': results_list_pages, 'no_search_results': no_search_result,
+                           'filter_input': filter_input,
+                           'position_list': position_list, 'group_list': group_list,
+                           'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
         else:
             print('filter_input', filter_input)
@@ -460,21 +464,29 @@ def tests_results_list(request):
                     result = True
                 else:
                     result = False
-                total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position, user_id__groups__name__icontains=group, conclusion__exact=result)
+                total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
+                                                              user_id__groups__name__icontains=group,
+                                                              conclusion__exact=result)
             else:
-                total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position, user_id__groups__name__icontains=group, conclusion__icontains=result)
+                total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
+                                                              user_id__groups__name__icontains=group,
+                                                              conclusion__icontains=result)
             print('DATA:', position, group, result)
             if not total_user_list:
                 no_search_result = True
                 results = f'Результаты тестов не найдены'
-                context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
+                context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
+                           'position_list': position_list, 'group_list': group_list,
+                           'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
             else:
                 #  Постраничная разбивка
                 paginator = Paginator(total_user_list, 10)
                 page_number = request.GET.get('page', 1)
                 users = paginator.page(page_number)
-                context = {'results': users, 'no_search_results': no_search_result, 'filter_input': filter_input, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
+                context = {'results': users, 'no_search_results': no_search_result, 'filter_input': filter_input,
+                           'position_list': position_list, 'group_list': group_list,
+                           'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
 
 
@@ -483,7 +495,8 @@ def tests_results_list(request):
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)
-        context = {'results': results_list_pages, 'position_list': position_list, 'group_list': group_list, 'results_list_options': results_list_options}
+        context = {'results': results_list_pages, 'position_list': position_list, 'group_list': group_list,
+                   'results_list_options': results_list_options}
         return render(request, 'tests_results_list.html', context=context)
 
 
@@ -890,7 +903,7 @@ def user_list(request):
         group_list = []
         for group in groups:
             group_list.append(group)
-        group_list.append({'name': 'Все'}) #  Добавляем выбор всех групп
+        group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
         position_list = Profile.Position.values
         position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
 
@@ -949,7 +962,8 @@ def user_list(request):
                         page_number = request.GET.get('page', 1)
                         users = paginator.page(page_number)
                         context = {'user_list': users, 'no_search_results': no_search_result,
-                                   'position_list': position_list, 'filter_input': filter_input, 'group_list': group_list}
+                                   'position_list': position_list, 'filter_input': filter_input,
+                                   'group_list': group_list}
                         return render(request, 'user_list.html', context=context)
                     elif filter_input[0] == "Все":
                         total_user_list = User.objects.filter(groups__name=filter_input[1]).order_by('last_name')
@@ -962,7 +976,8 @@ def user_list(request):
                                    'group_list': group_list}
                         return render(request, 'user_list.html', context=context)
                     else:
-                        total_user_list = User.objects.filter(profile__position=filter_input[0], groups__name=filter_input[1]).order_by('last_name')
+                        total_user_list = User.objects.filter(profile__position=filter_input[0],
+                                                              groups__name=filter_input[1]).order_by('last_name')
                         #  Постраничная разбивка
                         paginator = Paginator(total_user_list, 20)
                         page_number = request.GET.get('page', 1)
@@ -977,7 +992,8 @@ def user_list(request):
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
             users = paginator.page(page_number)
-            context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list, 'group_list': group_list}
+            context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
+                       'group_list': group_list}
             return render(request, 'user_list.html', context=context)
 
 
@@ -1004,7 +1020,8 @@ def group_users(request, id):
     paginator = Paginator(total_user_list, 20)
     page_number = request.GET.get('page', 1)
     users = paginator.page(page_number)
-    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list, 'group_list': group_list}
+    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
+               'group_list': group_list}
     return render(request, 'user_list.html', context=context)
 
 
@@ -1242,7 +1259,32 @@ def user_detales(request, id):
                             instance.num_try = test['num_try']
                             instance.date_before = test['date_before']
                             instance.save()
-                            #UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
+                            now = datetime.datetime.now().date()
+                            five_day_before = datetime.datetime.now().date() + datetime.timedelta(days=common.days_left_notify)
+                            days_left = (test['date_before'].date() - now).days
+                            # Если новая дата теста больше сегодняшней, то удалям тест из просроченных у пользователя
+                            if test['date_before'].date() > five_day_before:
+                                try:
+                                    user_test_instance = UserTests.objects.get(user=id, test_name=test['test_name'])
+                                    TestExpired.objects.get(user=id, test=user_test_instance).delete()
+                                except Exception:
+                                    pass
+                            # Если новая дата меньше срока определённого для информирования но больше сегодняшней
+                            elif test['date_before'].date() > now:
+                                user_test_instance = UserTests.objects.get(user=id, test_name=test['test_name'])
+                                try:
+                                    if TestExpired.objects.get(user=id, test=user_test_instance):
+                                        user_test_instance = UserTests.objects.get(user=id, test_name=test['test_name'])
+                                        tets_inst = TestExpired.objects.get(user=id, test=user_test_instance)
+                                        tets_inst.days_left = days_left
+                                        tets_inst.save()
+                                except Exception:
+                                    TestExpired.objects.create(user=id,
+                                                               test=user_test_instance,
+                                                               days_left=days_left
+                                                               )
+
+                            # UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
                     except Exception:
                         # Создаём только те объекты, которые не помечены для удаления
                         if not test['DELETE']:
@@ -1258,7 +1300,10 @@ def user_detales(request, id):
                             message = f"<p style='font-size: 25px;'><b>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</b></p><br>" \
                                       f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
                                       f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
-                                      f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
+                                      f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>" \
+                                      f"<br>" \
+                                      f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
+                                      f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
                             email_msg = {'subject': subject, 'message': message, 'to': user[0].email}
                             send_email(request, email_msg)
