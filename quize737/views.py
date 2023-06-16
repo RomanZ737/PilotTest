@@ -518,22 +518,22 @@ def question_list(request):
     filter_input = request.GET.get("theme_filter")
     filter_flag = request.GET.get("filter_flag")
 
-    print('request.GET', request.GET)
     no_search_result = False
     if user_search_input or filter_input or filter_flag:
         if user_search_input:
             total_questions_list = QuestionSet.objects.filter(Q(question__icontains=f'{user_search_input}'))
+            q_count = total_questions_list.count()
             if not total_questions_list:
                 no_search_result = True
                 results = f'Вопросы по запросу "{user_search_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results, 'them_list': them_list}
+                context = {'no_search_results': no_search_result, 'results': results, 'them_list': them_list, 'q_count': q_count}
                 return render(request, 'question_list.html', context=context)
             else:
                 paginator = Paginator(total_questions_list, 15)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
                 context = {'questions': results_list_pages, 'no_search_results': no_search_result,
-                           'them_list': them_list}
+                           'them_list': them_list, 'q_count': q_count}
                 return render(request, 'question_list.html', context=context)
         else:
             print('filter_input', filter_input)
@@ -541,19 +541,21 @@ def question_list(request):
                 return redirect('quize737:question_list')
             else:
                 them_q_list = QuestionSet.objects.filter(them_name=filter_input)
+                q_count = them_q_list.count()
                 paginator = Paginator(them_q_list, 15)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
                 context = {'questions': results_list_pages, 'no_search_results': no_search_result,
-                           'them_list': them_list, 'filter_input': int(filter_input)}
+                           'them_list': them_list, 'filter_input': int(filter_input), 'q_count': q_count}
                 return render(request, 'question_list.html', context=context)
     else:
         question_list = QuestionSet.objects.all()
+        q_count = question_list.count()
         paginator = Paginator(question_list, 15)
         page_number = request.GET.get('page', 1)
         questions = paginator.page(page_number)
         filtered = None
-        context = {'questions': questions, 'them_list': them_list, 'filtered': filtered}
+        context = {'questions': questions, 'them_list': them_list, 'filtered': filtered, 'q_count': q_count}
         return render(request, 'question_list.html', context=context)
 
 

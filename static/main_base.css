@@ -276,7 +276,7 @@ div.search-form {  /* блок формы поиска */
 div.filter-form {   /* блок формы фильтра */
     position: relative;
     display: inline-block;
-    width: 75%;
+    width: 65%;
 }
 
 div.list-test_name {    /* блок названия теста в таблице */
@@ -430,4 +430,12 @@ div.button_block {
     position: relative;
     display: inline-block;
     margin-left: 30px;
+}
+
+div.list-q_count {
+    position: relative;
+    display: inline-block;
+    width: 6%;
+    right: -8%;
+    top: -2%;
 }
