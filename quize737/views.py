@@ -1251,11 +1251,11 @@ def user_detales(request, id):
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
                 if test['DELETE']:
-                    UserTests.objects.filter(user=id, test_name=test['test_name']).delete()
+                    UserTests.objects.filter(user=user_object, test_name=test['test_name']).delete()
                 else:
                     try:
-                        if UserTests.objects.get(user=id, test_name=test['test_name']):
-                            instance = UserTests.objects.get(user=id, test_name=test['test_name'])
+                        if UserTests.objects.get(user=user_object, test_name=test['test_name']):
+                            instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
                             instance.num_try = test['num_try']
                             instance.date_before = test['date_before']
                             instance.save()
@@ -1265,21 +1265,21 @@ def user_detales(request, id):
                             # Если новая дата теста больше сегодняшней, то удалям тест из просроченных у пользователя
                             if test['date_before'].date() > five_day_before:
                                 try:
-                                    user_test_instance = UserTests.objects.get(user=id, test_name=test['test_name'])
-                                    TestExpired.objects.get(user=id, test=user_test_instance).delete()
+                                    user_test_instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
+                                    TestExpired.objects.get(user=user_object, test=user_test_instance).delete()
                                 except Exception:
                                     pass
                             # Если новая дата меньше срока определённого для информирования но больше сегодняшней
                             elif test['date_before'].date() > now:
-                                user_test_instance = UserTests.objects.get(user=id, test_name=test['test_name'])
+                                user_test_instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
                                 try:
-                                    if TestExpired.objects.get(user=id, test=user_test_instance):
-                                        user_test_instance = UserTests.objects.get(user=id, test_name=test['test_name'])
-                                        tets_inst = TestExpired.objects.get(user=id, test=user_test_instance)
+                                    if TestExpired.objects.get(user=user_object, test=user_test_instance):
+                                        user_test_instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
+                                        tets_inst = TestExpired.objects.get(user=user_object, test=user_test_instance)
                                         tets_inst.days_left = days_left
                                         tets_inst.save()
                                 except Exception:
-                                    TestExpired.objects.create(user=id,
+                                    TestExpired.objects.create(user=user_object,
                                                                test=user_test_instance,
                                                                days_left=days_left
                                                                )
@@ -1288,8 +1288,7 @@ def user_detales(request, id):
                     except Exception:
                         # Создаём только те объекты, которые не помечены для удаления
                         if not test['DELETE']:
-                            user = User.objects.filter(id=id)
-                            UserTests.objects.create(user=user[0],
+                            UserTests.objects.create(user=user_object,
                                                      test_name=test['test_name'],
                                                      num_try_initial=test['num_try'],
                                                      num_try=test['num_try'],
@@ -1297,7 +1296,7 @@ def user_detales(request, id):
 
                             #  Отправляем письмо пользователю о назначенном тесте
                             subject = f"Вам назначен Тест: '{test['test_name']}'"
-                            message = f"<p style='font-size: 25px;'><b>Уважаемый, {user[0].profile.first_name} {user[0].profile.middle_name}.</b></p><br>" \
+                            message = f"<p style='font-size: 25px;'><b>Уважаемый, {user_object.profile.first_name} {user_object.profile.middle_name}.</b></p><br>" \
                                       f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
                                       f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
                                       f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>" \
@@ -1305,7 +1304,7 @@ def user_detales(request, id):
                                       f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
                                       f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
-                            email_msg = {'subject': subject, 'message': message, 'to': user[0].email}
+                            email_msg = {'subject': subject, 'message': message, 'to': user_object.email}
                             send_email(request, email_msg)
 
             # Загружаем новые данные в форму
