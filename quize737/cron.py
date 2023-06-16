@@ -11,11 +11,12 @@ now = datetime.datetime.now().date()
 
 five_day_before = datetime.datetime.now().date() + datetime.timedelta(days=common.days_left_notify)
 
-
+# Проверка просроченных тестов
 class MyCronJob(CronJobBase):
     RUN_EVERY_MINS = 1  # every 5 minutes
-    RETRY_AFTER_FAILURE_MINS = 1
-    schedule = Schedule(run_every_mins=RUN_EVERY_MINS, retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
+    RUN_AT_TIMES = ['08:00']#, '14:00', '23:15']
+    #RETRY_AFTER_FAILURE_MINS = 1
+    schedule = Schedule(run_at_times=RUN_AT_TIMES, run_every_mins=RUN_EVERY_MINS)#, retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
     code = 'quize737.my_cron_job'  # a unique code
 
     def do(self):
