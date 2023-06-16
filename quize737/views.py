@@ -9,6 +9,7 @@ import sys
 
 import common
 
+from django.utils.encoding import force_str
 from django.core.exceptions import ObjectDoesNotExist
 from common import send_email
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
@@ -1399,89 +1400,105 @@ def file_upload(request):
             questions_created = 0
             # Анализируем загруженный файл
             dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-            with open(f"{dir_path}/media/documents/{request.FILES['docfile']}", newline='',
-                      encoding='utf-8') as csvfile:
+            f = request.FILES['docfile']
+            forman_index = str(f).find('.')
+            file_format = str(f)[forman_index:]
+            if str(file_format) == '.csv':
+                filename = force_str(f).strip().replace(' ', '_')
+                filename = force_str(filename).strip().replace('(', '')
+                filename = force_str(filename).strip().replace(')', '')
+                print('filename', filename)
+                with open(f"{dir_path}/media/documents/{filename}", newline='',
+                          encoding='utf-8') as csvfile:
 
-                #  Пропускаем первую строку (заголовок)
-                heading = next(csvfile)
-                fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
-                              'q_weight', 'answer', 'answers', 'ac_type']
-                reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
-                try:
-                    for row in reader:
-                        if row['theme'] and row['question'] and row['option_1'] and row['option_2'] and row['q_kind']:
-                            if row['answer'] or row['answers']:
-                                #  Вынимаем тему, если такой темы нет, создаём её
-                                them = Thems.objects.get_or_create(name=row['theme'])
-                                #  Подсчитывае созданные темы
-                                if them[1]:
-                                    them_created += 1
-                                #  Проверяем существование вопроса, если такого вопроса нет, создаём его
-                                if row['q_kind'] == 'Один Ответ':
-                                    q_kind = False
-                                    answer = row['answer']
-                                    if len(row['answer']) > 1 or not row['answer'].isdigit():
-                                        wrong_data.append(
-                                            f'В поле "Ответ" должна быть одна цифра, строка {reader.line_num}')
-                                        continue
-                                else:
-                                    q_kind = True
-                                    answers = row['answers']
-                                    answers = answers.replace(' ', '')
-                                    if len(answers) < 2:
-                                        wrong_data.append(
-                                            f'В поле "Ответы" должно быть больше одной цифры и они должны быть разделены запятыми без пробелов {reader.line_num}')
-                                        continue
-                                if not row['q_weight']:
-                                    q_weight = 0.0
-                                else:
-                                    q_weight = row['q_weight']
-                                # проверяем наличие вопроса
-                                if not QuestionSet.objects.filter(Q(question__icontains=row['question'])):
-                                    question = QuestionSet.objects.get_or_create(them_name=them[0],
-                                                                                 question=row['question'],
-                                                                                 option_1=row['option_1'],
-                                                                                 option_2=row['option_2'],
-                                                                                 option_3=row['option_3'],
-                                                                                 option_4=row['option_4'],
-                                                                                 option_5=row['option_5'],
-                                                                                 q_kind=q_kind,
-                                                                                 q_weight=q_weight,
-                                                                                 answer=answer,
-                                                                                 answers=answers,
-                                                                                 ac_type=row['ac_type']
-                                                                                 )
-                                    if question[1]:
-                                        questions_created += 1
-                                else:
-                                    print('Вопрос существует')
-                                # Подсчитываем созданные вопросы
+                    #  Пропускаем первую строку (заголовок)
+                    heading = next(csvfile)
+                    fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
+                                  'q_weight', 'answer', 'answers', 'ac_type']
+                    reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
+                    try:
+                        for row in reader:
+                            if row['theme'] and row['question'] and row['option_1'] and row['option_2'] and row['q_kind']:
+                                if row['answer'] or row['answers']:
+                                    #  Вынимаем тему, если такой темы нет, создаём её
+                                    them = Thems.objects.get_or_create(name=row['theme'])
+                                    #  Подсчитывае созданные темы
+                                    if them[1]:
+                                        them_created += 1
+                                    #  Проверяем существование вопроса, если такого вопроса нет, создаём его
+                                    if row['q_kind'] == 'Один Ответ':
+                                        q_kind = False
+                                        answer = row['answer']
+                                        if len(row['answer']) > 1 or not row['answer'].isdigit():
+                                            wrong_data.append(
+                                                f'В поле "Ответ" должна быть одна цифра, строка {reader.line_num}')
+                                            continue
+                                    else:
+                                        q_kind = True
+                                        answers = row['answers']
+                                        answers = answers.replace(' ', '')
+                                        if len(answers) < 2:
+                                            wrong_data.append(
+                                                f'В поле "Ответы" должно быть больше одной цифры и они должны быть разделены запятыми без пробелов {reader.line_num}')
+                                            continue
+                                    if not row['q_weight']:
+                                        q_weight = 0.0
+                                    else:
+                                        q_weight = row['q_weight']
+                                    # проверяем наличие вопроса
+                                    if not QuestionSet.objects.filter(Q(question__icontains=row['question'])):
+                                        question = QuestionSet.objects.get_or_create(them_name=them[0],
+                                                                                     question=row['question'],
+                                                                                     option_1=row['option_1'],
+                                                                                     option_2=row['option_2'],
+                                                                                     option_3=row['option_3'],
+                                                                                     option_4=row['option_4'],
+                                                                                     option_5=row['option_5'],
+                                                                                     q_kind=q_kind,
+                                                                                     q_weight=q_weight,
+                                                                                     answer=answer,
+                                                                                     answers=answers,
+                                                                                     ac_type=row['ac_type']
+                                                                                     )
+                                        if question[1]:
+                                            questions_created += 1
+                                    else:
+                                        print('Вопрос существует')
+                                    # Подсчитываем созданные вопросы
 
 
+
+                                else:
+                                    wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
+                                    continue
 
                             else:
-                                wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
-                                continue
+                                for data in row.values():
+                                    alpha = False
+                                    if data is not None:
+                                        if len(data) > 2:
+                                            alpha = True
 
-                        else:
-                            for data in row.values():
-                                alpha = False
-                                if data is not None:
-                                    if len(data) > 2:
-                                        alpha = True
+                                if alpha == True:
+                                    wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
+                                    continue
 
-                            if alpha == True:
-                                wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
-                                continue
+                    except csv.Error as e:
+                        error_read = {'file': filename, 'line': reader.line_num, 'error': e}
+                        sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
+                os.remove(f"{dir_path}/media/documents/{filename}")
 
-                except csv.Error as e:
-                    error_read = {'file': filename, 'line': reader.line_num, 'error': e}
-                    sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
-            os.remove(f"{dir_path}/media/documents/{request.FILES['docfile']}")
-
-            context = {"upload_form": upload_form, 'reading_errors': error_read, 'them_num_created': them_created,
-                       'q_num_created': questions_created, 'uploaded': True, 'wrong_data': wrong_data}
-            return render(request, 'file_upload.html', context=context)
+                context = {"upload_form": upload_form, 'reading_errors': error_read, 'them_num_created': them_created,
+                           'q_num_created': questions_created, 'uploaded': True, 'wrong_data': wrong_data}
+                return render(request, 'file_upload.html', context=context)
+            else:
+                filename = force_str(f).strip().replace(' ', '_')
+                filename = filename.replace('(', '')
+                filename = filename.replace(')', '')
+                os.remove(f"{dir_path}/media/documents/{filename}")
+                wrong_data = [f'Файл должен быть формата .csv. Формат {file_format} не подходит']
+                context = {"upload_form": upload_form, 'uploaded': False, 'wrong_data': wrong_data}
+                return render(request, 'file_upload.html', context=context)
 
     else:
         context = {"upload_form": upload_form, 'uploaded': False}
