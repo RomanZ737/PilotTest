@@ -1447,19 +1447,25 @@ def file_upload(request):
                                         q_weight = row['q_weight']
                                     # проверяем наличие вопроса
                                     if not QuestionSet.objects.filter(Q(question__icontains=row['question'])):
-                                        question = QuestionSet.objects.get_or_create(them_name=them[0],
-                                                                                     question=row['question'],
-                                                                                     option_1=row['option_1'],
-                                                                                     option_2=row['option_2'],
-                                                                                     option_3=row['option_3'],
-                                                                                     option_4=row['option_4'],
-                                                                                     option_5=row['option_5'],
-                                                                                     q_kind=q_kind,
-                                                                                     q_weight=q_weight,
-                                                                                     answer=answer,
-                                                                                     answers=answers,
-                                                                                     ac_type=row['ac_type']
-                                                                                     )
+                                        try:
+                                            question = QuestionSet.objects.get_or_create(them_name=them[0],
+                                                                                         question=row['question'],
+                                                                                         option_1=row['option_1'],
+                                                                                         option_2=row['option_2'],
+                                                                                         option_3=row['option_3'],
+                                                                                         option_4=row['option_4'],
+                                                                                         option_5=row['option_5'],
+                                                                                         q_kind=q_kind,
+                                                                                         q_weight=q_weight,
+                                                                                         answer=answer,
+                                                                                         answers=answers,
+                                                                                         ac_type=row['ac_type']
+                                                                                         )
+                                        except ValueError as error:
+                                            wrong_data.append(f'Не верные данные в строке {reader.line_num}\n{error}')
+                                            continue
+
+
                                         if question[1]:
                                             questions_created += 1
                                     else:
@@ -1476,11 +1482,20 @@ def file_upload(request):
                                 for data in row.values():
                                     alpha = False
                                     if data is not None:
-                                        if len(data) > 2:
-                                            alpha = True
+                                        if data:
+                                            if re.search('[a-zA-Z]', str(data)):
+                                                print('this data!:::', data)
+                                                alpha = True
+                                                break
+                                            elif re.search('[0-9]', str(data)):
+                                                print('this data!:::', data)
+                                                alpha = True
+                                                break
+
 
                                 if alpha == True:
                                     wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
+                                    print("HEREEEEEE_2")
                                     continue
 
                     except csv.Error as e:
