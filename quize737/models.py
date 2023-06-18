@@ -61,7 +61,7 @@ class QuizeSet(models.Model):
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                        help_text='Имя пользователя, который проходит тест')
     timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
-    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True,
+    questions_ids = models.TextField(verbose_name='Номера вопросов', null=True,
                                      help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
                                          verbose_name='Номер последовательного вопроса в тесте в процессе прохождения теста')
@@ -85,7 +85,7 @@ class QuizeResults(models.Model):
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     total_num_q = models.IntegerField(verbose_name='Количество вопросов', help_text='Общее количество вопросов в тесте')
     timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=datetime.now)
-    questions_ids = models.CharField(max_length=200, verbose_name='Номера вопросов', null=True)
+    questions_ids = models.TextField(verbose_name='Номера вопросов', null=True)
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
     score_number = models.FloatField(verbose_name='Количество баллов')
     total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
