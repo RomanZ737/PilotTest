@@ -33,29 +33,42 @@
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.question.label}}:
-                <textarea style="font-size: 15px; width: 80%;" id="question"
-                                                       name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea>
+                <span oninput="autoGrow()">{{question_form.question.label}}: {{question_form.question}}</span>
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.option_1.label}}: {{question_form.option_1}}
+                <span oninput="autoGrow()">{{question_form.option_1.label}}: {{question_form.option_1}}</span>
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.option_2.label}}: {{question_form.option_2}}
+                <span oninput="autoGrow()">{{question_form.option_2.label}}: {{question_form.option_2}}</span>
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.option_3.label}}: {{question_form.option_3}}
+                <span oninput="autoGrow()">{{question_form.option_3.label}}: {{question_form.option_3}}</span>
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.option_4.label}}: {{question_form.option_4}}
+                <span oninput="autoGrow()">{{question_form.option_4.label}}: {{question_form.option_4}}</span>
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.option_5.label}}: {{question_form.option_5}}
+                <span oninput="autoGrow()">{{question_form.option_5.label}}: {{question_form.option_5}}</span>
+            </div>
+            <div class="block_none_light_up">
+                <span oninput="autoGrow()">{{question_form.option_6.label}}: {{question_form.option_6}}</span>
+            </div>
+            <div class="block_none_light_up">
+                <span oninput="autoGrow()">{{question_form.option_7.label}}: {{question_form.option_7}}</span>
+            </div>
+            <div class="block_none_light_up">
+                <span oninput="autoGrow()">{{question_form.option_8.label}}: {{question_form.option_8}}</span>
+            </div>
+            <div class="block_none_light_up">
+                <span oninput="autoGrow()">{{question_form.option_9.label}}: {{question_form.option_9}}</span>
+            </div>
+            <div class="block_none_light_up">
+                <span oninput="autoGrow()">{{question_form.option_10.label}}: {{question_form.option_10}}</span>
             </div>
             <div class="block_none_light_up">
                 {{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()">
@@ -88,13 +101,13 @@
 <script type="text/javascript">
 
 //Скрипт меняет размер поля вопроса под фактическое количество символов
-var q_text_Length = "{{question_form.question.value}}".length;
-var q_rows_length = 1
-if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
-                              q_text_Length = 100 };
-var q_field = document.getElementById("question");
-q_field.setAttribute("cols", q_text_Length);
-q_field.setAttribute("rows", q_rows_length);
+//var q_text_Length = "{{question_form.question.value}}".length;
+//var q_rows_length = 1
+//if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
+//                              q_text_Length = 100 };
+//var q_field = document.getElementById("question");
+//q_field.setAttribute("cols", q_text_Length);
+//q_field.setAttribute("rows", q_rows_length);
 
 //Скрипт определяет изначальную видимость полей, в зависимости от вида вопроса
 var checkBox = document.getElementById("q_kind");
@@ -130,8 +143,9 @@ function hideFunc() {
     }
 
 //Динамическое изменение поля воода текста вопроса
-var q_text = document.getElementById("question");
+//var q_text = document.getElementById("question");
 function autoGrow() {
+    var q_text=document.getElementById(event.target.id)
   if (q_text.scrollHeight > q_text.clientHeight) {
     q_text.style.height = `${q_text.scrollHeight}px`;
   }

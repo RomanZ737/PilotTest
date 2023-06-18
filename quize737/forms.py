@@ -11,26 +11,46 @@ def similar_question(value):
         raise ValidationError('Такой вопрос уже есть в базе')
 
 
-# Класс для объектов редактирования и создания вопроса
+# Класс для объектов создания вопроса
 class NewQuestionSetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(NewQuestionSetForm, self).__init__(*args, **kwargs)
-        self.fields['question'].validators = [similar_question]
+        self.fields['question'].validators = [similar_question]  #  Добавляем валидатор одинаковых вопросв к форме
+        self.fields['them_name'].queryset = Thems.objects.all().exclude(name='Все темы')  # Исключаем 'Все темы' из опции выбора
 
     class Meta:
         model = QuestionSet
-        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
+        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                   'q_weight', 'answer', 'answers', 'ac_type']
 
+        widgets = {
+            'q_weight': forms.NumberInput(attrs={'size': '3', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
+            'question': forms.Textarea(attrs={'cols': 150, 'rows': 1}),
+            'option_1': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_2': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_3': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_4': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_5': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_6': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_7': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_8': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_9': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'option_10': forms.Textarea(attrs={'cols': 100, 'rows': 1})
+        }
 
-# Класс для объектов редактирования и создания вопроса
+# Класс для объектов редактирования вопроса
 class QuestionSetForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(QuestionSetForm, self).__init__(*args, **kwargs)
+        self.fields['them_name'].queryset = Thems.objects.all().exclude(name='Все темы')  # Исключаем 'Все темы' из опции выбора
+
     class Meta:
         model = QuestionSet
-        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
+        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                   'q_weight', 'answer', 'answers', 'ac_type']
         widgets = {
-            'q_weight': forms.NumberInput(attrs={'step': 0.5, 'max': 2.0, 'min': 0.0})
+            'q_weight': forms.NumberInput(attrs={'size': '3', 'step': 0.5, 'max': 2.0, 'min': 0.0})
         }
 
 

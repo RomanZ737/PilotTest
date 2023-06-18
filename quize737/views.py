@@ -598,7 +598,7 @@ def question_list_details(request, id):
 
     else:
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
-                                                          'option_4', 'option_5', 'q_kind', 'q_weight', 'answer',
+                                                          'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind', 'q_weight', 'answer',
                                                           'answers', 'id', 'ac_type')
         question_form = QuestionSetForm(result[0])
 
@@ -1413,7 +1413,7 @@ def file_upload(request):
 
                     #  Пропускаем первую строку (заголовок)
                     heading = next(csvfile)
-                    fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'q_kind',
+                    fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                                   'q_weight', 'answer', 'answers', 'ac_type']
                     reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
                     try:
@@ -1455,6 +1455,11 @@ def file_upload(request):
                                                                                          option_3=row['option_3'],
                                                                                          option_4=row['option_4'],
                                                                                          option_5=row['option_5'],
+                                                                                         option_6=row['option_6'],
+                                                                                         option_7=row['option_7'],
+                                                                                         option_8=row['option_8'],
+                                                                                         option_9=row['option_9'],
+                                                                                         option_10=row['option_10'],
                                                                                          q_kind=q_kind,
                                                                                          q_weight=q_weight,
                                                                                          answer=answer,
@@ -1488,14 +1493,14 @@ def file_upload(request):
                                                 alpha = True
                                                 break
                                             elif re.search('[0-9]', str(data)):
-                                                print('this data!:::', data)
+                                                #print('this data!:::', data)
                                                 alpha = True
                                                 break
 
 
                                 if alpha == True:
                                     wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
-                                    print("HEREEEEEE_2")
+                                    #print("HEREEEEEE_2")
                                     continue
 
                     except csv.Error as e:

@@ -35,6 +35,13 @@
                 <p>{{question_form.option_3.label}}: <textarea style="font-size: 15px;" id="option_3" name="option_3" oninput="autoGrow()">{{question_form.option_3.value}}</textarea></p>
                 <p>{{question_form.option_4.label}}: <textarea style="font-size: 15px;" id="option_4" name="option_4" oninput="autoGrow()">{{question_form.option_4.value}}</textarea></p>
                 <p>{{question_form.option_5.label}}: <textarea style="font-size: 15px;" id="option_5" name="option_5" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></p>
+                <p>{{question_form.option_6.label}}: <textarea style="font-size: 15px;" id="option_6" name="option_6" oninput="autoGrow()">{{question_form.option_6.value}}</textarea></p>
+                <p>{{question_form.option_7.label}}: <textarea style="font-size: 15px;" id="option_7" name="option_7" oninput="autoGrow()">{{question_form.option_7.value}}</textarea></p>
+                <p>{{question_form.option_8.label}}: <textarea style="font-size: 15px;" id="option_8" name="option_8" oninput="autoGrow()">{{question_form.option_8.value}}</textarea></p>
+                <p>{{question_form.option_9.label}}: <textarea style="font-size: 15px;" id="option_9" name="option_9" oninput="autoGrow()">{{question_form.option_9.value}}</textarea></p>
+                <p>{{question_form.option_10.label}}: <textarea style="font-size: 15px;" id="option_10" name="option_10" oninput="autoGrow()">{{question_form.option_10.value}}</textarea></p>
+
+
                 <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
                 <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
                 <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
@@ -126,6 +133,50 @@ var option_5_field = document.getElementById("option_5");
 option_5_field.setAttribute("cols", option_5_text_Length);
 option_5_field.setAttribute("rows", option_5_rows_length);
 
+//----------------------------------------------------
+var option_6_text_Length = "{{question_form.option_6.value}}".length;
+var option_6_rows_length = 1
+if ( option_6_text_Length > 100 ) { option_6_rows_length = Math.ceil(option_6_text_Length/100);
+                              option_6_text_Length = 100 };
+var option_6_field = document.getElementById("option_6");
+option_6_field.setAttribute("cols", option_6_text_Length);
+option_6_field.setAttribute("rows", option_6_rows_length);
+
+//----------------------------------------------------
+var option_7_text_Length = "{{question_form.option_7.value}}".length;
+var option_7_rows_length = 1
+if ( option_7_text_Length > 100 ) { option_7_rows_length = Math.ceil(option_7_text_Length/100);
+                              option_7_text_Length = 100 };
+var option_7_field = document.getElementById("option_7");
+option_7_field.setAttribute("cols", option_7_text_Length);
+option_7_field.setAttribute("rows", option_7_rows_length);
+
+//----------------------------------------------------
+var option_8_text_Length = "{{question_form.option_8.value}}".length;
+var option_8_rows_length = 1
+if ( option_8_text_Length > 100 ) { option_8_rows_length = Math.ceil(option_8_text_Length/100);
+                              option_8_text_Length = 100 };
+var option_8_field = document.getElementById("option_8");
+option_8_field.setAttribute("cols", option_8_text_Length);
+option_8_field.setAttribute("rows", option_8_rows_length);
+
+//----------------------------------------------------
+var option_9_text_Length = "{{question_form.option_9.value}}".length;
+var option_9_rows_length = 1
+if ( option_9_text_Length > 100 ) { option_9_rows_length = Math.ceil(option_9_text_Length/100);
+                              option_9_text_Length = 100 };
+var option_9_field = document.getElementById("option_9");
+option_9_field.setAttribute("cols", option_9_text_Length);
+option_9_field.setAttribute("rows", option_9_rows_length);
+
+//----------------------------------------------------
+var option_10_text_Length = "{{question_form.option_10.value}}".length;
+var option_10_rows_length = 1
+if ( option_10_text_Length > 100 ) { option_10_rows_length = Math.ceil(option_10_text_Length/100);
+                              option_10_text_Length = 100 };
+var option_10_field = document.getElementById("option_10");
+option_10_field.setAttribute("cols", option_10_text_Length);
+option_10_field.setAttribute("rows", option_10_rows_length);
 
 
 
@@ -162,7 +213,7 @@ function hideFunc() {
         }
     }
 
-//Динамическое изменение поля воода текста вопроса
+//Динамическое изменение поля ввода текста вопроса
 //var q_text = document.getElementById("question");
 function autoGrow() {
     var q_text=document.getElementById(event.target.id)

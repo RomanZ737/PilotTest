@@ -31,6 +31,11 @@ class QuestionSet(models.Model):
     option_3 = models.TextField(verbose_name='Вариант 3', blank=True, null=True)
     option_4 = models.TextField(verbose_name='Вариант 4', blank=True, null=True)
     option_5 = models.TextField(verbose_name='Вариант 5', blank=True, null=True)
+    option_6 = models.TextField(verbose_name='Вариант 6', blank=True, null=True)
+    option_7 = models.TextField(verbose_name='Вариант 7', blank=True, null=True)
+    option_8 = models.TextField(verbose_name='Вариант 8', blank=True, null=True)
+    option_9 = models.TextField(verbose_name='Вариант 9', blank=True, null=True)
+    option_10 = models.TextField(verbose_name='Вариант 10', blank=True, null=True)
     q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
                                  help_text='Если вопрос подразумевает несколько правильных ответов')
     q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0.0,
