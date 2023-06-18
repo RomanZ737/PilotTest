@@ -83,7 +83,7 @@
 <script type="text/javascript">
 
 //Скрипт меняет размер поля вопроса под фактическое количество символов
-var q_text_Length = "{{question_form.question.value}}".length;
+var q_text_Length = document.getElementById("question").value.length;
 var q_rows_length = 1
 if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
                               q_text_Length = 100 };
@@ -91,7 +91,7 @@ var q_field = document.getElementById("question");
 q_field.setAttribute("cols", q_text_Length);
 q_field.setAttribute("rows", q_rows_length);
 //----------------------------------------------------
-var option_1_text_Length = "{{question_form.option_1.value}}".length;
+var option_1_text_Length = document.getElementById("option_1").value.length;
 var option_1_rows_length = 1
 if ( option_1_text_Length > 100 ) { option_1_rows_length = Math.ceil(option_1_text_Length/100);
                               option_1_text_Length = 100 };
@@ -100,7 +100,7 @@ option_1_field.setAttribute("cols", option_1_text_Length);
 option_1_field.setAttribute("rows", option_1_rows_length);
 
 //----------------------------------------------------
-var option_2_text_Length = "{{question_form.option_2.value}}".length;
+var option_2_text_Length = document.getElementById("option_2").length;
 var option_2_rows_length = 1
 if ( option_2_text_Length > 100 ) { option_2_rows_length = Math.ceil(option_2_text_Length/100);
                               option_2_text_Length = 100 };
@@ -109,7 +109,7 @@ option_2_field.setAttribute("cols", option_2_text_Length);
 option_2_field.setAttribute("rows", option_2_rows_length);
 
 //----------------------------------------------------
-var option_3_text_Length = "{{question_form.option_3.value}}".length;
+var option_3_text_Length = document.getElementById("option_3").length;
 var option_3_rows_length = 1
 if ( option_3_text_Length > 100 ) { option_3_rows_length = Math.ceil(option_3_text_Length/100);
                               option_3_text_Length = 100 };
@@ -118,7 +118,7 @@ option_3_field.setAttribute("cols", option_3_text_Length);
 option_3_field.setAttribute("rows", option_3_rows_length);
 
 //----------------------------------------------------
-var option_4_text_Length = "{{question_form.option_4.value}}".length;
+var option_4_text_Length = document.getElementById("option_4").length;
 var option_4_rows_length = 1
 if ( option_4_text_Length > 100 ) { option_4_rows_length = Math.ceil(option_4_text_Length/100);
                               option_4_text_Length = 100 };
@@ -127,7 +127,7 @@ option_4_field.setAttribute("cols", option_4_text_Length);
 option_4_field.setAttribute("rows", option_4_rows_length);
 
 //----------------------------------------------------
-var option_5_text_Length = "{{question_form.option_5.value}}".length;
+var option_5_text_Length = document.getElementById("option_5").value.length;
 var option_5_rows_length = 1
 if ( option_5_text_Length > 100 ) { option_5_rows_length = Math.ceil(option_5_text_Length/100);
                               option_5_text_Length = 100 };
@@ -136,7 +136,7 @@ option_5_field.setAttribute("cols", option_5_text_Length);
 option_5_field.setAttribute("rows", option_5_rows_length);
 
 //----------------------------------------------------
-var option_6_text_Length = "{{question_form.option_6.value}}".length;
+var option_6_text_Length = document.getElementById("option_6").value.length;
 var option_6_rows_length = 1
 if ( option_6_text_Length > 100 ) { option_6_rows_length = Math.ceil(option_6_text_Length/100);
                               option_6_text_Length = 100 };
@@ -145,7 +145,7 @@ option_6_field.setAttribute("cols", option_6_text_Length);
 option_6_field.setAttribute("rows", option_6_rows_length);
 
 //----------------------------------------------------
-var option_7_text_Length = "{{question_form.option_7.value}}".length;
+var option_7_text_Length = document.getElementById("option_7").value.length;
 var option_7_rows_length = 1
 if ( option_7_text_Length > 100 ) { option_7_rows_length = Math.ceil(option_7_text_Length/100);
                               option_7_text_Length = 100 };
@@ -154,7 +154,7 @@ option_7_field.setAttribute("cols", option_7_text_Length);
 option_7_field.setAttribute("rows", option_7_rows_length);
 
 //----------------------------------------------------
-var option_8_text_Length = "{{question_form.option_8.value}}".length;
+var option_8_text_Length = document.getElementById("option_8").value.length;
 var option_8_rows_length = 1
 if ( option_8_text_Length > 100 ) { option_8_rows_length = Math.ceil(option_8_text_Length/100);
                               option_8_text_Length = 100 };
@@ -163,7 +163,7 @@ option_8_field.setAttribute("cols", option_8_text_Length);
 option_8_field.setAttribute("rows", option_8_rows_length);
 
 //----------------------------------------------------
-var option_9_text_Length = "{{question_form.option_9.value}}".length;
+var option_9_text_Length = document.getElementById("option_9").value.length;
 var option_9_rows_length = 1
 if ( option_9_text_Length > 100 ) { option_9_rows_length = Math.ceil(option_9_text_Length/100);
                               option_9_text_Length = 100 };
@@ -172,7 +172,7 @@ option_9_field.setAttribute("cols", option_9_text_Length);
 option_9_field.setAttribute("rows", option_9_rows_length);
 
 //----------------------------------------------------
-var option_10_text_Length = "{{question_form.option_10.value}}".length;
+var option_10_text_Length = document.getElementById("option_10").value.length;
 var option_10_rows_length = 1
 if ( option_10_text_Length > 100 ) { option_10_rows_length = Math.ceil(option_10_text_Length/100);
                               option_10_text_Length = 100 };
