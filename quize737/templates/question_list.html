@@ -1,7 +1,7 @@
 <!-- Список вопросов по всем темам -->
 
 {% extends "main_base.html" %}
-
+{% load tags %}
 {% block content %}
 
 <fieldset>
@@ -15,8 +15,12 @@
             <a href="{% url 'quize737:new_theme' %}">Добавить Тему</a>
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
-            <span style="color: black;"> | </span>
-            <a href="pass">Скачать базу</a>
+
+            {% if request.user|has_group:'krs' or user.is_superuser %}
+                <span style="color: black;"> | </span>
+                <a href="pass">Скачать базу</a>
+            {% endif %}
+
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
     </legend>

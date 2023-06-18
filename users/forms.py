@@ -87,11 +87,15 @@ class GroupForm(forms.ModelForm):
         model = GroupsDescription
         # fields = {'group', 'discription'}
         exclude = ('group',)
+        widgets = {
+             'discription': forms.Textarea(attrs={'cols': 70, 'rows': 2}),
+         }
+
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)
         # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
-        self.fields['group_name'] = forms.CharField(max_length=15)
+        self.fields['group_name'] = forms.CharField(widget=forms.Textarea(attrs={"cols": "50", 'rows': "1"}))
         self.fields['group_name'].validators = [similar_group_name]
 
 # Форма для редактирования существующей группы
@@ -100,11 +104,16 @@ class EditGroupForm(forms.ModelForm):
         model = GroupsDescription
         #fields = {'group', 'discription'}
         exclude = ('group',)
+        widgets = {
+            'discription': forms.Textarea(attrs={'cols': 70, 'rows': 2}),
+        }
+
+
 
     def __init__(self, *args, **kwargs):
             super(EditGroupForm, self).__init__(*args, **kwargs)
             # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
-            self.fields['group_name'] = forms.CharField(max_length=15)
+            self.fields['group_name'] = forms.CharField(widget=forms.Textarea(attrs={"cols": "50", 'rows': "1"}))
         # widgets = {
         #     'group': forms.TextInput(),
         #     'discription': forms.TextInput()}
