@@ -157,7 +157,7 @@ def start(request, id=None):
 
         #  Создаём словарь с вариантами ответов на вопрос
         option_dict = {}
-        for option_num in range(1, 6):
+        for option_num in range(1, 11):
             option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
 
         # Содержание context:
@@ -285,7 +285,7 @@ def next_question(request):
 
             #  Создаём словарь с вариантами ответов на вопрос
             option_dict = {}
-            for option_num in range(1, 6):
+            for option_num in range(1, 11):
                 option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
 
             # Содержание context:
