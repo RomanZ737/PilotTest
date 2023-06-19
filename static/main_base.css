@@ -418,7 +418,7 @@ div.filter_sign_result {
 select.theme_filter {
     position: relative;
     display: inline-block;
-    margin-left: 10%;
+    margin-left: 5%;
 }
 
 div.filter_related {
@@ -436,7 +436,6 @@ div.button_block {
 div.list-q_count {
     position: relative;
     display: inline-block;
-    width: 6%;
-    right: -4%;
+    right: -52%;
 
 }

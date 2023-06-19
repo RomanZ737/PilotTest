@@ -35,6 +35,7 @@
         </div>
 
         <div class="filter-form">
+            <div style="display: inline-block; width: 40%;">
             <form id="theme_filter" action="{% url 'quize737:question_list' %}" method="get">
                 <select class="theme_filter" name="theme_filter">
                     {% for option in them_list %}
@@ -55,10 +56,12 @@
                 </select>
                 <input type="submit" value="Фильтр">
             </form>
-        </div>
-        <div class="list-q_count">
+                </div>
+            <div class="list-q_count">
             <span class="mark_up">Всего: {{q_count}}</span>
         </div>
+        </div>
+
 
 
         {% if no_search_results %}
