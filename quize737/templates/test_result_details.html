@@ -97,6 +97,46 @@
                 {% endif %}
             </div>
             {% endfor %}
+
+            <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
+            <div id="answers" style="display:none">
+
+                    {% for question in answers%}
+                        <div>Вопрос:</div>
+                        <div>{{question.question.question}}</div>
+                        <div>Ответы:</div>
+                            {% if '1' in question.question%}
+                        <div>{{question.question.option_1}}</div>
+
+                        <div>{{question.question.option_2}}</div>
+                        {% if question.question.option_3 %}
+                            <div>{{question.question.option_3}}</div>
+                        {% endif %}
+                        {% if question.question.option_4 %}
+                            <div>{{question.question.option_4}}</div>
+                        {% endif %}
+                        {% if question.question.option_5 %}
+                            <div>{{question.question.option_5}}</div>
+                        {% endif %}
+                        {% if question.question.option_6 %}
+                            <div>{{question.question.option_6}}</div>
+                        {% endif %}
+                        {% if question.question.option_7 %}
+                            <div>{{question.question.option_7}}</div>
+                        {% endif %}
+                        {% if question.question.option_8 %}
+                            <div>{{question.question.option_8}}</div>
+                        {% endif %}
+                        {% if question.question.option_9 %}
+                            <div>{{question.question.option_9}}</div>
+                        {% endif %}
+                        {% if question.question.option_10 %}
+                            <div>{{question.question.option_10}}</div>
+                        {% endif %}
+                    {% endfor %}
+
+            </div>
+
             <form id="go_back" method='get' action='{% url "quize737:tests_results_list" %}'>
             </form>
             <form id="download_test" action="{% url 'quize737:download_test_result' id %}">
@@ -110,5 +150,20 @@
         </div>
     </fieldset>
 </div>
+
+<script>
+    let ans_block = document.getElementById("answers");
+    let button = document.getElementById("hide_show_butt");
+    function show_answers(event) {
+        if (ans_block.style.display === 'none' ) {
+                ans_block.style.display = 'block';
+                button.setAttribute('value', 'Скрыть ответы');
+            } else {
+                ans_block.style.display = 'none';
+                button.setAttribute('value', 'Показать ответы')
+                }
+    };
+
+</script>
 
 {% endblock %}

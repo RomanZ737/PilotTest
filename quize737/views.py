@@ -23,7 +23,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import six
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload
+from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload, AnswersResults
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
@@ -202,7 +202,10 @@ def next_question(request):
     if request.method == 'POST':
         #  Вынимаем объект отвеченного ответа
         answered_q_instance = QuestionSet.objects.get(id=request.POST.get('question_id'))
+        #  Вынимает объект результатов пользователя
+        results_inst = QuizeResults.objects.get(id=request.POST.get('result_id'))
         # Проверяем вид вопроса
+        #  Если вопрос имеет несколько вариантов ответа
         if answered_q_instance.q_kind:
             # Преобразуем ответы пользователя во множество
             user_answers_set = set()
@@ -212,6 +215,14 @@ def next_question(request):
             correct_answers_set = set(map(int, (answered_q_instance.answers).split(',')))
             # Если ответ пользователя правильный
             if user_answers_set == correct_answers_set:
+
+                #  Создаём объект ответа на вопрос конкретного теста
+                AnswersResults.objects.create(user=request.user,
+                                              results=results_inst,
+                                              question=answered_q_instance,
+                                              user_answer=user_answers_set,
+                                              conclusion=True
+                                              )
 
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                 user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
@@ -234,15 +245,27 @@ def next_question(request):
                 QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     score_number=updated_score_number)
             else:
+                AnswersResults.objects.create(user=request.user,
+                                              results=results_inst,
+                                              question=answered_q_instance,
+                                              user_answer=user_answers_set,
+                                              conclusion=False
+                                              )
                 print('Не правильный ответ')
 
         else:
-
+            #  Если вопрос с одним вариантом ответа
             user_aswer = request.POST.get('user_answer').replace('option_', '')
             print('request.POST', request.POST)
             # Если пользователь правильно ответил на вопрос:
             if int(answered_q_instance.answer) == int(user_aswer):
-
+                #  Создаём объект ответа на вопрос конкретного теста
+                AnswersResults.objects.create(user=request.user,
+                                              results=results_inst,
+                                              question=answered_q_instance,
+                                              user_answer=user_aswer,
+                                              conclusion=True
+                                              )
                 # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                 user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                     'correct_q_num', 'score_number')
@@ -264,6 +287,13 @@ def next_question(request):
                 QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     score_number=updated_score_number)
             else:
+                #  Создаём объект ответа на вопрос конкретного теста
+                AnswersResults.objects.create(user=request.user,
+                                              results=results_inst,
+                                              question=answered_q_instance,
+                                              user_answer=user_aswer,
+                                              conclusion=False
+                                              )
                 print('Не правильный ответ')
 
         # Количество оставшихся у пользователя вопросов
@@ -506,7 +536,9 @@ def tests_results_list(request):
 # Детали результатов теста
 def test_result_details(request, id):
     result = QuizeResults.objects.filter(id=id)
-    context = {'result': result, 'id': id}
+    answers = AnswersResults.objects.filter(user=result[0].user_id, results=result[0])
+    print('answers', answers)
+    context = {'result': result, 'id': id, 'answers': answers}
     return render(request, 'test_result_details.html', context=context)
 
 
