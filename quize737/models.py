@@ -145,7 +145,7 @@ class AnswersResults(models.Model):
                              help_text='Объект пользователя', default='User Deleted')
     results = models.ForeignKey(QuizeResults, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',
                                 help_text='Объект с результатами теста конкретного пользователя')
-    question = models.ForeignKey(QuestionSet, on_delete=models.SET_DEFAULT, max_length=500, verbose_name='Результаты теста',
+    question = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',
                                  help_text='Объект с результатами теста конкретного пользователя', default='Question Deleted')
     user_answer = models.CharField(max_length=255, verbose_name='Ответ пользователя',
                                    help_text='Ответ пользователя на вопрос')

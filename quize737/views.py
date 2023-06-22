@@ -903,6 +903,7 @@ def new_theme(request):
 @login_required
 @group_required(('KRS', 'Редактор Вопросов'))
 def theme_del(request, id):
+    print('id:', id)
     Thems.objects.get(id=id).delete()
     return redirect('quize737:theme_editor')
 
