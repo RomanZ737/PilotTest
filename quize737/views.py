@@ -1543,7 +1543,7 @@ def user_detales(request, id):
                             subject = f"Вам назначен Тест: '{test['test_name']}'"
                             message = f"<p style='font-size: 25px;'><b>Уважаемый, {user_object.profile.first_name} {user_object.profile.middle_name}.</b></p><br>" \
                                       f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
-                                      f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
+                                      f"<p style='font-size: 20px;'>На портале <a href='{config('SITE_URL', default='')}'>Pilot Test</a></p>" \
                                       f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>" \
                                       f"<br>" \
                                       f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
