@@ -93,35 +93,47 @@
                 {% else %}
                 <div class="list-other_field">
                     <span class="negative">ТЕСТ НЕ СДАН</span>
+                </div>
 
                 {% endif %}
-            </div>
-            {% endfor %}
 
-            <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
-            <div id="answers" style="display:none">
+            {% endfor %}
+            <div class="list-other_field_non_inline">
+                <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
+            </div>
+            <br>
+            <div id="answers" style="display: none;" >
+
 
                     {% for question in answers%}
+                    <fieldset>
                         {% if question.conclusion == True%}
+                            <legend>
                             <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
                         {% else %}
                             <span class="negative">НЕ ВЕРНЫЙ ОТВЕТ</span>
                         {% endif %}
+                            </legend>
                         <div class="result_answers_question">{{question.question}}</div>
 
                         {% for answer in question.answers %}
                             {% if answer.valid == True %}
                                 <div class="result_answers_correct">{{answer.option}}</div>
                             {% else %}
-                                <div>{{answer.option}}</div>
+                                <div class="result_answers_wrong">{{answer.option}}</div>
                             {% endif %}
                         {% endfor %}
-                        <div>Ответ Тестируемого:</div>
+                        <br>
+                        <div class="result_answers_question">Ответ Тестируемого:</div>
                         {% for user_answer in question.user_answer%}
-                            <div>{{user_answer}}</div>
+                            <div class="result_answers_user_answer">{{user_answer}}</div>
                         {% endfor %}
+
+                        </fieldset>
+                    <br>
                     <br>
                     {% endfor %}
+
 
             </div>
 

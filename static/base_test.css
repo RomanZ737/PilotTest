@@ -185,3 +185,61 @@ div.list-other_field {    /* блок для остальных типов да�
 span.static_sign {
     font-size: 24px;
 }
+
+
+div.result_answers_question {
+    position: relative;
+    display: block;
+    width: 95%;
+    left: 3%;
+    font-size: 22px;
+    text-align: justify;
+    text-justify: inter-word;
+
+}
+
+div.question_answer_conclusion_correct {
+    position: relative;
+    display: block;
+    color: rgb(148, 192, 74);
+    left: 3%;
+}
+
+div.question_answer_conclusion_wrong {
+    position: relative;
+    display: block;
+    left: 3%;
+    color: rgb(142, 23, 11);
+
+}
+
+div.result_answers_correct {
+    position: relative;
+    display: block;
+    width: 85%;
+    left: 5%;
+    background-color: rgba(29, 158, 36, 0.4);
+    color: rgb(209, 209,209);
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+div.result_answers_wrong {
+    position: relative;
+    display: block;
+    width: 85%;
+    left: 5%;
+    /*background-color: rgba(0, 209,209, 0.4); */
+    color: rgb(209, 209,209);
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+div.result_answers_user_answer {
+    position: relative;
+    display: block;
+    left: 5%;
+    text-align: justify;
+    text-justify: inter-word;
+    font-size: 22px;
+}

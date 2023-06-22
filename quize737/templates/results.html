@@ -1,7 +1,7 @@
 {% extends "base_test.html" %}
 
 {% block content %}
-<section>
+
     <div class="result_list">
         <fieldset>
                 <legend>Результат теста</legend>
@@ -36,6 +36,48 @@
                             </div>
                         {% endif %}
 
+                    <div class="list-other_field_non_inline">
+                <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
+            </div>
+            <br>
+            <div id="answers" style="display: none;" >
+
+
+                    {% for question in answers%}
+                    <fieldset>
+                        {% if question.conclusion == True%}
+                            <legend>
+                                <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
+                            </legend>
+                        {% else %}
+                            <legend>
+                                <span class="negative">НЕ ВЕРНЫЙ ОТВЕТ</span>
+                            </legend>
+                        {% endif %}
+
+                        <div class="result_answers_question">{{question.question}}</div>
+
+                        {% for answer in question.answers %}
+                            {% if answer.valid == True %}
+                                <div class="result_answers_correct">{{answer.option}}</div>
+                            {% else %}
+                                <div class="result_answers_wrong">{{answer.option}}</div>
+                            {% endif %}
+                        {% endfor %}
+                        <br>
+                        <div class="result_answers_question">Ответ Тестируемого:</div>
+                        {% for user_answer in question.user_answer%}
+                            <div class="result_answers_user_answer">{{user_answer}}</div>
+                        {% endfor %}
+
+                        </fieldset>
+                    <br>
+                    <br>
+                    {% endfor %}
+
+
+            </div>
+
                     <br>
                     <form method='get' action='{% url "start" %}'>
                         <br>
@@ -44,5 +86,21 @@
                     </form>
         </fieldset>
     </div>
-</section>
+
+
+<script>
+    let ans_block = document.getElementById("answers");
+    let button = document.getElementById("hide_show_butt");
+    function show_answers(event) {
+        if (ans_block.style.display === 'none' ) {
+                ans_block.style.display = 'block';
+                button.setAttribute('value', 'Скрыть ответы');
+            } else {
+                ans_block.style.display = 'none';
+                button.setAttribute('value', 'Показать ответы')
+                }
+    };
+
+</script>
+
 {% endblock %}

@@ -365,19 +365,70 @@ def next_question(request):
                 user_test_name = set_instance[0].quize_name  # Название теста пользователя
                 #  Удаляем тест у пользователя
                 UserTests.objects.filter(user=request.user, test_name=user_test_id).delete()
+
+                answer_results = []
+                answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
+                #  Формируем список ответов в результатах теста
+                for question in answers:
+                    question_block = {}
+                    question_block['question'] = question.question.question
+                    question_block['conclusion'] = question.conclusion
+                    #  Если вопрос имеет один ответ
+                    if not question.question.q_kind:
+                        options = []
+                        for i in range(1, 11):
+                            if question.question.answer == i:
+                                options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                            else:
+                                if getattr(question.question, f'option_{i}'):
+                                    options.append(
+                                        {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+                        user_answer = question.user_answer
+                        question_block['answers'] = options
+                        question_block['user_answer'] = [getattr(question.question, f'option_{user_answer}')]
+
+                    #  Если на вопрос несколько ответов
+                    else:
+                        options = []
+                        #  Список с правильными ответами
+                        correct_answers_list = list(map(int, question.question.answers.split(',')))
+                        print('correct_answers_list', correct_answers_list)
+                        for i in range(1, 11):
+                            if i in correct_answers_list:
+                                options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                            else:
+                                if getattr(question.question, f'option_{i}'):
+                                    options.append(
+                                        {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+
+                        question_block['answers'] = options
+                        user_answers = []
+                        for number in question.user_answer:
+                            if number.isdigit():
+                                user_answers.append(number)
+                        answer = []
+                        for user_answer in user_answers:
+                            print('user_answer', user_answer)
+                            answer.append(getattr(question.question, f'option_{user_answer}'))
+                        question_block['user_answer'] = answer
+
+                    answer_results.append(question_block)
+
                 context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                           'conclusion': True}
+                           'conclusion': True, 'answers': answer_results}
                 # Удаляем тест пользователя из базы тестов пользователя
                 QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
 
                 # Отправляем письмо КРС
+                site_url =config('SITE_URL', default='')
                 subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал Тест'
                 message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
                           f'<p style="color: rgb(148, 192, 74); font-size: 20px;"><b>СДАЛ ТЕСТ</b></p>' \
                           f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                           f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
-                          f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>'
+                          f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
+                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
                 to = common.krs_mail_list
                 email_msg = {'subject': subject, 'message': message, 'to': to}
                 common.send_email(request, email_msg)
@@ -400,6 +451,59 @@ def next_question(request):
                 if int(num_try) == 0:
                     QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).update(
                         total_result=total_result, conclusion=False)
+
+                    answer_results = []
+                    answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
+
+                    #  Формируем список ответов в результатах теста
+                    for question in answers:
+                        question_block = {}
+                        question_block['question'] = question.question.question
+                        question_block['conclusion'] = question.conclusion
+                        #  Если вопрос имеет один ответ
+                        if not question.question.q_kind:
+                            options = []
+                            for i in range(1, 11):
+                                if question.question.answer == i:
+                                    options.append(
+                                        {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                                else:
+                                    if getattr(question.question, f'option_{i}'):
+                                        options.append(
+                                            {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+                            user_answer = question.user_answer
+                            question_block['answers'] = options
+                            question_block['user_answer'] = [getattr(question.question, f'option_{user_answer}')]
+
+                        #  Если на вопрос несколько ответов
+                        else:
+                            options = []
+                            #  Список с правильными ответами
+                            correct_answers_list = list(map(int, question.question.answers.split(',')))
+                            print('correct_answers_list', correct_answers_list)
+                            for i in range(1, 11):
+                                if i in correct_answers_list:
+                                    options.append(
+                                        {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                                else:
+                                    if getattr(question.question, f'option_{i}'):
+                                        options.append(
+                                            {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+
+                            question_block['answers'] = options
+                            user_answers = []
+                            for number in question.user_answer:
+                                if number.isdigit():
+                                    user_answers.append(number)
+                            answer = []
+                            for user_answer in user_answers:
+                                print('user_answer', user_answer)
+                                answer.append(getattr(question.question, f'option_{user_answer}'))
+                            question_block['user_answer'] = answer
+
+                        answer_results.append(question_block)
+
+                    # Отправляем письмо КРС
                     subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
                     message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
                               f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>НЕ СДАЛ ТЕСТ</b></p>' \
@@ -411,13 +515,65 @@ def next_question(request):
                     common.send_email(request, email_msg)
                     context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                                'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                               'conclusion': False}
+                               'conclusion': False, 'answers': answer_results}
                     QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
                     return render(request, 'results.html', context=context)
                 else:
+
+                    answer_results = []
+                    answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
+
+                    #  Формируем список ответов в результатах теста
+                    for question in answers:
+                        question_block = {}
+                        question_block['question'] = question.question.question
+                        question_block['conclusion'] = question.conclusion
+                        #  Если вопрос имеет один ответ
+                        if not question.question.q_kind:
+                            options = []
+                            for i in range(1, 11):
+                                if question.question.answer == i:
+                                    options.append(
+                                        {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                                else:
+                                    if getattr(question.question, f'option_{i}'):
+                                        options.append(
+                                            {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+                            user_answer = question.user_answer
+                            question_block['answers'] = options
+                            question_block['user_answer'] = [getattr(question.question, f'option_{user_answer}')]
+
+                        #  Если на вопрос несколько ответов
+                        else:
+                            options = []
+                            #  Список с правильными ответами
+                            correct_answers_list = list(map(int, question.question.answers.split(',')))
+                            print('correct_answers_list', correct_answers_list)
+                            for i in range(1, 11):
+                                if i in correct_answers_list:
+                                    options.append(
+                                        {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                                else:
+                                    if getattr(question.question, f'option_{i}'):
+                                        options.append(
+                                            {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+
+                            question_block['answers'] = options
+                            user_answers = []
+                            for number in question.user_answer:
+                                if number.isdigit():
+                                    user_answers.append(number)
+                            answer = []
+                            for user_answer in user_answers:
+                                print('user_answer', user_answer)
+                                answer.append(getattr(question.question, f'option_{user_answer}'))
+                            question_block['user_answer'] = answer
+
+                        answer_results.append(question_block)
+
                     context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                                'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                               'conclusion': False}
+                               'conclusion': False, 'answers': answer_results}
 
                     QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
                     QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).delete()
@@ -574,17 +730,13 @@ def test_result_details(request, id):
             for number in question.user_answer:
                 if number.isdigit():
                     user_answers.append(number)
-            print('user_answers:', user_answers)
             answer = []
             for user_answer in user_answers:
                 print('user_answer', user_answer)
                 answer.append(getattr(question.question, f'option_{user_answer}'))
             question_block['user_answer'] = answer
 
-
         answer_results.append(question_block)
-
-    print('answer_results:', answer_results)
 
     context = {'result': result, 'id': id, 'answers': answer_results}
     return render(request, 'test_result_details.html', context=context)
