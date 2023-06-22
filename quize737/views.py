@@ -504,12 +504,14 @@ def next_question(request):
                         answer_results.append(question_block)
 
                     # Отправляем письмо КРС
+                    site_url = config('SITE_URL', default='')
                     subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
                     message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
                               f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>НЕ СДАЛ ТЕСТ</b></p>' \
                               f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                               f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
-                              f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>'
+                              f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
+                              f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
                     to = common.krs_mail_list
                     email_msg = {'subject': subject, 'message': message, 'to': to}
                     common.send_email(request, email_msg)
