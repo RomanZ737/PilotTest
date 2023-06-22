@@ -23,7 +23,8 @@ from django.core.exceptions import PermissionDenied
 from django.utils import six
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload, AnswersResults
+from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload, \
+    AnswersResults
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
@@ -535,10 +536,57 @@ def tests_results_list(request):
 @group_required('KRS')
 # Детали результатов теста
 def test_result_details(request, id):
+    answer_results = []
     result = QuizeResults.objects.filter(id=id)
     answers = AnswersResults.objects.filter(user=result[0].user_id, results=result[0])
-    print('answers', answers)
-    context = {'result': result, 'id': id, 'answers': answers}
+    for question in answers:
+        question_block = {}
+        question_block['question'] = question.question.question
+        question_block['conclusion'] = question.conclusion
+        #  Если вопрос имеет один ответ
+        if not question.question.q_kind:
+            options = []
+            for i in range(1, 11):
+                if question.question.answer == i:
+                    options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                else:
+                    if getattr(question.question, f'option_{i}'):
+                        options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+            user_answer = question.user_answer
+            question_block['answers'] = options
+            question_block['user_answer'] = [getattr(question.question, f'option_{user_answer}')]
+
+        #  Если на вопрос несколько ответов
+        else:
+            options = []
+            #  Список с правильными ответами
+            correct_answers_list = list(map(int, question.question.answers.split(',')))
+            print('correct_answers_list', correct_answers_list)
+            for i in range(1, 11):
+                if i in correct_answers_list:
+                    options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                else:
+                    if getattr(question.question, f'option_{i}'):
+                        options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': False})
+
+            question_block['answers'] = options
+            user_answers = []
+            for number in question.user_answer:
+                if number.isdigit():
+                    user_answers.append(number)
+            print('user_answers:', user_answers)
+            answer = []
+            for user_answer in user_answers:
+                print('user_answer', user_answer)
+                answer.append(getattr(question.question, f'option_{user_answer}'))
+            question_block['user_answer'] = answer
+
+
+        answer_results.append(question_block)
+
+    print('answer_results:', answer_results)
+
+    context = {'result': result, 'id': id, 'answers': answer_results}
     return render(request, 'test_result_details.html', context=context)
 
 
@@ -559,7 +607,8 @@ def question_list(request):
             if not total_questions_list:
                 no_search_result = True
                 results = f'Вопросы по запросу "{user_search_input}" не найдены'
-                context = {'no_search_results': no_search_result, 'results': results, 'them_list': them_list, 'q_count': q_count}
+                context = {'no_search_results': no_search_result, 'results': results, 'them_list': them_list,
+                           'q_count': q_count}
                 return render(request, 'question_list.html', context=context)
             else:
                 paginator = Paginator(total_questions_list, 15)
@@ -630,7 +679,8 @@ def question_list_details(request, id):
 
     else:
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
-                                                          'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind', 'q_weight', 'answer',
+                                                          'option_4', 'option_5', 'option_6', 'option_7', 'option_8',
+                                                          'option_9', 'option_10', 'q_kind', 'q_weight', 'answer',
                                                           'answers', 'id', 'ac_type')
         question_form = QuestionSetForm(result[0])
 
@@ -1297,21 +1347,25 @@ def user_detales(request, id):
                             instance.date_before = test['date_before']
                             instance.save()
                             now = datetime.datetime.now().date()
-                            five_day_before = datetime.datetime.now().date() + datetime.timedelta(days=common.days_left_notify)
+                            five_day_before = datetime.datetime.now().date() + datetime.timedelta(
+                                days=common.days_left_notify)
                             days_left = (test['date_before'].date() - now).days
                             # Если новая дата теста больше сегодняшней, то удалям тест из просроченных у пользователя
                             if test['date_before'].date() > five_day_before:
                                 try:
-                                    user_test_instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
+                                    user_test_instance = UserTests.objects.get(user=user_object,
+                                                                               test_name=test['test_name'])
                                     TestExpired.objects.get(user=user_object, test=user_test_instance).delete()
                                 except Exception:
                                     pass
                             # Если новая дата меньше срока определённого для информирования но больше сегодняшней
                             elif test['date_before'].date() > now:
-                                user_test_instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
+                                user_test_instance = UserTests.objects.get(user=user_object,
+                                                                           test_name=test['test_name'])
                                 try:
                                     if TestExpired.objects.get(user=user_object, test=user_test_instance):
-                                        user_test_instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
+                                        user_test_instance = UserTests.objects.get(user=user_object,
+                                                                                   test_name=test['test_name'])
                                         tets_inst = TestExpired.objects.get(user=user_object, test=user_test_instance)
                                         tets_inst.days_left = days_left
                                         tets_inst.save()
@@ -1447,12 +1501,14 @@ def file_upload(request):
 
                     #  Пропускаем первую строку (заголовок)
                     heading = next(csvfile)
-                    fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
+                    fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5',
+                                  'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                                   'q_weight', 'answer', 'answers', 'ac_type']
                     reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
                     try:
                         for row in reader:
-                            if row['theme'] and row['question'] and row['option_1'] and row['option_2'] and row['q_kind']:
+                            if row['theme'] and row['question'] and row['option_1'] and row['option_2'] and row[
+                                'q_kind']:
                                 if row['answer'] or row['answers']:
                                     #  Вынимаем тему, если такой темы нет, создаём её
                                     them = Thems.objects.get_or_create(name=row['theme'])
@@ -1504,7 +1560,6 @@ def file_upload(request):
                                             wrong_data.append(f'Не верные данные в строке {reader.line_num}\n{error}')
                                             continue
 
-
                                         if question[1]:
                                             questions_created += 1
                                     else:
@@ -1527,14 +1582,13 @@ def file_upload(request):
                                                 alpha = True
                                                 break
                                             elif re.search('[0-9]', str(data)):
-                                                #print('this data!:::', data)
+                                                # print('this data!:::', data)
                                                 alpha = True
                                                 break
 
-
                                 if alpha == True:
                                     wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
-                                    #print("HEREEEEEE_2")
+                                    # print("HEREEEEEE_2")
                                     continue
 
                     except csv.Error as e:

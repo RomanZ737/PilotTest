@@ -102,37 +102,25 @@
             <div id="answers" style="display:none">
 
                     {% for question in answers%}
-                        <div>Вопрос:</div>
-                        <div>{{question.question.question}}</div>
-                        <div>Ответы:</div>
-                            {% if '1' in question.question%}
-                        <div>{{question.question.option_1}}</div>
+                        {% if question.conclusion == True%}
+                            <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
+                        {% else %}
+                            <span class="negative">НЕ ВЕРНЫЙ ОТВЕТ</span>
+                        {% endif %}
+                        <div class="result_answers_question">{{question.question}}</div>
 
-                        <div>{{question.question.option_2}}</div>
-                        {% if question.question.option_3 %}
-                            <div>{{question.question.option_3}}</div>
-                        {% endif %}
-                        {% if question.question.option_4 %}
-                            <div>{{question.question.option_4}}</div>
-                        {% endif %}
-                        {% if question.question.option_5 %}
-                            <div>{{question.question.option_5}}</div>
-                        {% endif %}
-                        {% if question.question.option_6 %}
-                            <div>{{question.question.option_6}}</div>
-                        {% endif %}
-                        {% if question.question.option_7 %}
-                            <div>{{question.question.option_7}}</div>
-                        {% endif %}
-                        {% if question.question.option_8 %}
-                            <div>{{question.question.option_8}}</div>
-                        {% endif %}
-                        {% if question.question.option_9 %}
-                            <div>{{question.question.option_9}}</div>
-                        {% endif %}
-                        {% if question.question.option_10 %}
-                            <div>{{question.question.option_10}}</div>
-                        {% endif %}
+                        {% for answer in question.answers %}
+                            {% if answer.valid == True %}
+                                <div class="result_answers_correct">{{answer.option}}</div>
+                            {% else %}
+                                <div>{{answer.option}}</div>
+                            {% endif %}
+                        {% endfor %}
+                        <div>Ответ Тестируемого:</div>
+                        {% for user_answer in question.user_answer%}
+                            <div>{{user_answer}}</div>
+                        {% endfor %}
+                    <br>
                     {% endfor %}
 
             </div>

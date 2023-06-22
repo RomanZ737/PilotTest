@@ -142,13 +142,13 @@ class FileUpload(models.Model):
 #  Результаты ответов конкретного пользователя
 class AnswersResults(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, max_length=500, verbose_name='Пользователь',
-                              help_text='Объект пользователя', default='User Deleted')
+                             help_text='Объект пользователя', default='User Deleted')
     results = models.ForeignKey(QuizeResults, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',
-                              help_text='Объект с результатами теста конкретного пользователя')
+                                help_text='Объект с результатами теста конкретного пользователя')
     question = models.ForeignKey(QuestionSet, on_delete=models.SET_DEFAULT, max_length=500, verbose_name='Результаты теста',
-                              help_text='Объект с результатами теста конкретного пользователя', default='Question Deleted')
+                                 help_text='Объект с результатами теста конкретного пользователя', default='Question Deleted')
     user_answer = models.CharField(max_length=255, verbose_name='Ответ пользователя',
-                            help_text='Ответ пользователя на вопрос')
+                                   help_text='Ответ пользователя на вопрос')
     conclusion = models.BooleanField(verbose_name='Результат ответа', null=True,
                                      help_text='Результат ответа пользователя на вопрос')
 

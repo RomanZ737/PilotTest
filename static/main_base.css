@@ -443,3 +443,18 @@ div.list-q_count {
 div.results-question {
     display: block;
 }
+
+
+div.result_answers_question {
+    display: block;
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+div.result_answers_correct {
+    background-color: rgba(29, 158, 36, 0.4);
+}
+
+div.result_answers_wrong {
+    background-color: rgba(0, 209,209, 0.4);
+}
