@@ -35,7 +35,7 @@
                 </div>
                 <span style="color: black;">|</span>
                 <div class="list-them_questions_num">
-                    <a href="{% url 'quize737:question_list' theme_filter=theme.id %}">Список вопросов: {{num_dict|get_item:theme.name}}</a>
+                    <a href="/question_list/?theme_filter={{theme.id}}">Список вопросов: {{num_dict|get_item:theme.name}}</a>
                 </div>
                 <span style="color: black;">|</span>
 
