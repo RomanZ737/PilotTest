@@ -772,7 +772,6 @@ def question_list(request):
                            'them_list': them_list, 'q_count': q_count}
                 return render(request, 'question_list.html', context=context)
         else:
-            print('filter_input', filter_input)
             if filter_input == '5':
                 return redirect('quize737:question_list')
             else:
@@ -857,7 +856,7 @@ def question_del(request, id):
 def theme_editor(request, id=None):
     if request.method == 'POST':
         form = NewThemeForm(request.POST)
-        if form.is_valid():  # TODO: добавить проверку на уже существующую тему
+        if form.is_valid():
             theme = Thems.objects.get(id=id)
             theme.name = request.POST.get('name')
             theme.save()
@@ -872,12 +871,15 @@ def theme_editor(request, id=None):
             context = {'new_theme_form': theme_form}
             return render(request, 'edit_theme.html', context=context)
         else:
-
             theme_list = Thems.objects.all()
+            q_num_dict = {}
+            for them in theme_list:
+                q_num = QuestionSet.objects.filter(them_name=them).count()
+                q_num_dict[them.name] = q_num
             paginator = Paginator(theme_list, 20)
             page_number = request.GET.get('page', 1)
             themes = paginator.page(page_number)
-            context = {'themes': themes}
+            context = {'themes': themes, 'num_dict': q_num_dict}
             return render(request, 'theme_editor.html', context=context)
 
 

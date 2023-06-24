@@ -47,4 +47,5 @@ urlpatterns = [
     path('new_user/', views.new_user, name='new_user'),
     path('edit_group/<int:id>', views.edit_group, name='edit_group'),
     path('pilotload/', PLView.pilotload, name='pilotload'),
+    #path('question_list/<theme>', PLView.pilotload, name='pilotload'),
     ]

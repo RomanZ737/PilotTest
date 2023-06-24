@@ -210,7 +210,7 @@ div.list-test_result {  /* блок Результат сдачи теста в 
 div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
-    width: 13%;
+    width: 20%;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -519,3 +519,10 @@ div.result_answers_user_answer {
     text-justify: inter-word;
     font-size: 22px;
 }
+
+div.list-them_questions_num { /*  Количество вопросов в теме на странице спискеа тем*/
+    position: relative;
+    display: inline-block;
+    width: 25%;
+}
+
