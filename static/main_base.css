@@ -285,7 +285,7 @@ div.list-test_name {    /* блок названия теста в таблиц�
     left: 5%;
     word-wrap: break-word;
     text-align: left;
-    width: 40%;
+    width: 25%;
     vertical-align: middle;
 
 }
@@ -523,6 +523,21 @@ div.result_answers_user_answer {
 div.list-them_questions_num { /*  Количество вопросов в теме на странице спискеа тем*/
     position: relative;
     display: inline-block;
-    width: 25%;
+    width: 20%;
 }
 
+div.test_total_q_num {
+    position: relative;
+    display: inline-block;
+    width: 15%;
+    vertical-align: middle
+}
+
+div.test_them_list {
+    position: relative;
+    display: inline-block;
+    width: 45%;
+    text-align: justify;
+    text-justify: inter-word;
+    vertical-align: middle
+}

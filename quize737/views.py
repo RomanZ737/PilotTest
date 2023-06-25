@@ -995,6 +995,8 @@ class BaseUserTestFormSet(BaseFormSet):
 def test_editor(request):
     user_search_input = request.GET.get("test_search")
     no_search_result = False
+    total_test_q_num = {} #  Общее количество вопросов в тесте
+    total_test_theme = {}
     if user_search_input:
         total_test_list = TestConstructor.objects.filter(Q(name__icontains=f'{user_search_input}'))
         if not total_test_list:
@@ -1003,6 +1005,7 @@ def test_editor(request):
             context = {'no_search_results': no_search_result, 'results': results}
             return render(request, 'test_editor.html', context=context)
         else:
+
             paginator = Paginator(total_test_list, 10)
             page_number = request.GET.get('page', 1)
             results_list_pages = paginator.page(page_number)
@@ -1010,10 +1013,24 @@ def test_editor(request):
             return render(request, 'test_editor.html', context=context)
     else:
         tests_names = TestConstructor.objects.all()
+
+        #  Вынимаем общее количество вопросов по тесту
+        for test in tests_names:
+            #  Вынимаем темы с количеством вопросов
+            test_data =TestQuestionsBay.objects.filter(test_id=test)
+            q_num = int()
+            for q in test_data:
+                q_num +=q.q_num
+
+            total_test_q_num[test.name] = q_num
+            total_test_theme[test.name] = [x.theme.name for x in test_data]
+
+        print('total_test_theme', total_test_theme)
+
         paginator = Paginator(tests_names, 10)
         page_number = request.GET.get('page', 1)
         tests_names_pages = paginator.page(page_number)
-        context = {'tests_names': tests_names_pages}
+        context = {'tests_names': tests_names_pages, 'total_q_num': total_test_q_num, 'total_them': total_test_theme}
         return render(request, 'test_editor.html', context=context)
 
 

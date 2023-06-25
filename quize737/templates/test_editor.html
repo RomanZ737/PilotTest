@@ -29,8 +29,17 @@
                     <div class="list-test_name">
                         <a href="{{test.id}}"><span style="color: black;"></span> {{test.name}}</a>
                     </div>
+                    <span style="color: black;"> | </span>
+                    <div class="test_total_q_num">
+                        <span>Вопросов: {{total_q_num|get_item:test.name}}</span>
+                    </div>
+                    <span style="color: black;"> | </span>
+                    <div class="test_them_list">
+                        <span>{{total_them|get_item:test.name|join:", "}}</span>
+                    </div>
+                    <span style="color: black;"> | </span>
                     <div class="list-delete">
-                        <span style="color: black;"> | </span><a href="{% url 'quize737:del_test' test.id %}" onclick="return confirm('Удалить Тест: {{test.name}}?') || event.preventDefault()">Удалить</a>
+                        <a href="{% url 'quize737:del_test' test.id %}" onclick="return confirm('Удалить Тест: {{test.name}}?') || event.preventDefault()">Удалить</a>
                     </div>
                 </div>
             {% endfor %}
