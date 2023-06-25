@@ -1664,7 +1664,8 @@ def file_upload(request):
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
             #  Зашружаем файл
-
+            # Ошибка в имени файла, решается так:
+            #  https://itekblog.com/ascii-codec-cant-encode-characters-in-position/
             newdoc = FileUpload(docfile=request.FILES['docfile'])
             newdoc.save()
             error_read = {}  # Ошибка при чтении файл
