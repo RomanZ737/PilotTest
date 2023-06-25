@@ -1664,7 +1664,7 @@ def file_upload(request):
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
             #  Зашружаем файл
-            newdoc = FileUpload(docfile=request.FILES['docfile'])
+            newdoc = FileUpload(docfile=(request.FILES['docfile']).decode('utf-8'))
             newdoc.save()
             error_read = {}  # Ошибка при чтении файл
             wrong_data = []  # Ошибки в данных файла (пропущенные поля)
