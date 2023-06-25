@@ -215,7 +215,7 @@ div.question_answer_conclusion_wrong {
 
 div.result_answers_correct {
     position: relative;
-    display: block;
+    display: list-item;
     width: 85%;
     left: 5%;
     background-color: rgba(29, 158, 36, 0.4);
@@ -226,7 +226,7 @@ div.result_answers_correct {
 
 div.result_answers_wrong {
     position: relative;
-    display: block;
+    display: list-item;
     width: 85%;
     left: 5%;
     /*background-color: rgba(0, 209,209, 0.4); */
@@ -237,9 +237,10 @@ div.result_answers_wrong {
 
 div.result_answers_user_answer {
     position: relative;
-    display: block;
+    display: list-item;
     left: 5%;
     text-align: justify;
     text-justify: inter-word;
     font-size: 22px;
+    width: 85%;
 }
