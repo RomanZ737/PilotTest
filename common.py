@@ -5,7 +5,7 @@ from email.utils import make_msgid
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 import os
 
-krs_mail_list = ['pomanz@mail.ru', 'roman.v@zfamily.aero']  #  Список адресов для рассылки сообщений КРС
+krs_mail_list = ['r.zaychenko@nordwindairlines.ru', 'd.dolgov@nordwindairlines.ru', 'p.leshchinskiy@nordwindairlines.ru', 's.samoylov@nordwindairlines.ru', 'v.obraztsov@nordwindairlines.ru']  #  Список адресов для рассылки сообщений КРС
 fixed_groups = ['KRS', 'ВП B737', 'КВС B737', 'ПИ B737', 'Редактор Вопросов']  # Фиксированные группы, пользователи не могут удалять
 days_left_notify = 5  # Количество дней за которое информировать пользователя до истечения срока сдачи теста
 
