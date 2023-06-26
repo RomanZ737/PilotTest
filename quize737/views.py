@@ -656,11 +656,11 @@ def tests_results_list(request):
                     result = False
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
-                                                              conclusion__exact=result)
+                                                              conclusion__exact=result).distinct()
             else:
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
-                                                              conclusion__icontains=result)
+                                                              conclusion__icontains=result).distinct()
             print('DATA:', position, group, result)
             if not total_user_list:
                 no_search_result = True
