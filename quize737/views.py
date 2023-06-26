@@ -1788,7 +1788,7 @@ def file_upload(request):
                     context = {"upload_form": upload_form, 'reading_errors': error_read, 'them_num_created': them_created,
                                'q_num_created': questions_created, 'uploaded': True, 'wrong_data': wrong_data}
                     return render(request, 'file_upload.html', context=context)
-                except csv.FileNotFoundError as error:
+                except IOError as error:
                     wrong_data = 'Неверное имя файла. Попробуйте удалить не стандартные символы в имени файла'
                     error_read = error
                     context = {"upload_form": upload_form, 'reading_errors': error_read,
