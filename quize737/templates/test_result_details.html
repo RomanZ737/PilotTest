@@ -107,13 +107,13 @@
 
                     {% for question in answers%}
                     <fieldset>
-                        {% if question.conclusion == True%}
-                            <legend>
-                            <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
-                        {% else %}
-                            <span class="negative">НЕ ВЕРНЫЙ ОТВЕТ</span>
-                        {% endif %}
-                            </legend>
+                        <legend>
+                            {% if question.conclusion == True%}
+                                <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
+                            {% else %}
+                                <span class="negative">НЕ ВЕРНЫЙ ОТВЕТ</span>
+                            {% endif %}
+                        </legend>
                         <div class="result_answers_question">{{question.question}}</div>
 
                         {% for answer in question.answers %}
