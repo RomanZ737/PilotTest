@@ -113,6 +113,8 @@ class TestConstructor(models.Model):
     pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=70,
                                      verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
+    training = models.BooleanField(verbose_name='Тренировочный тест', default=False,
+                                   )
 
     def __str__(self):
         return f'{self.name}'

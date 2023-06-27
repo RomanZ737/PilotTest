@@ -364,7 +364,8 @@ def next_question(request):
                 user_test_id = set_instance[0].test_id  # ID теста пользователя
                 user_test_name = set_instance[0].quize_name  # Название теста пользователя
                 #  Удаляем тест у пользователя
-                UserTests.objects.filter(user=request.user, test_name=user_test_id).delete()
+
+                user_test_instance = UserTests.objects.filter(user=request.user, test_name=user_test_id)
 
                 answer_results = []
                 answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
@@ -418,20 +419,25 @@ def next_question(request):
                            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                            'conclusion': True, 'answers': answer_results}
                 # Удаляем тест пользователя из базы тестов пользователя
+
                 QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
 
-                # Отправляем письмо КРС
-                site_url = config('SITE_URL', default='')
-                subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал Тест'
-                message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
-                          f'<p style="color: rgb(148, 192, 74); font-size: 20px;"><b>СДАЛ ТЕСТ</b></p>' \
-                          f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
-                          f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
-                          f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
-                to = common.krs_mail_list
-                email_msg = {'subject': subject, 'message': message, 'to': to}
-                common.send_email(request, email_msg)
+                # Отправляем письмо КРС если тест не тренировочный
+                if user_test_instance[0].test_name.training == False:
+                    site_url = config('SITE_URL', default='')
+                    subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал Тест'
+                    message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                              f'<p style="color: rgb(148, 192, 74); font-size: 20px;"><b>СДАЛ ТЕСТ</b></p>' \
+                              f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
+                              f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
+                              f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
+                              f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
+                    to = common.krs_mail_list
+                    email_msg = {'subject': subject, 'message': message, 'to': to}
+                    common.send_email(request, email_msg)
+
+                #  Удаляем тест у пользователя
+                user_test_instance[0].delete()
 
                 return render(request, 'results.html', context=context)
 
@@ -503,18 +509,19 @@ def next_question(request):
 
                         answer_results.append(question_block)
 
-                    # Отправляем письмо КРС
-                    site_url = config('SITE_URL', default='')
-                    subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
-                    message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
-                              f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>НЕ СДАЛ ТЕСТ</b></p>' \
-                              f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
-                              f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
-                              f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                              f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
-                    to = common.krs_mail_list
-                    email_msg = {'subject': subject, 'message': message, 'to': to}
-                    common.send_email(request, email_msg)
+                    # Отправляем письмо КРС если тест не тренировочный
+                    if user_test_instance[0].test_name.training == False:
+                        site_url = config('SITE_URL', default='')
+                        subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
+                        message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                                  f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>НЕ СДАЛ ТЕСТ</b></p>' \
+                                  f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
+                                  f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
+                                  f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
+                                  f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
+                        to = common.krs_mail_list
+                        email_msg = {'subject': subject, 'message': message, 'to': to}
+                        common.send_email(request, email_msg)
                     context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                                'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                                'conclusion': False, 'answers': answer_results}
