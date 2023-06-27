@@ -35,7 +35,7 @@ from django.contrib.auth.views import (
 
 
 urlpatterns = [
-                  path('admin/', admin.site.urls),
+                  path('PilotAdmin/', admin.site.urls),
                   path('', quize737_views.start, name='start'),
                   path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
