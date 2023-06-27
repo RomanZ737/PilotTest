@@ -6,7 +6,7 @@ from decouple import config  # позволяет скрывать критич�
 import os
 
 
-krs_mail_list = ['r.zaychenko@nordwindairlines.ru']
+krs_mail_list = ['pomanz@mail.ru']
 #krs_mail_list = ['r.zaychenko@nordwindairlines.ru', 'd.dolgov@nordwindairlines.ru', 'p.leshchinskiy@nordwindairlines.ru', 's.samoylov@nordwindairlines.ru', 'v.obraztsov@nordwindairlines.ru']  #  Список адресов для рассылки сообщений КРС
 fixed_groups = ['KRS', 'ВП B737', 'КВС B737', 'ПИ B737', 'Редактор Вопросов']  # Фиксированные группы, пользователи не могут удалять
 days_left_notify = 5  # Количество дней за которое информировать пользователя до истечения срока сдачи теста
