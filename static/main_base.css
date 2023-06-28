@@ -170,7 +170,7 @@ div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     left: 5%;
-    width: 40%;
+    width: 35%;
     word-wrap: break-word;
     text-align: left;
 
@@ -188,8 +188,7 @@ div.list-date {     /* блок Дата в таблице */
 div.list-position {  /* блок Должность в таблице */
     position: relative;
     display: inline-block;
-    width: 14%;
-    margin: 0px;
+    width: 3%;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -225,7 +224,10 @@ div.list-question {  /* блок Текст вопроса в таблице */
     text-align: justify;
     text-justify: inter-word;
     padding-left: 5px;
-    padding-right: 6px;
+    padding-right: 5px;
+    margin: 4px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
 }
 
 div.list-delete {  /* блок Удалить каки-либо запись в таблице */
@@ -404,15 +406,13 @@ span.block_none_light_up {  /* блок всей строки данных в т
 div.filter_sign_position {
     position: relative;
     display: inline-block;
-    width: 16%;
     padding-left: 20px;
 }
 
 div.filter_sign_group {
     position: relative;
     display: inline-block;
-    width: 10%;
-    padding-left: 20px;
+    /* padding-left: 20px; */
 }
 
 select.position_filter {
@@ -429,8 +429,8 @@ input.submit_filter {
 div.filter_sign_result {
     position: relative;
     display: inline-block;
-    width: 15%;
-    padding-left: 20px;
+    /*width: 15%;
+    padding-left: 20px; */
 }
 
 select.theme_filter {
@@ -442,7 +442,7 @@ select.theme_filter {
 div.filter_related {
     position: relative;
     display: inline-block;
-    width: 65%
+    /* width: 65% */
 }
 
 div.button_block {
@@ -542,4 +542,32 @@ div.test_them_list {
     text-align: justify;
     text-justify: inter-word;
     vertical-align: middle
+}
+
+span.test_theme_list {
+    padding-right: 20px;
+}
+
+span.test_q_num {
+    padding-right: 5px;
+}
+
+
+span.test_theme_del {
+    padding-left: 40px;
+}
+
+span.vertical_line {
+     border-left: 5px solid black;
+     height: 200px;
+}
+
+div.list-test_name_results {    /* блок названия теста в таблице с результатами теста */
+    position: relative;
+    display: inline-block;
+    word-wrap: break-word;
+    text-align: left;
+    width: 17%;
+    vertical-align: middle;
+    color: rgb(209, 209,209);
 }

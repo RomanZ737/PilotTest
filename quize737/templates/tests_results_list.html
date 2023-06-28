@@ -22,7 +22,7 @@
                 <div class="filter-form">
                     <div class="filter_related">
                         <form id="position_filter" action="{% url 'quize737:tests_results_list' %}" method="get">
-                        <div class="filter_sign_position"> Должность: </div>
+                        <div class="filter_sign_position"> Квалификация: </div>
                         <select class="position_filter" name="filter">
                         {% for option in position_list %}
                             {% if filter_input %}
@@ -108,10 +108,12 @@
                         <div class="list-fio"><a href="{{i.id}}">{{i.user_name}}</a>
                         </div>
                         <span style="color: black">|</span>
-                        <div class="list-date">{{i.timestamp | date:"d.m.Y"}}
+                        <div class="list-position">{{i.user_id.profile.position}}
                         </div>
                         <span style="color: black">|</span>
-                        <div class="list-position">{{i.user_id.profile.position}}
+                        <div class="list-test_name_results">{{i.quize_name}}</div>
+                        <span style="color: black">|</span>
+                        <div class="list-date">{{i.timestamp | date:"d.m.Y"}}
                         </div>
                         <span style="color: black">|</span>
                         <div class="list-test_result">

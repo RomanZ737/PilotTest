@@ -58,7 +58,15 @@
             </form>
                 </div>
             <div class="list-q_count">
-            <span class="mark_up">Всего: {{q_count}}</span>
+                {% if filter_input %}
+                    {% for theme in them_list %}
+                        {% if theme.id == filter_input %}
+                            <span class="mark_up">{{theme.name}}: {{q_count}}</span>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <span class="mark_up">Все темы: {{q_count}}</span>
+                {% endif %}
         </div>
         </div>
 
@@ -74,11 +82,11 @@
                 <div class="list-them">
                     <a href="{% url 'quize737:theme_editor' i.them_name.id %}"><span class="theme_color">{{i.them_name}}</span></a>
                 </div>
-                    <span style="color: black;"> | </span>
+
                 <div class="list-question">
                     <a href="{% url 'quize737:question_list_details' i.id %}">{{i.question}}</a>
                 </div>
-                    <span style="color: black;"> | </span>
+
                 <div class="list-delete">
                     <a href="{% url 'quize737:question_del' i.id %}" onclick="return confirm('Удалить вопрос?') || event.preventDefault()">Удалить</a>
                 </div>

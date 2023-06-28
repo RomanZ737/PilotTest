@@ -32,7 +32,11 @@
         {{ test_q_set.management_form }}
         {% for form in test_q_set.forms %}
         <div class="q_forms">
-            <span>Тема: {{ form.theme }} Количество вопросов: {{ form.q_num }}</span><span id="max_q_{{ forloop.counter|sub:'1' }}"> Max. </span>
+            <span class="test_theme_list">Тема: {{ form.theme }} </span>
+            <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
+            <span>Max. </span>
+            <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
+            <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
 
         </div>
         <br>
@@ -80,7 +84,7 @@
                 let valueOfSelect = i.value //Вынимаем значение выбранного поля
                 let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
 
-                document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+                document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
                 let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
                 numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
 
@@ -100,7 +104,7 @@
 
             let valueOfSelect = event.target.value //Вынимаем значение выбранного поля
             let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
-            document.getElementById("max_q_" + select_id).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+            document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
             let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
             numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
 
@@ -145,7 +149,7 @@
             them_field.addEventListener('change', ThemSelection);
             them_field.value = '5'
             let numOfqAct = document.getElementById('5').value
-            document.getElementById("max_q_" + formNum).innerHTML = 'Max. ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+            document.getElementById("max_q_" + formNum).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
 
 
 

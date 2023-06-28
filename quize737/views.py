@@ -1070,7 +1070,7 @@ def create_new_test(request):
     min_q_them.sort()
     total_q_num_per_them['5'] = min_q_them[0]
 
-    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
+    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=20, extra=0, absolute_max=20,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
@@ -1084,9 +1084,10 @@ def create_new_test(request):
                                                       pass_score=test_name_form.data['test_name-pass_score'])
             # Создаём объекты вопросов теста
             for question in test_q_set.cleaned_data:
-                TestQuestionsBay.objects.create(theme=question['theme'],
-                                                test_id=new_test,
-                                                q_num=question['q_num'], )
+                if not question['DELETE']:
+                    TestQuestionsBay.objects.create(theme=question['theme'],
+                                                    test_id=new_test,
+                                                    q_num=question['q_num'], )
             return redirect('quize737:test_editor')
         else:
 
@@ -1125,9 +1126,10 @@ def test_details(request, id):
             a.pass_score = test_name_form.data.get('pass_score')
             a.save()
             for question in test_q_set.cleaned_data:
-                TestQuestionsBay.objects.create(theme=question['theme'],
-                                                test_id=a,
-                                                q_num=question['q_num'], )
+                if not question['DELETE']:
+                    TestQuestionsBay.objects.create(theme=question['theme'],
+                                                    test_id=a,
+                                                    q_num=question['q_num'], )
             return redirect('quize737:test_editor')
         else:
             form_errors = []  # Ошибки при валидации формы
@@ -1522,6 +1524,7 @@ def user_detales(request, id):
     user_object = User.objects.get(id=id)
     user_profile = Profile.objects.filter(user=user_object)
 
+
     # sent = False  # Переменная для отправки письма
 
     if request.method == 'POST':
@@ -1594,7 +1597,7 @@ def user_detales(request, id):
             # Загружаем новые данные в форму
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             tests_for_user_form = UserTestForm(initial=user_tests)
-            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True}
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True, 'user_id': id}
             return render(request, 'user_ditales.html', context=context)
 
         else:
@@ -1614,7 +1617,7 @@ def user_detales(request, id):
 
         # user_groups = user_obj.groups.all()
         # print('user_groups', user_groups)
-        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form}
+        context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id}
         return render(request, 'user_ditales.html', context=context)
 
 

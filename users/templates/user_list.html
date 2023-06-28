@@ -2,11 +2,11 @@
 
 {% block content %}
 <fieldset>
-    <legend><a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+    <legend><a href="{% url 'quize737:user_list' %}">ПИЛОТЫ</a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">Список Групп</a>
+        <a href="{% url 'quize737:group_list' %}">Группы</a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
 
@@ -25,7 +25,7 @@
         <div class="filter-form">
             <form id="position_filter" name="position_filter" action="{% url 'quize737:user_list' %}" method="get">
                 <div class="block_none_light_up">
-                    <div class="filter_sign_position"> Должность: </div>
+                    <div class="filter_sign_position"> Квалификация: </div>
                     <select class="position_filter" name="position_filter">
                         {% for option in position_list %}
                             {% if filter_input %}

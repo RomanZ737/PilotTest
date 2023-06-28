@@ -3,11 +3,11 @@
 {% block content %}
 <fieldset>
     <legend>
-        <a href="{% url 'quize737:user_list' %}">СПИСОК ПИЛОТОВ</a>
+        <a href="{% url 'quize737:user_list' %}">Пилоты</a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">Список Прупп</a>
+        <a href="{% url 'quize737:group_list' %}">Группы</a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
     </legend>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="block_none_light_up">
-        <div class="statick_field_sign">Должность:</div>
+        <div class="statick_field_sign">Квалификация:</div>
         <div class="dynamic_field_sign">{{user_profile.get_position_display}}</div>
     </div>
 
@@ -61,12 +61,24 @@
             <input class="block_none_light_up" id="add-form" type="submit" value="+ Назначить новый тест">
             <br>
             <br>
-            <input class="block_none_light_up" type="submit" value="Сохранить" id="save_btn">
-            <span class="block_none_light_up" id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
-
 
     </form>
 
+    <form  id="form_edit_user" method='get' action='{% url "quize737:edit_user" user_id %}'>
+    </form>
+
+    <div class="block_none_light_up">
+        <input type="submit" value="Сохранить" id="save_btn" form="user_tests_form">
+        <span style="color: black;" id="span_vline"> | </span>
+        <input type="submit" value="Редактировать" id="edit_btn" form="form_edit_user">
+    </div>
+    <span class="block_none_light_up" id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+    <br>
+    <div class="block_none_light_up" id="go_back">
+        <form  method='get' action='{% url "quize737:user_list" %}'>
+            <input type="submit" value="Вернуться">
+        </form>
+    </div>
 <!--    <form method='get' action='{% url "quize737:user_list" %}'>-->
 <!--        <button type="submit">Вернуться</button>-->
 <!--    </form>-->
@@ -151,11 +163,19 @@
 
 
 
-        const btn = document.getElementById('save_btn');
+        let btn = document.getElementById("save_btn");
+        let btn_edit = document.getElementById("edit_btn");
+        //let btn_back = document.getElementById("back_btn");
+        let vline = document.getElementById("span_vline");
+        let form_back = document.getElementById("go_back");
 
         btn.addEventListener('click', () => {
           btn.style.display = 'none';
-          const box = document.getElementById('wait');
+          btn_edit.style.display = 'none';
+          //btn_back.style.display = 'none';
+          vline.style.display = 'none';
+          form_back.style.display = 'none';
+          let box = document.getElementById("wait");
           box.style.display = 'block';
         });
 

@@ -137,13 +137,13 @@
 
             </div>
 
-            <form id="go_back" method='get' action='{% url "quize737:tests_results_list" %}'>
-            </form>
+<!--            <form id="go_back" method='get' action='{% url "quize737:tests_results_list" %}'>-->
+<!--            </form>-->
             <form id="download_test" action="{% url 'quize737:download_test_result' id %}">
             </form>
 
             <div class="list-other_field">
-                <input type="submit" value="Вернуться" form="go_back">
+                <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
                 <span style="color: black;"> | </span>
                 <input type="submit" value="Скачать" form="download_test">
             </div>

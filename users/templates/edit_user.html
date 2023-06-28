@@ -3,13 +3,15 @@
 {% block content %}
 <fieldset>
     <legend>
-        <a href="{% url 'quize737:user_list' %}"> ПИЛОТЫ </a>
+        <a href="{% url 'quize737:user_list' %}">ПИЛОТЫ</a>
         <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">Пруппы</a>
+        <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Группы</a>
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
     </legend>
-
+<div class="block-list">
    <h1> {{user_obj.profile.family_name}} {{user_obj.profile.first_name}} {{user_obj.profile.middle_name}}</h1>
 
     {% for error in form_user.errors.values %}
@@ -17,7 +19,7 @@
     {% endfor %}
   <form id="user_edit_form" method='post'>
       {% csrf_token %}
-    <p>Должность:
+    <p>Квалификация:
         <select name="position">
             {% for option in position_list %}
                 {% if option == user_obj.profile.get_position_display %}
@@ -49,6 +51,15 @@
     <input type="submit" form="user_edit_form" value="Сохранить">
     <span style="color: black;"> | </span>
     <input type="submit" form="user_del_form" value="Удалить" onclick="return confirm('Удалить Пилота?') || event.preventDefault()">
+
+    <br>
+    <br>
+    <br>
+        <form  method='get' action='{% url "quize737:user_list" %}'>
+            <input type="submit" value="Вернуться">
+        </form>
+
+</div>
 </fieldset>
 
     {% endblock %}
