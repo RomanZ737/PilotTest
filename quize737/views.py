@@ -1703,8 +1703,9 @@ def file_upload(request):
                                           'q_weight', 'answer', 'answers', 'ac_type']
                             reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
                         except BaseException as error:
+                            print('ERROR', error)
                             wrong_data = ['Вероятно ошибка кодлировки файла, файл должен быть в колировке UTF-8']
-                            # error_read = error
+                            error_read = error
                             context = {"upload_form": upload_form, 'reading_errors': error_read,
                                        'them_num_created': them_created,
                                        'q_num_created': questions_created, 'uploaded': False, 'wrong_data': wrong_data}
