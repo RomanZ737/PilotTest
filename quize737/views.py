@@ -1696,11 +1696,19 @@ def file_upload(request):
                               encoding='utf-8') as csvfile:
 
                         #  Пропускаем первую строку (заголовок)
-                        heading = next(csvfile)
-                        fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5',
-                                      'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
-                                      'q_weight', 'answer', 'answers', 'ac_type']
-                        reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
+                        try:
+                            heading = next(csvfile)
+                            fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5',
+                                          'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
+                                          'q_weight', 'answer', 'answers', 'ac_type']
+                            reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
+                        except BaseException as error:
+                            wrong_data = ['Вероятно ошибка кодлировки файла, файл должен быть в колировке UTF-8']
+                            # error_read = error
+                            context = {"upload_form": upload_form, 'reading_errors': error_read,
+                                       'them_num_created': them_created,
+                                       'q_num_created': questions_created, 'uploaded': False, 'wrong_data': wrong_data}
+                            return render(request, 'file_upload.html', context=context)
                         try:
                             for row in reader:
                                 if row['theme'] and row['question'] and row['option_1'] and row['option_2'] and row[
