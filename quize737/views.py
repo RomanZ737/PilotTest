@@ -1838,3 +1838,11 @@ def question_form_file_download(request):
     path_to_file = dir_path + '/static/PilotTest.xlsx'
     f = open(path_to_file, 'rb')
     return FileResponse(f, as_attachment=True, filename='PilotTest.xlsx')
+
+# Скачивание базы вопросов
+@login_required
+@group_required(('KRS'))
+def download_questions_bay(request):
+    constract_mess = 'Функция в разработке'
+    context = {'mess': constract_mess}
+    return render(request, 'download_questions_bay.html', context=context)

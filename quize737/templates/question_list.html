@@ -18,7 +18,7 @@
 
             {% if request.user|has_group:'krs' or user.is_superuser %}
                 <span style="color: black;"> | </span>
-                <a href="pass">Скачать базу</a>
+                <a href="{% url 'quize737:download_questions_bay' %}">Скачать базу</a>
             {% endif %}
 
             <span style="color: black;"> | </span>

@@ -15,7 +15,7 @@
             <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
             {% if request.user|has_group:'krs' or user.is_superuser %}
                 <span style="color: black;"> | </span>
-                <a href="pass">Скачать базу</a>
+                <a href="{% url 'quize737:download_questions_bay' %}">Скачать базу</a>
             {% endif %}
             <span style="color: black;"> | </span>
             <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
