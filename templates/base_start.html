@@ -61,14 +61,52 @@
 
     </body>
     <footer>
+        <form method="post" id="task-form">
+            {% csrf_token %}
+            <input type="text" placeholder="Enter Task" name="task" id="task" required>
+<!--            <input type="submit" value="Save">-->
+            <a href='#' id="issue_send">Сообщить об ошибке</a>
+        </form>
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
                     <span>|</span>
                     <a href="{% url 'quize737:pilotload' %}">Load Pilots</a>
                 {% endif %}
                     <span>|</span>
-                    <a href="">Написать Администратору</a>
+                    <a href="#">Написать Администратору</a>
                     <span>|</span>
             {% endif %}
         </footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+          integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+            crossorigin="anonymous"></script>
+
+
+
+<script>
+            $('#task-form').on('click','#issue_send',function(e){
+
+           let issue_form = document.getElementById("task-form");
+            issue_form.style.display = 'none';
+
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url "quize737:issue_mess" %}',
+            data:
+            {
+                task:$("#task").val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+            },
+            success:function(){
+                  alert('Saved');
+                    }
+            })
+        });
+
+
+
+        </script>
 </html>
+

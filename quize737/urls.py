@@ -48,4 +48,5 @@ urlpatterns = [
     path('edit_group/<int:id>', views.edit_group, name='edit_group'),
     path('pilotload/', PLView.pilotload, name='pilotload'),
     path('download_questions_bay/', views.download_questions_bay, name='download_questions_bay'),
+    path('issue_mess/', views.issue_mess, name='issue_mess'),
     ]

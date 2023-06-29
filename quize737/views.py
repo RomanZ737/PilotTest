@@ -1524,7 +1524,6 @@ def user_detales(request, id):
     user_object = User.objects.get(id=id)
     user_profile = Profile.objects.filter(user=user_object)
 
-
     # sent = False  # Переменная для отправки письма
 
     if request.method == 'POST':
@@ -1597,7 +1596,8 @@ def user_detales(request, id):
             # Загружаем новые данные в форму
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             tests_for_user_form = UserTestForm(initial=user_tests)
-            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True, 'user_id': id}
+            context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True,
+                       'user_id': id}
             return render(request, 'user_ditales.html', context=context)
 
         else:
@@ -1701,7 +1701,8 @@ def file_upload(request):
                         #  Пропускаем первую строку (заголовок)
                         try:
                             heading = next(csvfile)
-                            fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5',
+                            fieldnames = ['theme', 'question', 'option_1', 'option_2', 'option_3', 'option_4',
+                                          'option_5',
                                           'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                                           'q_weight', 'answer', 'answers', 'ac_type']
                             reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
@@ -1765,7 +1766,8 @@ def file_upload(request):
                                                                                              ac_type=row['ac_type']
                                                                                              )
                                             except ValueError as error:
-                                                wrong_data.append(f'Не верные данные в строке {reader.line_num}\n{error}')
+                                                wrong_data.append(
+                                                    f'Не верные данные в строке {reader.line_num}\n{error}')
                                                 continue
 
                                             if question[1]:
@@ -1804,12 +1806,13 @@ def file_upload(request):
                             sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
                     os.remove(f"{dir_path}/media/documents/{filename}")
 
-                    context = {"upload_form": upload_form, 'reading_errors': error_read, 'them_num_created': them_created,
+                    context = {"upload_form": upload_form, 'reading_errors': error_read,
+                               'them_num_created': them_created,
                                'q_num_created': questions_created, 'uploaded': True, 'wrong_data': wrong_data}
                     return render(request, 'file_upload.html', context=context)
                 except IOError as error:
                     wrong_data = ['Неверное имя файла. Попробуйте удалить не стандартные символы в имени файла']
-                    #error_read = error
+                    # error_read = error
                     context = {"upload_form": upload_form, 'reading_errors': error_read,
                                'them_num_created': them_created,
                                'q_num_created': questions_created, 'uploaded': False, 'wrong_data': wrong_data}
@@ -1839,6 +1842,7 @@ def question_form_file_download(request):
     f = open(path_to_file, 'rb')
     return FileResponse(f, as_attachment=True, filename='PilotTest.xlsx')
 
+
 # Скачивание базы вопросов
 @login_required
 @group_required(('KRS'))
@@ -1846,3 +1850,8 @@ def download_questions_bay(request):
     constract_mess = 'Функция в разработке'
     context = {'mess': constract_mess}
     return render(request, 'download_questions_bay.html', context=context)
+
+@login_required
+def issue_mess(request):
+    print('result_request', request.POST)
+    return render(request, "start.html")
