@@ -1851,7 +1851,24 @@ def download_questions_bay(request):
     context = {'mess': constract_mess}
     return render(request, 'download_questions_bay.html', context=context)
 
+# Сообщение от ошибке в вопросе от пользователя, сообщение рассылается всем пользователям в группе 'Редактор Вопросов'
 @login_required
 def issue_mess(request):
-    print('result_request', request.POST)
-    return render(request, "start.html")
+    q_id = int(request.POST.get('issue_q_id'))
+    site_url = config('SITE_URL', default='')
+    q_instance =QuestionSet.objects.get(id=q_id)
+    emails = User.objects.filter(groups__name='Редактор Вопросов').values('email')
+    to = [] #  Список email адресов для рассылки
+    for email in emails:
+        to.append(email['email'])
+    subject = f'Ошибка в Вопросе'
+    message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+              f'<p style="font-size: 15px;"><b>Сообщил об ошибке в вопросе:</b></p>' \
+              f'<p style="font-size: 15px;"><b>{q_instance.question}</b></p>' \
+              f'<a href="{site_url}/question_list/{q_id}">Редактировать вопрос</a>'
+    to = common.krs_mail_list
+    email_msg = {'subject': subject, 'message': message, 'to': to}
+    common.send_email(request, email_msg)
+
+
+    return HttpResponse(request.POST)

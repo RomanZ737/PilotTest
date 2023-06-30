@@ -244,3 +244,10 @@ div.result_answers_user_answer {
     font-size: 22px;
     width: 85%;
 }
+
+div.report_issue {
+    position: relative;
+    display: block;
+    left: 85%;
+    margin: 10px;
+}
