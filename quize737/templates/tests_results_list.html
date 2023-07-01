@@ -96,38 +96,31 @@
                 </div>
             {% else %}
 
-    <!--                <div id="head_1"><span class="list-title">ФИО</span></div><span style="color: black"> |</span>-->
-    <!--                <div class="list-date"><span class="list-title">Дата</span></div><span style="color: black"> |</span>-->
-    <!--                <div class="list-position"><span class="list-title">Должность</span></div><span style="color: black"> |</span>-->
-    <!--                <div class="list-test_result"><span class="list-title">Результат</span></div>-->
-    <!--                <div class="hr"></div>-->
-    <!--                    <br>-->
                 {% for i in results %}
-    <!--                <br>-->
-            <div class="block_light_up">
-                        <div class="list-fio"><a href="{{i.id}}">{{i.user_name}}</a>
-                        </div>
-                        <span style="color: black">|</span>
-                        <div class="list-position">{{i.user_id.profile.position}}
-                        </div>
-                        <span style="color: black">|</span>
-                        <div class="list-test_name_results">{{i.quize_name}}</div>
-                        <span style="color: black">|</span>
-                        <div class="list-date">{{i.timestamp | date:"d.m.Y"}}
-                        </div>
-                        <span style="color: black">|</span>
-                        <div class="list-test_result">
-                            {% if i.conclusion%}
-                                    <span class="positive">ТЕСТ СДАН</span>
-                                {% else %}
-                                    <span class="negative">ТЕСТ НЕ СДАН</span>
-                                {% endif %}
-                        </div>
+                        <div class="block_light_up">
+                            <div class="list-fio"><a href="{{i.id}}">{{i.user_name}}</a>
+                            </div>
+                            <span style="color: black">|</span>
+                            <div class="list-position">{{i.user_id.profile.position}}
+                            </div>
+                            <span style="color: black">|</span>
+                            <div class="list-test_name_results">{{i.quize_name}}</div>
+                            <span style="color: black">|</span>
+                            <div class="list-date">{{i.timestamp | date:"d.m.Y"}}
+                            </div>
+                            <span style="color: black">|</span>
+                            <div class="list-test_result">
+                                {% if i.conclusion%}
+                                        <span class="positive">ТЕСТ СДАН</span>
+                                    {% else %}
+                                        <span class="negative">ТЕСТ НЕ СДАН</span>
+                                    {% endif %}
+                            </div>
 
-                        <span style="color: black">|</span>
-                        <a href="{% url 'quize737:download_test_result' id=i.id %}">
-                        <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px">Скачать</a>
-            </div>
+                            <span style="color: black">|</span>
+                            <a href="{% url 'quize737:download_test_result' id=i.id %}">
+                            <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px">Скачать</a>
+                        </div>
                 {% endfor %}
                         <br>
                     {% include "paginator_2.html" with page=results %}

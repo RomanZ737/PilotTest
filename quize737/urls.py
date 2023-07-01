@@ -14,7 +14,6 @@ urlpatterns = [
     path('', views.start, name='start'),
     path('<int:id>/', views.start, name='start'),
     path('next_question/', views.next_question, name='next_question'),
-    path('one_them_q/', views.one_them_q, name='one_them_q'),
     path('tests_results_list/', views.tests_results_list, name='tests_results_list'),
     path('tests_results_list/<int:id>/', views.test_result_details, name='test_result_details'),
     path('question_list/', views.question_list, name='question_list'),

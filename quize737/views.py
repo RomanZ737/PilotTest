@@ -344,6 +344,8 @@ def next_question(request):
             return render(request, q_page_layout, context=context)
 
         else:
+            # Ставим флаг завершённости теста
+            QuizeResults.objects.filter(id=request.POST.get('result_id')).update(in_progress=False)
             # Вынимаем количество правильных ответов, число вопросов и количество баллов
             result_data = QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).values(
                 'correct_q_num', 'score_number', 'total_num_q', 'pass_score')
@@ -595,23 +597,6 @@ def next_question(request):
                 #            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                 #            'conclusion': False}
 
-            # Удаляем тест пользователя из базы
-            # QuizeSet.objects.filter(id=int(request.POST.get('user_set_id'))).delete()
-
-            # return render(request, 'results.html', context=context)
-
-
-def one_them_q(request):
-    if request.method == 'POST':
-        pass
-    else:
-        them_name = []
-        for them in Thems.objects.all():
-            them_name.append(them)
-        context = {'thems': them_name}
-
-        return render(request, 'one_them_q.html', context=context)
-
 
 @login_required
 @group_required('KRS')
@@ -630,7 +615,7 @@ def tests_results_list(request):
     no_search_result = False
     if user_search_input or filter_input:
         if user_search_input:
-            total_results_list = QuizeResults.objects.filter(Q(user_name__icontains=f'{user_search_input}'))
+            total_results_list = QuizeResults.objects.filter(Q(user_name__icontains=f'{user_search_input}'), in_progress=False)
             if not total_results_list:
                 no_search_result = True
                 results = f'Пилоты по запросу "{user_search_input}" не найдены'
@@ -663,12 +648,11 @@ def tests_results_list(request):
                     result = False
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
-                                                              conclusion__exact=result).distinct()
+                                                              conclusion__exact=result, in_progress=False).distinct()
             else:
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
-                                                              conclusion__icontains=result).distinct()
-            print('DATA:', position, group, result)
+                                                              conclusion__icontains=result, in_progress=False).distinct()
             if not total_user_list:
                 no_search_result = True
                 results = f'Результаты тестов не найдены'
@@ -688,7 +672,7 @@ def tests_results_list(request):
 
 
     else:
-        results_list = QuizeResults.objects.all()
+        results_list = QuizeResults.objects.filter(in_progress=False)
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)

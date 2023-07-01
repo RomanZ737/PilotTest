@@ -98,6 +98,8 @@ class QuizeResults(models.Model):
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
     conclusion = models.BooleanField(verbose_name='Итоговый результат', null=True,
                                      help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
+    in_progress = models.BooleanField(verbose_name='Тест не завершён', default=True,
+                                     help_text='Если тест не завершён, то результат не показывается в общем списке')
 
     class Meta:
         ordering = ['-timestamp']
