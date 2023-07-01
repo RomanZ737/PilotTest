@@ -1851,7 +1851,7 @@ def download_questions_bay(request):
     context = {'mess': constract_mess}
     return render(request, 'download_questions_bay.html', context=context)
 
-# Сообщение от ошибке в вопросе от пользователя, сообщение рассылается всем пользователям в группе 'Редактор Вопросов'
+# Сообщение об ошибке в вопросе от пользователя, сообщение рассылается всем пользователям в группе 'Редактор Вопросов'
 @login_required
 def issue_mess(request):
     q_id = int(request.POST.get('issue_q_id'))
@@ -1866,9 +1866,7 @@ def issue_mess(request):
               f'<p style="font-size: 15px;"><b>Сообщил об ошибке в вопросе:</b></p>' \
               f'<p style="font-size: 15px;"><b>{q_instance.question}</b></p>' \
               f'<a href="{site_url}/question_list/{q_id}">Редактировать вопрос</a>'
-    to = common.krs_mail_list
     email_msg = {'subject': subject, 'message': message, 'to': to}
     common.send_email(request, email_msg)
-
 
     return HttpResponse(request.POST)
