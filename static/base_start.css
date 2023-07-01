@@ -166,7 +166,7 @@ div.list-test_name {    /* блок названия теста в таблиц�
     word-wrap: break-word;
     text-align: left;
     width: 30%;
-    vertical-align: middle;
+    /* vertical-align: middle; */
     padding-bottom: 18px;
 }
 
