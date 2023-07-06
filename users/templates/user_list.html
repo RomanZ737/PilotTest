@@ -61,6 +61,24 @@
                             {% endif %}
                         {% endfor %}
                     </select>
+                    <div class="filter_sign_group">Тест: </div>
+                    <select class="position_filter" name="position_filter">
+                        {% for test in tests_list %}
+                            {% if filter_input %}
+                                {% if test.name == filter_input.2 %}
+                                    <option value="{{test.name}}" selected>{{test.name}}</option>
+                                {% else %}
+                                    <option value="{{test.name}}">{{test.name}}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if test.name == "Все" %}
+                                    <option value="{{test.name}}" selected>{{test.name}}</option>
+                                {% else %}
+                                    <option value="{{test.name}}">{{test.name}}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
                     <input class="submit_filter" type="submit" value="Фильтр" form="position_filter">
                 </div>
 
@@ -84,6 +102,15 @@
                        <span style="color: black;">|</span>
                        <div class="list-position">
                            <span class="theme_color">{{user.profile.position}}</span>
+                       </div>
+                       <span style="color: black;">|</span>
+                       <div class="list-user_test_list">
+                           {% if user_test_dict|get_item:user.username %}
+                                <span>{{user_test_dict|get_item:user.username|join:";  "}}</span>
+                           {% else %}
+                                <span>Нет Тестов</span>
+                           {% endif %}
+
                        </div>
                        <span style="color: black;">|</span>
                        <div class="list-edit">

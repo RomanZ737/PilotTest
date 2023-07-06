@@ -633,7 +633,6 @@ def tests_results_list(request):
                            'results_list_options': results_list_options}
                 return render(request, 'tests_results_list.html', context=context)
         else:
-            print('filter_input', filter_input)
             position = ''
             group = ''
             result = ''
@@ -987,7 +986,8 @@ def test_editor(request):
     user_search_input = request.GET.get("test_search")
     no_search_result = False
     total_test_q_num = {}  # Общее количество вопросов в тесте
-    total_test_theme = {}
+    total_test_theme = {}  # Темы в тесте
+    total_user_test = {}  # Количество пользователей, которым назначен конкретный тест
     if user_search_input:
         total_test_list = TestConstructor.objects.filter(Q(name__icontains=f'{user_search_input}'))
         if not total_test_list:
@@ -1000,6 +1000,7 @@ def test_editor(request):
                 #  Вынимаем темы с количеством вопросов
                 test_data = TestQuestionsBay.objects.filter(test_id=test)
                 test_them_num = Thems.objects.all().count()
+                users_number = UserTests.objects.filter(test_name=test).count()  # Количество пользователей, которым назначен конкретный тест
                 q_num = int()
                 for q in test_data:
 
@@ -1007,13 +1008,14 @@ def test_editor(request):
                         q_num = test_them_num * q.q_num
                     else:
                         q_num += q.q_num
+                total_user_test[test.name] = users_number
                 total_test_q_num[test.name] = q_num
                 total_test_theme[test.name] = [x.theme.name for x in test_data]
             paginator = Paginator(total_test_list, 10)
             page_number = request.GET.get('page', 1)
             results_list_pages = paginator.page(page_number)
             context = {'tests_names': results_list_pages, 'no_search_results': no_search_result,
-                       'total_q_num': total_test_q_num, 'total_them': total_test_theme}
+                       'total_q_num': total_test_q_num, 'total_them': total_test_theme, 'users': total_user_test}
             return render(request, 'test_editor.html', context=context)
     else:
         tests_names = TestConstructor.objects.all()
@@ -1022,18 +1024,20 @@ def test_editor(request):
             #  Вынимаем темы с количеством вопросов
             test_data = TestQuestionsBay.objects.filter(test_id=test)
             test_them_num = Thems.objects.all().count()
+            users_number = UserTests.objects.filter(test_name=test).count()  # Количество пользователей, которым назначен конкретный тест
             q_num = int()
             for q in test_data:
                 if q.theme.name == 'Все темы':
                     q_num = (int(test_them_num) - 1) * q.q_num
                 else:
                     q_num += q.q_num
+            total_user_test[test.name] = users_number
             total_test_q_num[test.name] = q_num
             total_test_theme[test.name] = [x.theme.name for x in test_data]
         paginator = Paginator(tests_names, 10)
         page_number = request.GET.get('page', 1)
         tests_names_pages = paginator.page(page_number)
-        context = {'tests_names': tests_names_pages, 'total_q_num': total_test_q_num, 'total_them': total_test_theme}
+        context = {'tests_names': tests_names_pages, 'total_q_num': total_test_q_num, 'total_them': total_test_theme, 'users': total_user_test}
         return render(request, 'test_editor.html', context=context)
 
 
@@ -1164,18 +1168,26 @@ def user_list(request):
         pass
 
     else:
-        groups = Group.objects.all().values()
-
+        groups = Group.objects.all().values()  # Список всех групп для бильтра
+        tests = TestConstructor.objects.all().values()  # Список всех тестов для фильтра
+        assign_test_list = UserTests.objects.all()  # Все тесты, назначенные кому либо
+        user_test_dict = {} # Словарь с тестами пользователей
+        #  Формируем словаль 'Пользователь - назначенные тесты'
+        for user_tests in assign_test_list:
+            user_test_dict.setdefault(user_tests.user.username, []).append(user_tests.test_name.name)
         group_list = []
+        test_list = []
         for group in groups:
             group_list.append(group)
+        for test in tests:
+            test_list.append(test)
         group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
+        test_list.append({'name': 'Все'})  #  Добавляем выбор всех тестов
         position_list = Profile.Position.values
         position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
 
         user_search_input = request.GET.get("user_search")
         filter_input = request.GET.getlist("position_filter")
-        print('filter_input', filter_input)
         no_search_result = False
         if user_search_input or filter_input:
             if user_search_input:
@@ -1191,7 +1203,6 @@ def user_list(request):
                         total_user_list = User.objects.filter(
                             Q(profile__first_name__icontains=f'{user_search_data[0]}'),
                             Q(profile__middle_name__icontains=f'{user_search_data[1]}'))
-
                 elif len(user_search_data) == 1:
                     total_user_list = User.objects.filter(
                         Q(profile__family_name__icontains=f'{user_search_data[0]}') | Q(
@@ -1207,51 +1218,76 @@ def user_list(request):
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
-                               'position_list': position_list, 'group_list': group_list}
+                               'position_list': position_list, 'group_list': group_list, 'assign_test_list': assign_test_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     paginator = Paginator(total_user_list, 20)
                     page_number = request.GET.get('page', 1)
                     users = paginator.page(page_number)
                     context = {'user_list': users, 'no_search_results': no_search_result,
-                               'position_list': position_list, 'group_list': group_list}
+                               'position_list': position_list, 'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict}
                     return render(request, 'user_list.html', context=context)
-
             else:
-                if filter_input[0] == "Все" and filter_input[1] == "Все":
-                    return redirect('quize737:user_list')
+                position=''
+                group = ''
+                test = ''
+                if filter_input[0] != 'Все':
+                    position = filter_input[0]
+                if filter_input[1] != 'Все':
+                    group = filter_input[1]
+                if filter_input[2] != 'Все':
+                    test = filter_input[2]
+                    total_user_list = User.objects.filter(profile__position__icontains=position, groups__name__icontains=group, usertests__test_name__name__icontains=test).distinct().order_by('last_name')
                 else:
-                    if filter_input[1] == "Все":
-                        total_user_list = User.objects.filter(profile__position=filter_input[0]).order_by('last_name')
-                        #  Постраничная разбивка
-                        paginator = Paginator(total_user_list, 20)
-                        page_number = request.GET.get('page', 1)
-                        users = paginator.page(page_number)
-                        context = {'user_list': users, 'no_search_results': no_search_result,
-                                   'position_list': position_list, 'filter_input': filter_input,
-                                   'group_list': group_list}
-                        return render(request, 'user_list.html', context=context)
-                    elif filter_input[0] == "Все":
-                        total_user_list = User.objects.filter(groups__name=filter_input[1]).order_by('last_name')
-                        #  Постраничная разбивка
-                        paginator = Paginator(total_user_list, 20)
-                        page_number = request.GET.get('page', 1)
-                        users = paginator.page(page_number)
-                        context = {'user_list': users, 'no_search_results': no_search_result,
-                                   'position_list': position_list, 'filter_input': filter_input,
-                                   'group_list': group_list}
-                        return render(request, 'user_list.html', context=context)
-                    else:
-                        total_user_list = User.objects.filter(profile__position=filter_input[0],
-                                                              groups__name=filter_input[1]).order_by('last_name')
-                        #  Постраничная разбивка
-                        paginator = Paginator(total_user_list, 20)
-                        page_number = request.GET.get('page', 1)
-                        users = paginator.page(page_number)
-                        context = {'user_list': users, 'no_search_results': no_search_result,
-                                   'position_list': position_list, 'filter_input': filter_input,
-                                   'group_list': group_list}
-                        return render(request, 'user_list.html', context=context)
+                    total_user_list = User.objects.filter(profile__position__icontains=position,groups__name__icontains=group).distinct().order_by('last_name')
+                if not total_user_list:
+                    no_search_result = True
+                    results = f'Пилоты по запросу не найдены'
+                    context = {'no_search_results': no_search_result, 'results': results,
+                               'position_list': position_list, 'group_list': group_list, 'tests_list': test_list}
+                    return render(request, 'user_list.html', context=context)
+                else:
+                    paginator = Paginator(total_user_list, 20)
+                    page_number = request.GET.get('page', 1)
+                    users = paginator.page(page_number)
+                    context = {'user_list': users, 'no_search_results': no_search_result,
+                               'position_list': position_list, 'filter_input': filter_input,
+                               'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict}
+                    return render(request, 'user_list.html', context=context)
+                # if filter_input[0] == "Все" and filter_input[1] == "Все":
+                #     return redirect('quize737:user_list')
+                # else:
+                #     if filter_input[1] == "Все":
+                #         total_user_list = User.objects.filter(profile__position=filter_input[0]).order_by('last_name')
+                #         #  Постраничная разбивка
+                #         paginator = Paginator(total_user_list, 20)
+                #         page_number = request.GET.get('page', 1)
+                #         users = paginator.page(page_number)
+                #         context = {'user_list': users, 'no_search_results': no_search_result,
+                #                    'position_list': position_list, 'filter_input': filter_input,
+                #                    'group_list': group_list}
+                #         return render(request, 'user_list.html', context=context)
+                #     elif filter_input[0] == "Все":
+                #         total_user_list = User.objects.filter(groups__name=filter_input[1]).order_by('last_name')
+                #         #  Постраничная разбивка
+                #         paginator = Paginator(total_user_list, 20)
+                #         page_number = request.GET.get('page', 1)
+                #         users = paginator.page(page_number)
+                #         context = {'user_list': users, 'no_search_results': no_search_result,
+                #                    'position_list': position_list, 'filter_input': filter_input,
+                #                    'group_list': group_list}
+                #         return render(request, 'user_list.html', context=context)
+                #     else:
+                #         total_user_list = User.objects.filter(profile__position=filter_input[0],
+                #                                               groups__name=filter_input[1]).order_by('last_name')
+                #         #  Постраничная разбивка
+                #         paginator = Paginator(total_user_list, 20)
+                #         page_number = request.GET.get('page', 1)
+                #         users = paginator.page(page_number)
+                #         context = {'user_list': users, 'no_search_results': no_search_result,
+                #                    'position_list': position_list, 'filter_input': filter_input,
+                #                    'group_list': group_list}
+                #         return render(request, 'user_list.html', context=context)
         else:
             total_user_list = User.objects.all().order_by('last_name')  # Вынимаем всех пользователей
             #  Постраничная разбивка
@@ -1259,7 +1295,7 @@ def user_list(request):
             page_number = request.GET.get('page', 1)
             users = paginator.page(page_number)
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
-                       'group_list': group_list}
+                       'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict}
             return render(request, 'user_list.html', context=context)
 
 

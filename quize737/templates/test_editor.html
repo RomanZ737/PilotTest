@@ -31,7 +31,11 @@
                     </div>
                     <span style="color: black;"> | </span>
                     <div class="test_total_q_num">
-                        <span>Всего вопросов: <span class="mark_up">{{total_q_num|get_item:test.name}}</span></span>
+                        <span>Вопросов: <span class="mark_up">{{total_q_num|get_item:test.name}}</span></span>
+                    </div>
+                    <span style="color: black;"> | </span>
+                    <div class="test_total_users">
+                        <a href="/user_list/?position_filter=Все&position_filter=Все&position_filter={{test.name}}">Назначен: {{users|get_item:test.name}}</a>
                     </div>
                     <span style="color: black;"> | </span>
                     <div class="test_them_list">

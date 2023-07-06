@@ -170,7 +170,7 @@ div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     left: 5%;
-    width: 35%;
+    width: 320px;
     word-wrap: break-word;
     text-align: left;
 
@@ -188,7 +188,7 @@ div.list-date {     /* блок Дата в таблице */
 div.list-position {  /* блок Должность в таблице */
     position: relative;
     display: inline-block;
-    width: 3%;
+    width: 35px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -287,7 +287,7 @@ div.list-test_name {    /* блок названия теста в таблиц�
     left: 5%;
     word-wrap: break-word;
     text-align: left;
-    width: 25%;
+    width: 270px;
     vertical-align: middle;
 
 }
@@ -352,7 +352,7 @@ div.list-group_users {
 div.list-edit {
     position: relative;
     display: inline-block;
-    width: 13%;
+    width: 115px;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;
@@ -531,14 +531,14 @@ div.list-them_questions_num { /*  Количество вопросов в те�
 div.test_total_q_num {
     position: relative;
     display: inline-block;
-    width: 15%;
+    width: 130px;
     vertical-align: middle
 }
 
 div.test_them_list {
     position: relative;
     display: inline-block;
-    width: 45%;
+    width: 480px;
     text-align: justify;
     text-justify: inter-word;
     vertical-align: middle
@@ -570,4 +570,19 @@ div.list-test_name_results {    /* блок названия теста в та�
     width: 17%;
     vertical-align: middle;
     color: rgb(209, 209,209);
+}
+
+div.test_total_users {
+    position: relative;
+    display: inline-block;
+    width: 350px;
+    vertical-align: middle
+
+}
+
+div.list-user_test_list {
+    position: relative;
+    display: inline-block;
+    width: 345px;
+    vertical-align: middle
 }
