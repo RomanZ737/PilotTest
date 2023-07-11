@@ -1,49 +1,52 @@
 {% load static %}
 {% load tags %}
 <html>
-<link href="https://fonts.cdnfonts.com/css/helveticaneuecyr-2" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'base_start.css' %}" type="text/css">
+        <link href="https://fonts.cdnfonts.com/css/helveticaneuecyr-2" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'base_start.css' %}" type="text/css">
     <head>
         <title>NWS Pilot Test</title>
         <link rel="icon" href="{% static 'nws_icon.png' %}">
     </head>
 
     <body>
+    <header>
 
-        <header>
+        <span><img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto"></span>
+        <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
 
-            <span><img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto"></span>
-            <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
-            <nav>
+        <nav>
+            {% if user.is_authenticated %}
+                <span>|</span>
+                <a href="{% url 'quize737:start' %}">Главная</a>
+                <span>|</span>
+                <a href="{% url 'password_change' %}">Профиль</a>
+                <span>|</span>
 
-                {% if user.is_authenticated %}
-                    <span>|</span>
-                    <a href="{% url 'quize737:start' %}">Главная</a>
-                    <span>|</span>
-                    <a href="{% url 'password_change' %}">Профиль</a>
-                    <span>|</span>
-                        {% if request.user|has_group:'krs' or user.is_superuser %}
-                            <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
-                            <span>|</span>
-                        {% endif %}
-                        {% if request.user|has_group:'krs,Редактор Вопросов' or user.is_superuser %}
-                            <a href="{% url 'quize737:question_list' %}">База вопросов</a>
-                            <span>|</span>
-                        {% endif %}
-                        {% if request.user|has_group:'krs' or user.is_superuser %}
-
-                            <a href="{% url 'quize737:test_editor' %}">Тесты</a>
-                            <span>|</span>
-                            <a href="{% url 'quize737:user_list' %}">Пилоты</a>
-                            <span>|</span>
-                        {% endif %}
-
-            	    <a href="{% url 'logout' %}?next=/login">Выход</a>
+                {% if request.user|has_group:'krs' or user.is_superuser %}
+                    <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
                     <span>|</span>
                 {% endif %}
-            </nav>
-        </header>
-        <main>
+
+                {% if request.user|has_group:'krs,Редактор Вопросов' or user.is_superuser %}
+                    <a href="{% url 'quize737:question_list' %}">База вопросов</a>
+                    <span>|</span>
+                {% endif %}
+
+                {% if request.user|has_group:'krs' or user.is_superuser %}
+                    <a href="{% url 'quize737:test_editor' %}">Тесты</a>
+                    <span>|</span>
+                    <a href="{% url 'quize737:user_list' %}">Пилоты</a>
+                    <span>|</span>
+                {% endif %}
+
+                <a href="{% url 'logout' %}?next=/login">Выход</a>
+                <span>|</span>
+            {% endif %}
+
+        </nav>
+    </header>
+
+    <main>
             <aside>
                 {% if user_tests|length > 0 %}
                     {% for test in user_tests %}
@@ -57,9 +60,8 @@
                 {% block content %}
                 {% endblock %}
             </section>
-        </main>
+    </main>
 
-    </body>
     <footer>
 
             {% if user.is_authenticated %}
@@ -73,5 +75,6 @@
             {% endif %}
         </footer>
 
+    </body>
 </html>
 

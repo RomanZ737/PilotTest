@@ -257,21 +257,60 @@ div.list-q_number {
 
 div.note_in_list {
     position: relative;
-    left: 25%;
     color: rgba(209, 209,209, 0.4);
     font-size: 19px;
 }
 
-div.profile_statick_field {
+div.profile_statick_fio {
     position: relative;
     display: inline-block;
-    width: 12%;
+    width: 65px;
 }
 
-div.profile_dynamic_field {
+div.profile_dynamic_fio {
     position: relative;
     display: inline-block;
-    width: 36%;
+    width: 300px;
+    overflow-wrap: break-word;
+    color: rgb(209, 209,209);
+}
+
+div.profile_statick_position {
+    position: relative;
+    display: inline-block;
+    width: 145px;
+}
+
+div.profile_dynamic_position {
+    position: relative;
+    display: inline-block;
+    width: 125px;
+    color: rgb(209, 209,209);
+}
+
+div.profile_statick_email  {
+    position: relative;
+    display: inline-block;
+    width: 65px;
+}
+
+div.profile_dynamic_email  {
+    position: relative;
+    display: inline-block;
+    width: 300px;
+    color: rgb(209, 209,209);
+}
+
+div.profile_statick_login  {
+    position: relative;
+    display: inline-block;
+    width: 145px;
+}
+
+div.profile_dynamic_login {
+    position: relative;
+    display: inline-block;
+    width: 125px;
     color: rgb(209, 209,209);
 }
 

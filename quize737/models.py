@@ -22,6 +22,7 @@ class QuestionSet(models.Model):
         B777 = 'B777', 'Boeing 777'
         A32X = 'A32X', 'Airbus 32X'
         A33X = 'A33X', 'Airbus 33X'
+        ANY = 'ANY', 'ANY TYPE'
 
     # Имя темы связано с классом Them
     them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
