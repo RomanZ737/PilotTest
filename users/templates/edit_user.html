@@ -31,6 +31,18 @@
             {% endfor %}
         </select>
     </p>
+    <p>Тип ВС:
+          <select name="ac_type">
+            {% for option in ac_type %}
+                {% if option == user_obj.profile.get_ac_type_display %}
+<!--            get_position_display -->
+                    <option value="{{option}}" selected>{{option}}</option>
+                {% else %}
+                    <option value="{{option}}">{{option}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
 
     <p>Группы пользователя:</p>
     {% for group in all_groups %}

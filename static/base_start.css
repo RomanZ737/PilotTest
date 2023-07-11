@@ -264,7 +264,7 @@ div.note_in_list {
 div.profile_statick_fio {
     position: relative;
     display: inline-block;
-    width: 65px;
+    width: 80px;
 }
 
 div.profile_dynamic_fio {
@@ -291,7 +291,7 @@ div.profile_dynamic_position {
 div.profile_statick_email  {
     position: relative;
     display: inline-block;
-    width: 65px;
+    width: 80px;
 }
 
 div.profile_dynamic_email  {
@@ -313,6 +313,21 @@ div.profile_dynamic_login {
     width: 125px;
     color: rgb(209, 209,209);
 }
+
+
+div.profile_statick_ac_type  {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+}
+
+div.profile_dynamic_ac_type {
+    position: relative;
+    display: inline-block;
+    width: 300px;
+    color: rgb(209, 209,209);
+}
+
 
 div.profile_input_field {
     position: relative;

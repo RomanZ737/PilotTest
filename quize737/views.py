@@ -1181,7 +1181,8 @@ def user_list(request):
         pass
 
     else:
-        groups = Group.objects.all().values()  # Список всех групп для бильтра
+
+        groups = Group.objects.all().values()  # Список всех групп для фильтра
         tests = TestConstructor.objects.all().values()  # Список всех тестов для фильтра
         assign_test_list = UserTests.objects.all()  # Все тесты, назначенные кому либо
         user_test_dict = {}  # Словарь с тестами пользователей
@@ -1197,8 +1198,10 @@ def user_list(request):
         group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
         test_list.append({'name': 'Все'})  # Добавляем выбор всех тестов
         position_list = Profile.Position.values
-        position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
-
+        position_list.append('Все')  # Добавляем вариант выбора всех должностей
+        ac_types_list = Profile.ac_type.values  # Список типов ВС для фильтра
+        ac_types_list.append('Все')
+        #TODO: доделать фильтры для типа ВС
         user_search_input = request.GET.get("user_search")
         filter_input = request.GET.getlist("position_filter")
         no_search_result = False
@@ -1471,13 +1474,18 @@ def group_del(request, id):
 @group_required('KRS')
 def edit_user(request, id):
     position_list = Profile.Position.labels  # Вырианты выбора должности пилота
+    ac_type_list = Profile.ACType.labels  # Варианты выбора типа ВС пилота
     user_obj = User.objects.get(id=id)  # Объект пользователя
     all_groups = Group.objects.all()  # Все существующие группы
     if request.method == 'POST':
         form_user = EditUserForm(request.POST, instance=user_obj)
         new_position = request.POST.get('position')  # Новая должность
         changed_groups = request.POST.getlist('group')  # Новые группы
-        old_position = user_obj.profile.position
+        new_ac_type = request.POST.get('ac_type')  # Новый тип ВС
+        old_position = user_obj.profile.position  #  Текущая (старая) должность
+        old_ac_type = user_obj.profile.ac_type  #  Текущий (старый) тип ВС
+
+        # Проверяем должность (квалификацию), при необходимости обновляем должность и группу
         for j in Profile.Position.choices:  # Выясняем соответсвие названию выбора и самому выбору
             if j[1] == new_position:
                 new_position = j[0]
@@ -1513,6 +1521,18 @@ def edit_user(request, id):
             group_obj = Group.objects.get(name=add_group)
             user_obj.groups.add(group_obj)
 
+        #  Проверям ТИП ВС
+        for j in Profile.ACType.choices:  # Выясняем соответсвие названию выбора и самому выбору
+            if j[1] == new_ac_type:
+                new_ac_type = j[0]
+                break
+        if old_ac_type != new_ac_type:
+            user_obj.profile.ac_type = new_ac_type
+            user_obj.profile.save()
+
+        #TODO: долелать автоматическое изменение группы, в случаем изменения типа ВС
+
+        # Проверяем форму Логина и Email
         if form_user.is_valid():
             form_user.save()
             return redirect('quize737:user_list')
@@ -1520,13 +1540,13 @@ def edit_user(request, id):
             form_user = EditUserForm(request.POST, instance=user_obj)
             form_profile = ProfileForm()
             context = {'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list,
-                       'form_user': form_user, 'form_profile': form_profile}
+                       'form_user': form_user, 'form_profile': form_profile, 'ac_type': ac_type_list}
             return render(request, 'edit_user.html', context=context)
     else:
         form_user = EditUserForm(initial={"username": user_obj.username, 'email': user_obj.email})
         form_profile = ProfileForm()
         context = {'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list,
-                   'form_user': form_user, 'form_profile': form_profile}
+                   'form_user': form_user, 'form_profile': form_profile, 'ac_type': ac_type_list}
         return render(request, 'edit_user.html', context=context)
 
 
@@ -1646,7 +1666,7 @@ def new_user(request):
         form_profile = ProfileForm(request.POST)
         if form_user.is_valid() and form_profile.is_valid():
             group = Group.objects.get(name=form_profile.cleaned_data[
-                                               'position'] + ' ' + 'B737')  # form_profile.cleaned_data['ac_type'])  - раскоментить и убрать 'B737'
+                                               'position'] + ' ' + form_profile.cleaned_data['ac_type'])  #- раскоментить и убрать 'B737'
             new_user = form_user.save(commit=False)
             new_user.set_password(form_user.cleaned_data['password1'])
             new_user.first_name = form_profile.cleaned_data['first_name']
@@ -1659,8 +1679,7 @@ def new_user(request):
                 first_name=form_profile.cleaned_data['first_name'],
                 middle_name=form_profile.cleaned_data['middle_name'],
                 position=form_profile.cleaned_data['position'],
-                ac_type='B737'
-                # form_profile.cleaned_data['ac_type']  - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
+                ac_type=form_profile.cleaned_data['ac_type'] # - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
             )
             return redirect('quize737:user_list')
 

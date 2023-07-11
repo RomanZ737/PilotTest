@@ -102,12 +102,19 @@
                 {% if user.username != 'roman' %}
                    <div class="block_light_up">
                        <div class="list-fio">
-
                            <a href="{% url 'quize737:user_detales' user.id %}">{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</a>
+                       </div>
+                       <span style="color: black;">|</span>
+                       <div class="list-ac_type">
+                           <span class="theme_color">{{user.profile.ac_type}}</span>
                        </div>
                        <span style="color: black;">|</span>
                        <div class="list-position">
                            <span class="theme_color">{{user.profile.position}}</span>
+                       </div>
+                       <span style="color: black;">|</span>
+                       <div class="list-groups">
+                           <span>{{user.groups.all|join:";  "}}</span>
                        </div>
                        <span style="color: black;">|</span>
                        <div class="list-user_test_list">

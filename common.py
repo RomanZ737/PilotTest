@@ -8,7 +8,7 @@ import os
 
 #krs_mail_list = ['pomanz@mail.ru']
 krs_mail_list = ['r.zaychenko@nordwindairlines.ru', 'd.dolgov@nordwindairlines.ru', 'p.leshchinskiy@nordwindairlines.ru', 's.samoylov@nordwindairlines.ru', 'v.obraztsov@nordwindairlines.ru']  #  Список адресов для рассылки сообщений КРС
-fixed_groups = ['KRS', 'ВП B737', 'КВС B737', 'ПИ B737', 'Редактор Вопросов']  # Фиксированные группы, пользователи не могут удалять
+fixed_groups = ['KRS', 'ВП B737', 'КВС B737', 'ПИ B737', 'Редактор', 'ВП B777', 'КВС B777', 'ПИ B777', 'ВП A32X', 'КВС A32X', 'ПИ A32X', 'ВП A33X', 'КВС A33X', 'ПИ A33X']  # Фиксированные группы, пользователи не могут удалять
 days_left_notify = 5  # Количество дней за которое информировать пользователя до истечения срока сдачи теста
 
 

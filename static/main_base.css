@@ -177,6 +177,17 @@ div.list-fio {  /* блок ФИО в таблице */
 
 }
 
+
+div.list-ac_type {  /* блок Типа ВС в таблице */
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    word-wrap: break-word;
+    text-align: left;
+
+
+}
+
 div.list-date {     /* блок Дата в таблице */
     position: relative;
     display: inline-block;
@@ -192,8 +203,17 @@ div.list-position {  /* блок Должность в таблице */
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
+}
 
-
+div.list-groups {  /* блок Должность в таблице */
+    position: relative;
+    display: inline-block;
+    width: 95px;
+    text-align: left;
+    word-wrap: break-word;
+    vertical-align: middle;
+    color: rgb(209, 209,209);
+    font-size: 18px;
 }
 
 div.list-test_result {  /* блок Результат сдачи теста в таблице */
@@ -370,7 +390,7 @@ div.new_user-field {
 
 div.note_in_list {
     position: relative;
-    left: 19%;
+    left: 3%;
     color: rgba(209, 209,209, 0.4);
     font-size: 19px;
 }
@@ -594,7 +614,7 @@ div.test_total_users {
 div.list-user_test_list {
     position: relative;
     display: inline-block;
-    width: 345px;
+    width: 270px;
     vertical-align: middle
 }
 

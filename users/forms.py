@@ -12,7 +12,7 @@ import users.models
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = users.models.Profile
-        fields = ('family_name', 'first_name', 'middle_name', 'position')#, 'ac_type')
+        fields = ('family_name', 'first_name', 'middle_name', 'position', 'ac_type')
 
 
 #  Редактируем параметры польхователя
