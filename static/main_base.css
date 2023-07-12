@@ -468,13 +468,19 @@ div.filter_related_questions {
 div.filter_related_users {
     position: relative;
     display: inline-block;
-    width: 420px;
+    width: 450px;
 }
 
 div.filter_related_results {
     position: relative;
     display: inline-block;
     width: 355px;
+}
+
+div.filter_related_them {
+    position: relative;
+    display: inline-block;
+    width: 70px;
 }
 
 div.button_block {

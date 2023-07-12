@@ -22,7 +22,54 @@
     </legend>
 
     <div class="block-list">
-<!--        <p><a href="{% url 'quize737:new_theme' %}">+ Добавить тему</a></p>-->
+        <div class="block_none_light_up">
+            <div class="search-form">
+                <form id="them_search" action="{% url 'quize737:theme_editor' %}" method="get">
+                    <input type="text" name="them_search" placeholder="Поиск темы...">
+                    <input type="submit" value="Искать">
+                </form>
+            </div>
+            <div class="filter-form">
+<!--                <div class="filter_related_them">-->
+<!--                    <form id="them_filter" name="them_filter" action="{% url 'quize737:theme_editor' %}" method="get">-->
+<!--                        <div class="filter_sign_position"></div>-->
+<!--                        <select class="them_filter" name="them_filter">-->
+<!--                            {% for option in ac_types %}-->
+<!--                                {% if filter_input %}-->
+<!--                                    {% if option == filter_input.0 %}-->
+<!--                                        <option value="{{option}}" selected>{{option}}</option>-->
+<!--                                    {% else %}-->
+<!--                                        <option value="{{option}}">{{option}}</option>-->
+<!--                                    {% endif %}-->
+<!--                                {% else %}-->
+<!--                                    {% if option == "Все" %}-->
+<!--                                        <option value="{{option}}" selected>{{option}}</option>-->
+<!--                                    {% else %}-->
+<!--                                        <option value="{{option}}">{{option}}</option>-->
+<!--                                    {% endif %}-->
+<!--                                {% endif %}-->
+<!--                            {% endfor %}-->
+<!--                        </select>-->
+<!--                    </form>-->
+
+<!--                </div>-->
+<!--                <div style="display: inline-block;">-->
+<!--                        <form id="reset_filter" action="{% url 'quize737:theme_editor' %}" method="get">-->
+<!--                    </form>-->
+<!--                </div>-->
+<!--                <div class="button_block">-->
+<!--                        <input class="submit_filter" type="submit" value="Фильтр" form="them_filter">-->
+<!--                        <span style="color: black">|</span>-->
+<!--                        <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">-->
+<!--                </div>-->
+                <div class="total_user_num">Всего: {{them_num}}</div>
+            </div>
+        </div>
+            {% if no_search_results %}
+        <div>
+            <span style="color: rgb(209, 209,209);">{{results}}</span>
+        </div>
+        {% else %}
             {% for theme in themes %}
                 {% if theme.name != 'Все темы'%}
             <div class="block_light_up">
@@ -47,22 +94,12 @@
                 {% endif %}
             {% endfor %}
         <br>
-        {% include "paginator.html" with page=themes %}
+            {% include "paginator.html" with page=themes %}
+        {% endif %}
     </div>
 </fieldset>
 
 
-<!--<div class="right_side">-->
-<!--        <fieldset>-->
-<!--            <legend>Редактировать</legend>-->
-
-<!--            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>-->
-<!--            <p><a href="pass">Редактировать Темы</a></p>-->
-<!--            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>-->
-<!--            <p><a href="pass">Скачать базу</a></p>-->
-
-<!--        </fieldset>-->
-<!--</div>-->
 
 <script type="text/javascript">
     var DelTheme = document.getElementsByName('theme_del');

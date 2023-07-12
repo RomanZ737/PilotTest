@@ -871,16 +871,39 @@ def theme_editor(request, id=None):
             context = {'new_theme_form': theme_form}
             return render(request, 'edit_theme.html', context=context)
         else:
+            # ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
+            # ac_types_list.append('Все')
+            user_search_input = request.GET.get("them_search")
             theme_list = Thems.objects.all()
+            them_num = Thems.objects.all().count()
             q_num_dict = {}
-            for them in theme_list:
-                q_num = QuestionSet.objects.filter(them_name=them).count()
-                q_num_dict[them.name] = q_num
-            paginator = Paginator(theme_list, 20)
-            page_number = request.GET.get('page', 1)
-            themes = paginator.page(page_number)
-            context = {'themes': themes, 'num_dict': q_num_dict}
-            return render(request, 'theme_editor.html', context=context)
+            no_search_result = False
+            if user_search_input:
+                them_search_list = Thems.objects.filter(name__icontains=user_search_input)
+                if not them_search_list:
+                    no_search_result = True
+                    results = f'Темы по запросу "{user_search_input}" не найдены'
+                    context = {'no_search_results': no_search_result, 'results': results, 'them_num': 0}
+                    return render(request, 'theme_editor.html', context=context)
+                else:
+                    for them in them_search_list:
+                        q_num = QuestionSet.objects.filter(them_name=them).count()
+                        q_num_dict[them.name] = q_num
+                    them_num = them_search_list.count()
+                    paginator = Paginator(them_search_list, 20)
+                    page_number = request.GET.get('page', 1)
+                    themes = paginator.page(page_number)
+                    context = {'themes': themes, 'num_dict': q_num_dict, 'them_num': them_num}
+                    return render(request, 'theme_editor.html', context=context)
+            else:
+                for them in theme_list:
+                    q_num = QuestionSet.objects.filter(them_name=them).count()
+                    q_num_dict[them.name] = q_num
+                paginator = Paginator(theme_list, 20)
+                page_number = request.GET.get('page', 1)
+                themes = paginator.page(page_number)
+                context = {'themes': themes, 'num_dict': q_num_dict, 'them_num': them_num}
+                return render(request, 'theme_editor.html', context=context)
 
 
 @login_required
@@ -1181,7 +1204,6 @@ def user_list(request):
         pass
 
     else:
-
         groups = Group.objects.all().values()  # Список всех групп для фильтра
         tests = TestConstructor.objects.all().values()  # Список всех тестов для фильтра
         assign_test_list = UserTests.objects.all()  # Все тесты, назначенные кому либо
@@ -1199,9 +1221,8 @@ def user_list(request):
         test_list.append({'name': 'Все'})  # Добавляем выбор всех тестов
         position_list = Profile.Position.values
         position_list.append('Все')  # Добавляем вариант выбора всех должностей
-        ac_types_list = Profile.ac_type.values  # Список типов ВС для фильтра
+        ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
         ac_types_list.append('Все')
-        #TODO: доделать фильтры для типа ВС
         user_search_input = request.GET.get("user_search")
         filter_input = request.GET.getlist("position_filter")
         no_search_result = False
@@ -1230,7 +1251,7 @@ def user_list(request):
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
-                               'position_list': position_list, 'group_list': group_list}
+                               'position_list': position_list, 'group_list': group_list, 'ac_types': ac_types_list}
                     return render(request, 'user_list.html', context=context)
                 if not total_user_list:
                     no_search_result = True
@@ -1249,28 +1270,31 @@ def user_list(request):
                                'user_test_dict': user_test_dict, 'user_num': total_user_number}
                     return render(request, 'user_list.html', context=context)
             else:
+                ac_type = ''
                 position = ''
                 group = ''
                 test = ''
                 if filter_input[0] != 'Все':
-                    position = filter_input[0]
+                    ac_type = filter_input[0]
                 if filter_input[1] != 'Все':
-                    group = filter_input[1]
+                    position = filter_input[1]
                 if filter_input[2] != 'Все':
-                    test = filter_input[2]
-                    total_user_list = User.objects.filter(profile__position__icontains=position,
+                    group = filter_input[2]
+                if filter_input[3] != 'Все':
+                    test = filter_input[3]
+                    total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type, profile__position__icontains=position,
                                                           groups__name__icontains=group,
                                                           usertests__test_name__name__icontains=test).exclude(
                         username='roman').distinct().order_by('last_name')
                 else:
-                    total_user_list = User.objects.filter(profile__position__icontains=position,
+                    total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type, profile__position__icontains=position,
                                                           groups__name__icontains=group).exclude(
                         username='roman').distinct().order_by('last_name')
                 if not total_user_list:
                     no_search_result = True
                     results = f'Пилоты по запросу не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
-                               'position_list': position_list, 'group_list': group_list, 'tests_list': test_list}
+                               'position_list': position_list, 'group_list': group_list, 'tests_list': test_list, 'ac_types': ac_types_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
@@ -1280,7 +1304,7 @@ def user_list(request):
                     context = {'user_list': users, 'no_search_results': no_search_result,
                                'position_list': position_list, 'filter_input': filter_input,
                                'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
-                               'user_num': total_user_number}
+                               'user_num': total_user_number, 'ac_types': ac_types_list}
                     return render(request, 'user_list.html', context=context)
 
         else:
@@ -1293,7 +1317,7 @@ def user_list(request):
             users = paginator.page(page_number)
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
                        'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
-                       'user_num': total_user_number}
+                       'user_num': total_user_number, 'ac_types': ac_types_list}
             return render(request, 'user_list.html', context=context)
 
 
