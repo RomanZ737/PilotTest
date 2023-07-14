@@ -1916,7 +1916,7 @@ def issue_mess(request):
     q_id = int(request.POST.get('issue_q_id'))
     site_url = config('SITE_URL', default='')
     q_instance = QuestionSet.objects.get(id=q_id)
-    emails = User.objects.filter(groups__name='Редактор Вопросов').values('email')
+    emails = User.objects.filter(groups__name='Редактор').values('email')
     to = []  # Список email адресов для рассылки
     for email in emails:
         to.append(email['email'])
