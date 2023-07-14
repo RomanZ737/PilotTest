@@ -738,7 +738,7 @@ def test_result_details(request, id):
 
 # Список вопросов из базы
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def question_list(request):
     them_list = Thems.objects.all()
     user_search_input = request.GET.get("question_search")
@@ -796,7 +796,7 @@ def question_list(request):
 
 # Добавить новый вопрос в базу вопросов
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def new_question(request):
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
@@ -816,7 +816,7 @@ def new_question(request):
 
 # Редактирование конкретно взятого вопроса
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def question_list_details(request, id):
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
@@ -844,7 +844,7 @@ def question_list_details(request, id):
 
 # Удаляем вопрос
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def question_del(request, id):
     QuestionSet.objects.get(id=id).delete()
     return redirect('quize737:question_list')
@@ -852,7 +852,7 @@ def question_del(request, id):
 
 # Редактор тем вопросов
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def theme_editor(request, id=None):
     if request.method == 'POST':
         form = NewThemeForm(request.POST)
@@ -926,7 +926,7 @@ def new_theme(request):
 
 # Удаление темы
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def theme_del(request, id):
     print('id:', id)
     Thems.objects.get(id=id).delete()
