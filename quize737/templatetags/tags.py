@@ -8,12 +8,12 @@ register = template.Library()
 @register.filter(name='has_group')
 def has_group(user, group_name):
     str_new = ''.join(group_name).split(',')
+    print('str_new', str_new)
     return user.groups.filter(name__in=str_new).exists()
 
 
 @register.filter(name='random_loop')
 def shuffle(arg):
-    # print('args before:', arg)
     aux = list(arg)[:]
     random.shuffle(aux)
     return aux
@@ -47,7 +47,11 @@ def param_replace(context, **kwargs):
         del d[k]
     return d.urlencode()
 
+
 #  Вынимаем значение из словаря по ключу (в переменной) в template
 @register.filter
 def get_item(dictionary, key):
-    return dictionary.get(key)
+    if dictionary:
+        return dictionary.get(key)
+    else:
+        return ['Нет данных']

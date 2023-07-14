@@ -27,7 +27,7 @@
                     <span>|</span>
                 {% endif %}
 
-                {% if request.user|has_group:'krs,Редактор Вопросов' or user.is_superuser %}
+                {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
                     <a href="{% url 'quize737:question_list' %}">База вопросов</a>
                     <span>|</span>
                 {% endif %}

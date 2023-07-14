@@ -1723,7 +1723,7 @@ def del_user(request, id):
 
 
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 #  Загрузка файла с вопросами
 def file_upload(request):
     upload_form = FileUploadForm()
@@ -1893,7 +1893,7 @@ def file_upload(request):
 
 # Скачивание формы для заполнения вопросов
 @login_required
-@group_required(('KRS', 'Редактор Вопросов'))
+@group_required(('KRS', 'Редактор'))
 def question_form_file_download(request):
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     path_to_file = dir_path + '/static/PilotTest.xlsx'
