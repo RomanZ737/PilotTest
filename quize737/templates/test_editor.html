@@ -6,7 +6,7 @@
     <legend>
         <a href="{% url 'quize737:test_editor' %}">СПИСОК ТЕСТОВ</a>
         <span style="color: black;"> | </span>
-        <a href='{% url "quize737:create_new_test" %}'>Добавить тест</a>
+        <a href='{% url "quize737:new_test_ac_type" %}'>Добавить тест</a>
     </legend>
 
     <div class="block-list">
@@ -29,6 +29,10 @@
                         <a href="{{test.id}}"><span style="color: black;"></span> {{test.name}}</a>
                     </div>
                     <span style="color: black;"> | </span>
+                    <div class="test_ac-type">
+                        {{test.ac_type}}
+                    </div>
+                    <span style="color: black;"> | </span>
                     <div class="test_total_q_num">
                         <span>Вопросов: <span class="mark_up">{{total_q_num|get_item:test.name}}</span></span>
                     </div>
@@ -39,6 +43,14 @@
                     <span style="color: black;"> | </span>
                     <div class="test_them_list">
                         <span>{{total_them|get_item:test.name|join:", "}}</span>
+                    </div>
+                    <span style="color: black;"> | </span>
+                    <div class="test_training">
+                        {% if test.training %}
+                            <span>Трен.</span>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
                     </div>
                     <span style="color: black;"> | </span>
                     <div class="list-delete">

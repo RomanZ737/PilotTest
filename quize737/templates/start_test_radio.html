@@ -10,6 +10,12 @@
          {% if q_num_left %}
                 <span class="q_num_count">Осталось {{q_num_left}}</span>
             {% endif %}
+            <span style="color: black;"> | </span>
+            {% if q_instance.ac_type != 'ANY' %}
+                <span>Тип ВС: {{q_instance.ac_type}}</span>
+            {% else %}
+                <span>Все Типы ВС</span>
+            {% endif %}
         </legend>
         <div>
             <form method='post' action='{% url "quize737:next_question" %}' id="question">

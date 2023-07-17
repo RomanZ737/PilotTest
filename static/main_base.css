@@ -568,14 +568,21 @@ div.list-them_questions_num { /*  Количество вопросов в те�
 div.test_total_q_num {
     position: relative;
     display: inline-block;
-    width: 130px;
+    width: 120px;
     vertical-align: middle
+}
+
+div.test_ac-type {
+    position: relative;
+    display: inline-block;
+    width: 43px;
+    vertical-align: middle;
 }
 
 div.test_them_list {
     position: relative;
     display: inline-block;
-    width: 480px;
+    width: 400px;
     text-align: justify;
     text-justify: inter-word;
     vertical-align: middle
@@ -589,6 +596,11 @@ span.test_q_num {
     padding-right: 5px;
 }
 
+div.test_training {
+    position: relative;
+    display: inline-block;
+    width: 43px;
+}
 
 span.test_theme_del {
     padding-left: 40px;
@@ -612,7 +624,7 @@ div.list-test_name_results {    /* блок названия теста в та�
 div.test_total_users {
     position: relative;
     display: inline-block;
-    width: 140px;
+    width: 115px;
     vertical-align: middle
 
 }
@@ -629,4 +641,9 @@ div.total_user_num {
     display: inline-block;
     margin-left: 14px;
     color: rgb(209, 209,209);
+}
+
+span.comment {
+    color: rgba(209, 209,209, 0.4);
+    font-size: 19px;
 }

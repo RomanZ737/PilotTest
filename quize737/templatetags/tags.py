@@ -8,7 +8,6 @@ register = template.Library()
 @register.filter(name='has_group')
 def has_group(user, group_name):
     str_new = ''.join(group_name).split(',')
-    print('str_new', str_new)
     return user.groups.filter(name__in=str_new).exists()
 
 

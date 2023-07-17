@@ -1,0 +1,25 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+
+<fieldset>
+    <legend>
+        <a href="{% url 'quize737:test_editor' %}">Список Тестов</a>
+        <span style="color: black;"> | </span>
+        <a href='{% url "quize737:new_test_ac_type" %}'>ДОБАВИТЬ ТЕСТ</a>
+    </legend>
+
+    <div class="block-list">
+        <form id="ac_type_select" name="ac_type" action='{% url "quize737:create_new_test" %}'>
+            Выберите Тип ВС:
+            <select id="ac_type" name="ac_type">
+                {% for option in ac_type %}
+                    <option value="{{option}}">{{option}}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <input type="submit" value="Дальше" form="ac_type_select">
+    </div>
+</fieldset>
+
+{% endblock %}

@@ -14,17 +14,19 @@
 
             <!--Перебираем количество вопросов по темам-->
     {% for them, q_num in q_num_per_them.items %}
-        <input type="hidden" id="{{them}}" value="{{q_num}}">
+        <input type="hidden" id="{{them.id}}" value="{{q_num}}">
     {% endfor %}
 
 
     <form id="question_form" method='post'>
       {% csrf_token %}
-<!--        <p>{% for name_error in test_name_form.errors.values %}</p>-->
-<!--            <p>{{name_error}}</p>-->
-<!--        {% endfor %}-->
-        <p>Название теста {{test_name_form.name}}</p>
-        <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
+
+        <p>Название теста {{test_name_form.name}}
+        <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
+        </p>
+        <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%
+            <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
+        </p>
         <input type="hidden" id="test_id_num" value="{{test_id}}">
         {{ test_q_set.management_form }}
         {% for form in test_q_set %}

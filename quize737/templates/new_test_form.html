@@ -8,54 +8,55 @@
     <legend>
         <a href="{% url 'quize737:test_editor' %}">Список Тестов</a>
         <span style="color: black;"> | </span>
-        <a href='{% url "quize737:create_new_test" %}'>ДОБАВИТЬ ТЕСТ</a>
+        <a href='{% url "quize737:new_test_ac_type" %}'>ДОБАВИТЬ ТЕСТ</a>
     </legend>
-    <br>
-    <h4>{{non_form_errors}}</h4>
+    <div class="block-list">
+            <h4>{{non_form_errors}}</h4>
 
-    {% for error in form_errors%}
-    <h4>{{error}}</h4>
-    {% endfor %}
+            {% for error in form_errors%}
+            <h4>{{error}}</h4>
+            {% endfor %}
 
-    <!--Перебираем количество вопросов по темам-->
-    {% for them, q_num in q_num_per_them.items %}
-        <input type="hidden" id="{{them}}" value="{{q_num}}">
-    {% endfor %}
+            <!--Перебираем количество вопросов по темам-->
+            {% for them, q_num in q_num_per_them.items %}
+                <input type="hidden" id="{{them.id}}" value="{{q_num}}">
+            {% endfor %}
 
-    <form id="question_form" method='post'>
-      {% csrf_token %}
-        <p>{% for name_error in test_name_form.errors.values %}</p>
-            <p>{{name_error}}</p>
-        {% endfor %}
-        <p>Название теста {{test_name_form.name}}</p>
-        <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
-        {{ test_q_set.management_form }}
-        {% for form in test_q_set.forms %}
-        <div class="q_forms">
-            <span class="test_theme_list">Тема: {{ form.theme }} </span>
-            <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
-            <span>Max. </span>
-            <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
-            <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
+            <form id="question_form" method='post'>
+              {% csrf_token %}
+                <p>{% for name_error in test_name_form.errors.values %}</p>
+                    <p>{{name_error}}</p>
+                {% endfor %}
+                <p>Название теста {{test_name_form.name}}
+                    <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
+                    <input type="hidden" name="ac_type" value="{{ac_type}}">
 
-        </div>
-        <br>
-        {% endfor %}
-        <input id="add-form" type="button" value="+ Добавить тему">
-        <br>
-        <br>
 
-    </form>
-<form method='get' id="go_back" action='{% url "quize737:test_editor" %}'>
+                </p>
+                <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%
+                    <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
+                </p>
+                {{ test_q_set.management_form }}
+                {% for form in test_q_set.forms %}
 
-</form>
+                <div class="q_forms">
+                    <span class="test_theme_list">Тема: {{form.theme}}</span>
+                    <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
+                    <span>Max. </span>
+                    <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
+                    <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
 
-    <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input type="submit" value="Вернуться" form="go_back">
+                </div>
+                <br>
+                {% endfor %}
+                <input id="add-form" type="button" value="+ Добавить тему">
+                <br>
+                <br>
+            </form>
+        <form method='get' id="go_back" action='{% url "quize737:new_test_ac_type" %}'></form>
+            <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input type="submit" value="Вернуться" form="go_back">
 
-<!--    <div id="empty_form" style="display:none">-->
-<!--    {{ test_q_set.empty_form }}-->
-<!--</div>-->
-
+    </div>
 </fieldset>
 
 
@@ -65,7 +66,8 @@
 
 <!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
 
-<script type="text/javascript">
+
+<script>
 
         // Вычисление количества вопросов
 
@@ -74,23 +76,24 @@
         var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
 
         for (i of Select) {  // Перебираем уже существующие поля, вешаем listener и подставляем количество вопросов из темы
-                i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
-                // Вынимаем порядковый номер формы, для сихронизации с полем количества вопросов
 
-                let select_id = i.name.match( numberPattern ) // Номер поля
+                    i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
 
+                    // Вынимаем порядковый номер формы, для сихронизации с полем количества вопросов
+                    let select_id = i.name.match( numberPattern ) // Номер поля
 
+                    let valueOfSelect = i.value //Вынимаем значение выбранного поля
 
-                let valueOfSelect = i.value //Вынимаем значение выбранного поля
-                let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
+                    let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
 
-                document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
-                let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
-                numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
+                    document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
 
-                //document.getElementById("demo_0").innerHTML = "Value_0: " + valueOfSelect
+                    let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
+
+                    numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
 
              };
+
 
         function ThemSelection(event){ //Функция отслеживаем выбранную тему и подставляет количество вопросов
             event.preventDefault()

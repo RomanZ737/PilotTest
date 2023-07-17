@@ -28,7 +28,7 @@ from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, Quize
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
-    NewThemeForm
+    NewThemeForm, MyNewTestFormQuestions
 from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
@@ -93,7 +93,8 @@ def start(request, id=None):
             if q_set['theme'] == 5:
                 for theme in Thems.objects.all():
                     if theme.name != 'Все темы':
-                        quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
+                        quiz_set = QuestionSet.objects.filter(Q(them_name=them.name), (Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
+                        #quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
                         quiz_set = random.sample(list(quiz_set), int(
                             q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
                         all_theme_set.append(quiz_set)  # Добавляем выбранные вопросы в список
@@ -101,7 +102,9 @@ def start(request, id=None):
                         total_q_number += int(q_set['q_num'])
             # Сохраняем вопросы для пользователя в базу
             else:
-                quiz_set = QuestionSet.objects.filter(them_name=q_set['theme'])
+                quiz_set = QuestionSet.objects.filter(Q(them_name=q_set['theme']),
+                                                      (Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
+                #quiz_set = QuestionSet.objects.filter(them_name=q_set['theme'])
                 quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
                 all_theme_set.append(quiz_set)
                 total_q_number += int(q_set['q_num'])
@@ -137,6 +140,7 @@ def start(request, id=None):
 
         # Достаём нужный вопрос из базы вопросов по сквозному номеру
         question = QuestionSet.objects.filter(id=question_pisition).values()
+        question_instance = QuestionSet.objects.get(id=question_pisition)
 
         # Формируем данные для отправки на страницу тестирования
 
@@ -169,10 +173,7 @@ def start(request, id=None):
 
         context = {'question': question[0]['question'], 'question_id': question[0]['id'],
                    'tmp_test_id': user_quize_set.id, 'result_id': result_obj.id, 'option_dict': option_dict,
-                   'q_num_left': total_q_number}
-
-        # context = {'user_name': user_instance.username, 'question': question, 'user_set_id': user_quize_set.id, 'results_object_id': result_obj.id, 'q_kind': question[0]['q_kind'], 'q_num_left': total_q_number}
-
+                   'q_num_left': total_q_number, 'q_instance': question_instance}
         # Проверяем содержит ли вопрос мультивыбор
         if not question[0]['q_kind']:
             q_page_layout = 'start_test_radio.html'
@@ -180,8 +181,9 @@ def start(request, id=None):
             q_page_layout = 'start_test_check.html'
 
         return render(request, q_page_layout, context=context)
-
+    # Если пользователь открывает страницу
     else:
+        # Если польхователь выбирает конкретный тест из списка назначенных
         if id:
             user_test = UserTests.objects.filter(test_name=id)
             user_tests = UserTests.objects.filter(user=request.user)
@@ -437,6 +439,9 @@ def next_question(request):
                     to = common.krs_mail_list
                     email_msg = {'subject': subject, 'message': message, 'to': to}
                     common.send_email(request, email_msg)
+                else:
+                    # Если тест тренировочный, удаляем результаты теста
+                    results_instance.delete()
 
                 #  Удаляем тест у пользователя
                 user_test_instance[0].delete()
@@ -524,6 +529,9 @@ def next_question(request):
                         to = common.krs_mail_list
                         email_msg = {'subject': subject, 'message': message, 'to': to}
                         common.send_email(request, email_msg)
+                    else:
+                        # Удаляем результаты теста, если тест тренировояный
+                        results_instance.delete()
                     context = {'user_name': results_instance[0].user_name, 'total_num_q': result_data[0]['total_num_q'],
                                'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
                                'conclusion': False, 'answers': answer_results}
@@ -1045,7 +1053,7 @@ def test_editor(request):
                 total_user_test[test.name] = users_number
                 total_test_q_num[test.name] = q_num
                 total_test_theme[test.name] = [x.theme.name for x in test_data]
-            paginator = Paginator(total_test_list, 10)
+            paginator = Paginator(total_test_list, 15)
             page_number = request.GET.get('page', 1)
             results_list_pages = paginator.page(page_number)
             context = {'tests_names': results_list_pages, 'no_search_results': no_search_result,
@@ -1069,67 +1077,92 @@ def test_editor(request):
             total_user_test[test.name] = users_number
             total_test_q_num[test.name] = q_num
             total_test_theme[test.name] = [x.theme.name for x in test_data]
-        paginator = Paginator(tests_names, 10)
+        paginator = Paginator(tests_names, 15)
         page_number = request.GET.get('page', 1)
         tests_names_pages = paginator.page(page_number)
         context = {'tests_names': tests_names_pages, 'total_q_num': total_test_q_num, 'total_them': total_test_theme,
                    'users': total_user_test}
         return render(request, 'test_editor.html', context=context)
 
+# Выбор Типа ВС в новом тесте
+@login_required
+@group_required('KRS')
+def new_test_ac_type(request):
+    ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
+    ac_types_list.append('Все')  # Добавляем в выбор вариант 'Все'
+    context = {'ac_type': ac_types_list}
+    return render(request, 'new_test_ac_type.html', context=context)
+
 
 @login_required
 @group_required('KRS')
 def create_new_test(request):
+    ac_type = request.GET.get('ac_type')
     thems = Thems.objects.all()
     total_q_num_per_them = {}
     totla_q_num = 0
     min_q_them = []
+    all_them_instance = Thems.objects.get(id=5)  # Instance объекта 'Все темы'
     for them_name in thems:
         # Считаем количество вопросов в каждой теме, кроме "Все темы"
         if them_name.id != 5:
-            q_num = QuestionSet.objects.filter(them_name=them_name).count()
-            total_q_num_per_them[f'{them_name.id}'] = q_num
-            totla_q_num += 1
-            min_q_them.append(q_num)
+            q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
+            if q_num > 0:
+                total_q_num_per_them[them_name] = q_num
+                totla_q_num += 1
+                min_q_them.append(q_num)
     min_q_them.sort()
-    total_q_num_per_them['5'] = min_q_them[0]
-
-    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=20, extra=0, absolute_max=20,
+    total_q_num_per_them[all_them_instance] = min_q_them[0]  # Включаем 'Все темы' в список выбора тем
+    thems_selection = []
+    # Создаём список тем для конктретного типа ВС
+    for them in total_q_num_per_them.keys():
+        thems_selection.append((them.id, them.name))
+    QuestionFormSet = formset_factory(MyNewTestFormQuestions, min_num=1, max_num=20, extra=0, absolute_max=20,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
-        test_q_set = QuestionFormSet(request.POST, request.FILES, initial=[{'theme': '5', 'q_num': '4'}],
+        ac_type = request.POST.get('ac_type')  # Вынимаем Тип ВС
+
+        print('POST', request.POST)
+        test_q_set = QuestionFormSet(request.POST, request.FILES, form_kwargs={'thems_selection': tuple(thems_selection)}, initial=[{'theme': '5', 'q_num': '4'}],
                                      prefix="questions")
         test_name_form = NewTestFormName(request.POST, prefix="test_name")
 
         if test_q_set.is_valid() and test_name_form.is_valid():
             # Создаём объект теста
+            training = False
+            if test_name_form.data['test_name-training'] == 'on':
+                training = True
             new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
-                                                      pass_score=test_name_form.data['test_name-pass_score'])
+                                                      pass_score=test_name_form.data['test_name-pass_score'],
+                                                      training=training,
+                                                      ac_type=ac_type)
             # Создаём объекты вопросов теста
+
             for question in test_q_set.cleaned_data:
+                print('question', question)
                 if not question['DELETE']:
-                    TestQuestionsBay.objects.create(theme=question['theme'],
+                    them_instance = Thems.objects.get(id=question['theme'])
+                    TestQuestionsBay.objects.create(theme=them_instance,
                                                     test_id=new_test,
-                                                    q_num=question['q_num'], )
+                                                    q_num=question['q_num'])
             return redirect('quize737:test_editor')
         else:
-
             form_errors = []  # Ошибки при валидации формы
             for error in test_q_set.errors:
                 if len(error) > 0:
                     for value in error.values():
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
+            print('test_q_set',test_q_set)
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them}
+                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type}
             return render(request, 'new_test_form.html', context=context)
     else:
-
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
-        test_q_set = QuestionFormSet(initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
-        context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them}
+        test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)}, initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
+        context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type}
         return render(request, 'new_test_form.html', context=context)
 
 
@@ -1137,21 +1170,49 @@ def create_new_test(request):
 @group_required('KRS')
 # Редактируем Детали уже существующего конекретного теста
 def test_details(request, id):
-    QuestionFormSet = formset_factory(NewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
+    # Вынимаем объект теста
+    test_instance = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score', 'training', 'ac_type')
+    ac_type = test_instance[0]['ac_type']
+    thems = Thems.objects.all()
+    total_q_num_per_them = {}
+    totla_q_num = 0
+    min_q_them = []
+    all_them_instance = Thems.objects.get(id=5)  # Instance объекта 'Все темы'
+    for them_name in thems:
+        # Считаем количество вопросов в каждой теме, кроме "Все темы"
+        if them_name.id != 5:
+            q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
+            if q_num > 0:
+                total_q_num_per_them[them_name] = q_num
+                totla_q_num += 1
+                min_q_them.append(q_num)
+    min_q_them.sort()
+    total_q_num_per_them[all_them_instance] = min_q_them[0]  # Включаем 'Все темы' в список выбора тем
+    thems_selection = []
+    # Создаём список тем для конктретного типа ВС
+    for them in total_q_num_per_them.keys():
+        thems_selection.append((them.id, them.name))
+    #  Формируем форму
+    QuestionFormSet = formset_factory(MyNewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
         a = TestConstructor.objects.get(id=id)
         test_name_form = NewTestFormName(request.POST)
-        test_q_set = QuestionFormSet(request.POST, request.FILES, prefix="questions")
+        test_q_set = QuestionFormSet(request.POST, request.FILES, form_kwargs={'thems_selection': tuple(thems_selection)}, prefix="questions")
         TestQuestionsBay.objects.filter(test_id=id).delete()
         if test_q_set.is_valid():
+            training = False
             a.name = test_name_form.data.get('name')
             a.pass_score = test_name_form.data.get('pass_score')
+            if test_name_form.data.get('training') == 'on':
+                training = True
+            a.training = training
             a.save()
             for question in test_q_set.cleaned_data:
                 if not question['DELETE']:
-                    TestQuestionsBay.objects.create(theme=question['theme'],
+                    them_instance = Thems.objects.get(id=question['theme'])
+                    TestQuestionsBay.objects.create(theme=them_instance,
                                                     test_id=a,
                                                     q_num=question['q_num'], )
             return redirect('quize737:test_editor')
@@ -1163,29 +1224,16 @@ def test_details(request, id):
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'test_id': id}
+                       'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type']}
             return render(request, 'test_detailes.html', context=context)
 
     else:
-        thems = Thems.objects.all()
-        total_q_num_per_them = {}
-        totla_q_num = 0
-        min_q_them = []
-        for them_name in thems:
-            # Считаем количество вопросов в каждой теме, кроме "Все темы"
-            if them_name.id != 5:
-                q_num = QuestionSet.objects.filter(them_name=them_name).count()
-                total_q_num_per_them[f'{them_name.id}'] = q_num
-                totla_q_num += 1
-                min_q_them.append(q_num)
-        min_q_them.sort()
-        total_q_num_per_them['5'] = min_q_them[0]
-        result = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score')
-        test_name_form = NewTestFormName(result[0])  # Форма с названием теста
+        test_name_form = NewTestFormName(test_instance[0])  # Форма с названием теста
         test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
-        test_q_set = QuestionFormSet(initial=test_questions, prefix='questions')
-        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': result[0]['id'],
-                   'q_num_per_them': total_q_num_per_them}
+        # Создаём набор форм
+        test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)}, initial=test_questions, prefix='questions')
+        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
+                   'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type']}
         return render(request, 'test_detailes.html', context=context)
 
 

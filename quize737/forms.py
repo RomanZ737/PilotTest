@@ -15,12 +15,14 @@ def similar_question(value):
 class NewQuestionSetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(NewQuestionSetForm, self).__init__(*args, **kwargs)
-        self.fields['question'].validators = [similar_question]  #  Добавляем валидатор одинаковых вопросв к форме
-        self.fields['them_name'].queryset = Thems.objects.all().exclude(name='Все темы')  # Исключаем 'Все темы' из опции выбора
+        self.fields['question'].validators = [similar_question]  # Добавляем валидатор одинаковых вопросв к форме
+        self.fields['them_name'].queryset = Thems.objects.all().exclude(
+            name='Все темы')  # Исключаем 'Все темы' из опции выбора
 
     class Meta:
         model = QuestionSet
-        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
+        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6',
+                  'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                   'q_weight', 'answer', 'answers', 'ac_type']
 
         widgets = {
@@ -38,16 +40,19 @@ class NewQuestionSetForm(forms.ModelForm):
             'option_10': forms.Textarea(attrs={'cols': 100, 'rows': 1})
         }
 
+
 # Класс для объектов редактирования вопроса
 class QuestionSetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(QuestionSetForm, self).__init__(*args, **kwargs)
-        self.fields['them_name'].queryset = Thems.objects.all().exclude(name='Все темы')  # Исключаем 'Все темы' из опции выбора
+        self.fields['them_name'].queryset = Thems.objects.all().exclude(
+            name='Все темы')  # Исключаем 'Все темы' из опции выбора
 
     class Meta:
         model = QuestionSet
-        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
+        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6',
+                  'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                   'q_weight', 'answer', 'answers', 'ac_type']
         widgets = {
             'q_weight': forms.NumberInput(attrs={'size': '3', 'step': 0.5, 'max': 2.0, 'min': 0.0})
@@ -73,27 +78,30 @@ class NewTestFormName(forms.Form):
                                                                                 'max': '100',  # For maximum number
                                                                                 'min': '0',  # For minimum number
                                                                                 }))
+    training = forms.BooleanField(initial=False, required=False)
 
 
 # Форма для вопросов создаваемого теста
 class NewTestFormQuestions(forms.ModelForm):
+
+    theme = forms.ChoiceField()
+
     class Meta:
         model = TestQuestionsBay
-        fields = ['theme', 'q_num', ]
-
-        # labels = {'name': _('Writer'),}
-        # help_texts = {'name': _('Some useful help text.'),}
+        fields = ['q_num']
         error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"}}
         widgets = {
             "q_num": NumberInput(attrs={'size': '3', 'min': '1'}),
         }
 
-        # def __init__(self, *args, **kwargs):
-        #     super(NewTestFormQuestions, self).__init__(*args, **kwargs)
-        #     self.fields['family_name'].disabled = True
-        # help_texts = {
-        #     'q_num': 'Маx',
-        # }
+
+# https://docs.djangoproject.com/en/2.2/topics/forms/formsets/#passing-custom-parameters-to-formset-forms
+# Форма, которая принимает кастомный аргумент со списком полей выбора. Наследуется от формы NewTestFormQuestions. Используемтся для Form Factory
+class MyNewTestFormQuestions(NewTestFormQuestions):
+    def __init__(self, *args, thems_selection, **kwargs):
+        self.thems_selection = thems_selection
+        super(MyNewTestFormQuestions, self).__init__(*args, **kwargs)
+        self.fields['theme'].choices = self.thems_selection
 
 
 #  Форма для загрузки файла

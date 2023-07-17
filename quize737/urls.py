@@ -21,6 +21,7 @@ urlpatterns = [
     path('new_question/', views.new_question, name='new_question'),
     path('download_test_result/<int:id>/', views.download_test_result, name='download_test_result'),
     path('test_editor/', views.test_editor, name='test_editor'),
+    path('new_test_ac_type/', views.new_test_ac_type, name='new_test_ac_type'),
     path('create_new_test/', views.create_new_test, name='create_new_test'),
     path('test_editor/<int:id>/', views.test_details, name='test_details'),
     path('test_editor/del_test/<int:id>', views.del_test, name='del_test'),

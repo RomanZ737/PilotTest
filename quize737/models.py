@@ -17,6 +17,7 @@ class Thems(models.Model):
 
 # Вся база вопросов по всем темам
 class QuestionSet(models.Model):
+
     class ACType(models.TextChoices):
         B737 = 'B737', 'Boeing 737'
         B777 = 'B777', 'Boeing 777'
@@ -116,14 +117,15 @@ class TestConstructor(models.Model):
     pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=70,
                                      verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
-    training = models.BooleanField(verbose_name='Тренировочный тест', default=False,
-                                   )
+    training = models.BooleanField(verbose_name='Тренировочный тест', default=False)
+
+    ac_type = models.CharField(max_length=255, verbose_name='Тип ВС')
 
     def __str__(self):
         return f'{self.name}'
 
 
-# Модель конструктора тестов - сами вопросы для теста
+# Модель конструктора тестов - сами вопросы для теста, записываются в отдельную таблицу
 class TestQuestionsBay(models.Model):
     theme = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема',
                               help_text='Тема из которой выбираются вопросы')
