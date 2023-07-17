@@ -77,7 +77,16 @@ def all_them_q_set():
 def start(request, id=None):
     user_instance = request.user
     if request.method == 'POST':
-        question_set_id = id  # ID теста, назначенного пользователю
+
+        user_test = UserTests.objects.get(test_name=id, user=user_instance)  # Объект теста конкретного пользователя
+        #  Уменьшаем количество попыток у пользователя
+        num_try = user_test.num_try  #  Текущее количество попыток
+        num_try -= 1
+        user_test.num_try = num_try
+        #user_test.update(num_try=num_try)
+        user_test.save()
+
+        question_set_id = id  # ID теста (сам тест), назначенного пользователю
         test_instance = TestConstructor.objects.filter(id=question_set_id)
 
         #  Вынимаем объекты Тема и Вопрос, которые принадлежат данному тесту
@@ -140,12 +149,13 @@ def start(request, id=None):
 
         # Достаём нужный вопрос из базы вопросов по сквозному номеру
         question = QuestionSet.objects.filter(id=question_pisition).values()
+        # Вынимаем объект вопроса
         question_instance = QuestionSet.objects.get(id=question_pisition)
 
         # Формируем данные для отправки на страницу тестирования
 
-        # Обновляем количество оставшихся вопросов
-        QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
+        # Обновляем количество оставшихся вопросов - закоментил т.е. уменьшать количество вопросов надо после ответа пользователя
+        #QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
 
         # Создаём запись с результатами теста
         user_name_for_h = f'{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}'
@@ -183,15 +193,48 @@ def start(request, id=None):
         return render(request, q_page_layout, context=context)
     # Если пользователь открывает страницу
     else:
-        # Если польхователь выбирает конкретный тест из списка назначенных
+        # Если пользователь выбирает конкретный тест из списка назначенных
         if id:
-            user_test = UserTests.objects.filter(test_name=id)
-            user_tests = UserTests.objects.filter(user=request.user)
-            test_instance = TestConstructor.objects.get(id=id)
-            test_question_sets = TestQuestionsBay.objects.filter(test_id=id)
-            context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
-                       'user_tests': user_tests}
-            return render(request, 'start_test_ditales.html', context=context)
+            #  Проверяем, есть ли у пользователя не завершённые тесты
+            try:
+                test_in_progress = QuizeSet.objects.get(test_id=id, user_under_test=request.user.username)  # Объект сформированного пользователю теста
+                #  Если сформированный пользователю тест существует, продолжаем выполнение
+                in_progress = True #  Флаг не завершунного теста
+                test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный)
+                user_test = UserTests.objects.filter(test_name=id)  # Объект теста назначенного пользователю
+                results_instance = QuizeResults.objects.get(user_id=request.user, quize_name=test_instance.name)  # Сформированный результат выполнения теста
+                user_tests = UserTests.objects.filter(user=request.user)  # Весь список тестов пользователя для отображения в боковом меню
+                test_question_sets = TestQuestionsBay.objects.filter(test_id=id)  #  Вопросы теста, назначенного пользователю
+
+                #-----------------------------------------------
+                # Количество оставшихся у пользователя вопросов
+                q_amount = test_in_progress.q_sequence_num
+                # Номера вопросов сгенерированные пользователю
+                q_num_list = list((test_in_progress.questions_ids).split(' '))
+                # Выясняем ID вопроса по номеру позиции вопроса в списке
+                question_pisition = q_num_list[int(q_amount) - 1]
+                # Достаём нужный вопрос из базы вопросов по сквозному номеру
+                question = QuestionSet.objects.filter(id=question_pisition).values()
+                #  Создаём словарь с вариантами ответов на вопрос
+                option_dict = {}
+                for option_num in range(1, 11):
+                    option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+                # -----------------------------------------------
+
+                context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
+                           'user_tests': user_tests, 'in_progress': in_progress, 'tmp_test_id':test_in_progress.id, 'result_id': results_instance.id, 'question_id': id}
+                return render(request, 'start_test_ditales.html', context=context)
+
+            except ObjectDoesNotExist:
+                in_progress = False
+                user_test = UserTests.objects.filter(test_name=id)  # Выбраный пользователем тест
+                user_tests = UserTests.objects.filter(user=request.user)  # Весь список тестов пользователя для отображения
+                test_instance = TestConstructor.objects.get(id=id)
+                test_question_sets = TestQuestionsBay.objects.filter(test_id=id)
+                context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
+                           'user_tests': user_tests, 'in_progress': in_progress}
+                return render(request, 'start_test_ditales.html', context=context)
+        #  Если пользователь открывает страницу со списком тестов
         else:
             user_tests = UserTests.objects.filter(user=request.user)
             context = {'user_tests': user_tests}
@@ -203,7 +246,15 @@ def start(request, id=None):
 def next_question(request):
     # Проверяем нажал ли пользователь кнопку "ответить"
     if request.method == 'POST':
-        #  Вынимаем объект отвеченного ответа
+        user_quize_set_id = int(request.POST.get('tmp_test_id')) #  ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
+        # Количество оставшихся у пользователя вопросов
+        q_amount = QuizeSet.objects.filter(id=user_quize_set_id).values('q_sequence_num')
+        # Уменьшаем на единицу количество оставшихся вопросов
+        question_sequence = int(q_amount[0]['q_sequence_num']) - 1
+        # Обновляем количество оставшихся вопросов
+        QuizeSet.objects.filter(id=user_quize_set_id).update(q_sequence_num=question_sequence)
+
+        #  Вынимаем объект отвеченного вопроса
         answered_q_instance = QuestionSet.objects.get(id=request.POST.get('question_id'))
         #  Вынимает объект результатов пользователя
         results_inst = QuizeResults.objects.get(id=request.POST.get('result_id'))
@@ -218,7 +269,6 @@ def next_question(request):
             correct_answers_set = set(map(int, (answered_q_instance.answers).split(',')))
             # Если ответ пользователя правильный
             if user_answers_set == correct_answers_set:
-
                 #  Создаём объект ответа на вопрос конкретного теста
                 AnswersResults.objects.create(user=request.user,
                                               results=results_inst,
@@ -238,15 +288,15 @@ def next_question(request):
                 # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
                 print('answered_q_instance.q_weight', answered_q_instance.q_weight)
                 if answered_q_instance.q_weight != 0:
-
                     updated_score_number = user_result_data[0]['score_number'] + answered_q_instance.q_weight
                 else:
                     updated_score_number = user_result_data[0]['score_number'] + 1
-                print('updated_score_number', updated_score_number)
 
                 # Обновляем количетво баллов
                 QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                     score_number=updated_score_number)
+
+            #  Создаём объект ответа на вопрос конкретного теста
             else:
                 AnswersResults.objects.create(user=request.user,
                                               results=results_inst,
@@ -254,8 +304,6 @@ def next_question(request):
                                               user_answer=user_answers_set,
                                               conclusion=False
                                               )
-                print('Не правильный ответ')
-
         else:
             #  Если вопрос с одним вариантом ответа
             user_aswer = request.POST.get('user_answer').replace('option_', '')
@@ -299,8 +347,8 @@ def next_question(request):
                                               )
                 print('Не правильный ответ')
 
-        # Количество оставшихся у пользователя вопросов
-        q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
+        # # Количество оставшихся у пользователя вопросов
+        # q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
 
         # Номера вопросов сгенерированные пользователю
         q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('questions_ids')
@@ -310,11 +358,14 @@ def next_question(request):
             q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
 
             # Номер позиции вопроса в списке
-            question_sequence = int(q_amount[0]['q_sequence_num']) - 1
+            # question_sequence = int(q_amount[0]['q_sequence_num']) - 1
             question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
 
             # Достаём нужный вопрос из базы вопросов по сквозному номеру
             question = QuestionSet.objects.filter(id=question_pisition).values()
+
+            # Объект "следующего" вопроса
+            question_instance = QuestionSet.objects.get(id=question_pisition)
 
             #  Создаём словарь с вариантами ответов на вопрос
             option_dict = {}
@@ -329,7 +380,7 @@ def next_question(request):
 
             context = {'question': question[0]['question'], 'question_id': question[0]['id'],
                        'tmp_test_id': request.POST.get('tmp_test_id'), 'result_id': request.POST.get('result_id'),
-                       'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num']}
+                       'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num'], 'q_instance': question_instance}
 
             # Формируем данные для отправки на страницу тестирования
             # context = {'user_name': request.POST.get("user_name"), 'user_set_id': request.POST.get('user_set_id'), 'question': question, 'results_object_id': request.POST.get('results_object_id'), 'q_kind': question[0]['q_kind'], 'q_num_left': q_amount[0]['q_sequence_num']}
@@ -457,8 +508,8 @@ def next_question(request):
                 user_test_instance = UserTests.objects.filter(user=request.user, test_name=user_test_id)
                 # Уменьшаем количество попыток
                 num_try = user_test_instance[0].num_try
-                num_try -= 1
-                user_test_instance.update(num_try=num_try)
+                # num_try -= 1
+                # user_test_instance.update(num_try=num_try)
 
                 # Если у пользователя не осталось попыток, отправляем письмо КРС
                 if int(num_try) == 0:
@@ -597,13 +648,47 @@ def next_question(request):
                     QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
                     QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).delete()
                     return render(request, 'results.html', context=context)
-                #
-                # Добавляем итоговый результать в отчёт по пользователю
-                # QuizeResults.objects.filter(id=int(request.POST.get('results_object_id'))).update(total_result=total_result)
-                # Формируем данные для отправки
-                # context = {'user_name': request.POST.get("user_name"), 'total_num_q': result_data[0]['total_num_q'],
-                #            'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                #            'conclusion': False}
+
+    #  Если пользователь продолжает попытку
+    else:
+        user_quize_set_id = int(request.GET.get('tmp_test_id'))  # ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
+        # Количество оставшихся у пользователя вопросов
+        q_amount = QuizeSet.objects.filter(id=user_quize_set_id).values('q_sequence_num')
+        q_num_list = QuizeSet.objects.filter(id=int(request.GET.get('tmp_test_id'))).values('questions_ids')
+        q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
+
+        # Номер позиции вопроса в списке
+        question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
+
+        # Достаём нужный вопрос из базы вопросов по сквозному номеру
+        question = QuestionSet.objects.filter(id=question_pisition).values()
+
+        # Объект "следующего" вопроса
+        question_instance = QuestionSet.objects.get(id=question_pisition)
+
+        #  Создаём словарь с вариантами ответов на вопрос
+        option_dict = {}
+        for option_num in range(1, 11):
+            option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+
+        # Содержание context:
+        # 'question' - Сам вопрос
+        # 'tmp_test_id' - ID сформированного теста пользователю
+        # 'result_id' - ID сформированных результатов теста
+        # 'option_dict' - Варианты ответов на вопрос
+
+        context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                   'tmp_test_id': request.GET.get('tmp_test_id'), 'result_id': request.GET.get('result_id'),
+                   'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num'],
+                   'q_instance': question_instance}
+
+        # Проверяем содержит ли вопрос мультивыбор
+        if question[0]['q_kind'] == False:
+            q_page_layout = 'start_test_radio.html'
+        else:
+            q_page_layout = 'start_test_check.html'
+
+        return render(request, q_page_layout, context=context)
 
 
 @login_required

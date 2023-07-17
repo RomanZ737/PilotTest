@@ -59,7 +59,7 @@ class QuestionSet(models.Model):
         return f'{self.them_name}, {self.question}'
 
 
-# Сгенерированнный Тест для конекретного пользователя
+# Сгенерированнный Тест для конекретного пользователя, удаляется после завершения теста
 class QuizeSet(models.Model):
     """Варианты тестов"""
     test_id = models.IntegerField(verbose_name='id теста из которого сформирован QuizeSet', null=True)
