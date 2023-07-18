@@ -1391,7 +1391,7 @@ def user_list(request):
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
                                'position_list': position_list, 'group_list': group_list,
-                               'assign_test_list': assign_test_list}
+                               'assign_test_list': assign_test_list, 'ac_types': ac_types_list, 'tests_list': test_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
