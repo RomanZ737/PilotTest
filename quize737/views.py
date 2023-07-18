@@ -208,17 +208,17 @@ def start(request, id=None):
 
                 #-----------------------------------------------
                 # Количество оставшихся у пользователя вопросов
-                q_amount = test_in_progress.q_sequence_num
-                # Номера вопросов сгенерированные пользователю
-                q_num_list = list((test_in_progress.questions_ids).split(' '))
-                # Выясняем ID вопроса по номеру позиции вопроса в списке
-                question_pisition = q_num_list[int(q_amount) - 1]
-                # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                question = QuestionSet.objects.filter(id=question_pisition).values()
-                #  Создаём словарь с вариантами ответов на вопрос
-                option_dict = {}
-                for option_num in range(1, 11):
-                    option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+                # q_amount = test_in_progress.q_sequence_num
+                # # Номера вопросов сгенерированные пользователю
+                # q_num_list = list((test_in_progress.questions_ids).split(' '))
+                # # Выясняем ID вопроса по номеру позиции вопроса в списке
+                # question_pisition = q_num_list[int(q_amount) - 1]
+                # # Достаём нужный вопрос из базы вопросов по сквозному номеру
+                # question = QuestionSet.objects.filter(id=question_pisition).values()
+                # #  Создаём словарь с вариантами ответов на вопрос
+                # option_dict = {}
+                # for option_num in range(1, 11):
+                #     option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
                 # -----------------------------------------------
 
                 context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
