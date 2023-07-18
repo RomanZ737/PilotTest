@@ -39,6 +39,7 @@ urlpatterns = [
                   path('', quize737_views.start, name='start'),
                   path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
+                  path('DBLoad/', include('DBLoad.urls', namespace='DBLoad')),
                   path('profile/', users_views.profile, name='profile'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
                   path('register/', users_views.register, name='register'),
@@ -48,5 +49,5 @@ urlpatterns = [
                   path('password-reset-complete/', PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
                   #path('password_change/', PasswordChangeView.as_view(template_name='password_change.html'), name='password_change'),
                   path('password_change/', users_views.password_change, name='password_change'),
-                  path('password_change_done/', PasswordChangeDoneView.as_view(template_name='password_change_done.html'), name='password_change_done'),
+                  path('password_change_done/', PasswordChangeDoneView.as_view(template_name='password_change_done.html'), name='password_change_done')
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

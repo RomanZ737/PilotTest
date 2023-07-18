@@ -53,4 +53,4 @@ def get_item(dictionary, key):
     if dictionary:
         return dictionary.get(key)
     else:
-        return ['Нет данных']
+        return None

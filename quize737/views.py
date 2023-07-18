@@ -1400,7 +1400,7 @@ def user_list(request):
                     users = paginator.page(page_number)
                     context = {'user_list': users, 'no_search_results': no_search_result,
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
-                               'user_test_dict': user_test_dict, 'user_num': total_user_number}
+                               'user_test_dict': user_test_dict, 'user_num': total_user_number, 'ac_types': ac_types_list}
                     return render(request, 'user_list.html', context=context)
             else:
                 ac_type = ''

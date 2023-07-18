@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'users',
     'quize737',
     'PilotLoad',
+    'DBLoad'
 ]
 
 MIDDLEWARE = [
