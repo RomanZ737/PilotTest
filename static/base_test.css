@@ -59,28 +59,26 @@ label.option {
 
 }
 
-div.option {
-    display: block;
-    position: relative;
-    color: rgb(209, 209,209);
-    font-size: 25px;
-    width: 90%;
-    text-align: justify;
-    text-justify: inter-word;
-    padding: 10px;
+div.radiobuttons {
+  position: relative;
+  display: block;
+  left: 7%;
+  margin-bottom: 5px;
+  word-wrap: break-word;
+  width: 850px;
 }
 
-div.option-choice {
-    display: inline-block;
-    position: relative;
-    width: 3%;
-}
 
 div.option-value {
     display: inline-block;
     position: relative;
-    width: 90%;
+    width: 88%;
     vertical-align: middle;
+    text-align: justify;
+    text-justify: inter-word;
+    padding: 5px;
+    color: rgb(209, 209,209);
+    font-size: 25px;
 }
 
 
@@ -90,12 +88,28 @@ div.button_answer {
     display: block;
     margin-top: 40px;
     margin-bottom: 5px;
+    width: 450px;
 
 }
 
 .radiobuttons input[type='radio'] + label:not(:last-child){
   margin-right: 200px;
 }
+
+.radiobuttons label:hover {text-shadow: 1px 1px 1px #997676, 0 0 1em #23506b, 0 0 0.1em #9e9292; /* Добавляет тень к тексту при наведении */
+
+}
+
+/*.radiobuttons {position:absolute;}
+
+.radiobuttons input {visibility:hidden; width:0;}
+
+.radiobuttons label:hover {font-weight:bold}
+
+.radiobuttons input:checked + label {font-weight:bold; text-transform:uppercase}
+*/
+
+
 
 input[type='radio']{
     width: 20px;
@@ -107,13 +121,6 @@ input[type='checkbox']{
     height: 20px;
 }
 
-div.radiobuttons {
-  position: relative;
-  display: block;
-  left: 7%;
-  margin-bottom: 12px;
-  word-wrap: break-word;
-}
 
 a {
     text-decoration: none; /* Убирает подчеркивание для ссылок */
@@ -246,8 +253,8 @@ div.result_answers_user_answer {
 }
 
 div.report_issue {
-    position: relative;
+    position: absolute;
     display: block;
-    left: 85%;
+    right: 2%;
     margin: 10px;
 }

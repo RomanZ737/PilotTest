@@ -27,12 +27,15 @@
                 {% for option, value in option_dict.items|random_loop %}
                     {% if value %}
                         <div class="radiobuttons">
-                            <div class="option">
-                                <div class="option-choice">
+<!--                            <div class="option">-->
+<!--                                <div class="option-choice">-->
                                     <input type="checkbox" name="user_answer" id="{{option}}" value="{{option}}">
-                                </div>
-                                <div class="option-value">{{value}}</div>
-                            </div>
+                                    <div class="option-value">
+                                        <label for="{{option}}" class="option-value">{{value}}</label>
+                                    </div>
+<!--                                </div>-->
+<!--                                <div class="option-value">{{value}}</div>-->
+<!--                            </div>-->
                         </div>
                     {% endif %}
                 {% endfor %}
