@@ -91,7 +91,7 @@ class NewTestFormQuestions(forms.ModelForm):
         fields = ['q_num']
         error_messages = {'q_num': {'required': "Поле количества вопросов не может быть пустым"}}
         widgets = {
-            "q_num": NumberInput(attrs={'size': '3', 'min': '1'}),
+            "q_num": NumberInput(attrs={'size': '6', 'min': '1'}),
         }
 
 

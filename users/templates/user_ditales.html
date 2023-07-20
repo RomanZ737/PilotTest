@@ -68,8 +68,8 @@
             <br>
 
     </form>
-
     <form  id="form_edit_user" method='get' action='{% url "quize737:edit_user" user_id %}'>
+        <input type="hidden" name="previous_url" value="{{ previous_url }}">
     </form>
 
     <div class="block_none_light_up">
@@ -80,13 +80,12 @@
     <span class="block_none_light_up" id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
     <br>
     <div class="block_none_light_up" id="go_back">
-        <form  method='get' action='{% url "quize737:user_list" %}'>
+        <form method='get' action='{% url "quize737:go_back_button" %}'>
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
             <input type="submit" value="Вернуться">
         </form>
     </div>
-<!--    <form method='get' action='{% url "quize737:user_list" %}'>-->
-<!--        <button type="submit">Вернуться</button>-->
-<!--    </form>-->
+
     <div class="form_set" style="display:none">
         <div class="block_none_light_up">
             <span class="empty_form">Название теста: {{ user_tests.empty_form.test_name }} Количество попыток: {{ user_tests.empty_form.num_try }} Выполнить до: {{user_tests.empty_form.date_before}}</span><span>{{user_tests.empty_form.DELETE}} Удалить тест </span>

@@ -8,10 +8,11 @@
 <fieldset>
         <legend>Профиль тестированя</legend>
         {% if in_progress %}
-            <form  id="in progress" method='get' action="{% url 'quize737:next_question' %}">
+            <form  id="in progress" method='post' action="{% url 'quize737:next_question' %}">
                 <input type="hidden" name="tmp_test_id" value="{{tmp_test_id}}">
                 <input type="hidden" name="result_id" value="{{result_id}}">
                 <input type="hidden" name="question_id" value="{{question_id}}">
+                <input type="hidden" name="continue_test" value="True">
         {% else %}
             <form  id="data" method='post'>
         {% endif %}
@@ -79,6 +80,7 @@
             <div>
                 {% if in_progress %}
                     <p>У вас есть не завершённая попытка тестирования</p>
+                    <p>Вопросов осталось <span class="mark_up">{{q_num_left}}</span></p>
                     <input type="submit" form="in progress" value="Продолжить попытку">
                 {% else %}
                     <input type="submit" form="data" value="Начать Тестирование">
@@ -90,7 +92,7 @@
             </div>
             {% endif%}
         </form>
-
+            </form>
 </fieldset>
 
 

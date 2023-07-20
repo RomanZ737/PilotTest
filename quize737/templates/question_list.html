@@ -29,7 +29,7 @@
         <div class="block_none_light_up">
             <div class="search-form">
                 <form id="question_search" action="{% url 'quize737:question_list' %}" method="get">
-                    <input type="text" name="question_search" placeholder="Поиск вопроса...">
+                    <input type="text" name="question_search" placeholder="Поиск вопроса..." value="{{user_search_input}}">
                     <input type="submit" value="Искать">
                 </form>
             </div>

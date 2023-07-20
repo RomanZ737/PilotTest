@@ -29,7 +29,7 @@
             {% for error in question_form.errors.items %}
             <p>{{error}}</p>
             {% endfor %}
-
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
                 <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
                 <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
                 <p>{{question_form.option_1.label}}: <textarea style="font-size: 15px;" id="option_1" name="option_1" oninput="autoGrow()">{{question_form.option_1.value}}</textarea></p>

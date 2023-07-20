@@ -19,6 +19,7 @@
     {% endfor %}
   <form id="user_edit_form" method='post'>
       {% csrf_token %}
+    <input type="hidden" name="previous_url" value="{{ previous_url }}">
     <p>Квалификация:
         <select name="position">
             {% for option in position_list %}
@@ -67,7 +68,8 @@
     <br>
     <br>
     <br>
-        <form  method='get' action='{% url "quize737:user_list" %}'>
+        <form  method='get' action='{% url "quize737:go_back_button" %}'>
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
             <input type="submit" value="Вернуться">
         </form>
 
