@@ -141,9 +141,12 @@
 <!--            </form>-->
             <form id="download_test" action="{% url 'quize737:download_test_result' id %}">
             </form>
+            <form id="go-back" method='get' action='{% url "quize737:go_back_button" %}'>
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
+            </form>
 
             <div class="list-other_field">
-                <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
+                <input type="submit" value="Вернуться" form="go-back">
                 <span style="color: black;"> | </span>
                 <input type="submit" value="Скачать" form="download_test">
             </div>

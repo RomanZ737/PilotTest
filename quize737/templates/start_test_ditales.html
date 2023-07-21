@@ -55,7 +55,6 @@
             <div class="block_none_light_up">
                 <span class="main_sign">Вопросы теста:</span>
             </div>
-
                 {% for them in question_set%}
                     {% if not forloop.counter|divisibleby:2 %}
                         <div class="block_none_light_up">
@@ -87,9 +86,17 @@
                 {% endif %}
             </div>
             {% else %}
-            <div>
-                <span>Попытки израсходованы, обратитесь к руководству отряда</span>
-            </div>
+                {% if in_progress %}
+                    <div>
+                        <p>У вас есть не завершённая попытка тестирования</p>
+                        <p>Вопросов осталось <span class="mark_up">{{q_num_left}}</span></p>
+                        <input type="submit" form="in progress" value="Продолжить попытку">
+                    </div>
+                {% else %}
+                    <div>
+                        <span>Попытки израсходованы, обратитесь к руководству отряда</span>
+                    </div>
+                {% endif %}
             {% endif%}
         </form>
             </form>

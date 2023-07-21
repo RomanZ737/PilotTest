@@ -821,7 +821,7 @@ def tests_results_list(request):
                 results = f'Пилоты по запросу "{user_search_input}" не найдены'
                 context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                            'position_list': position_list, 'group_list': group_list,
-                           'results_list_options': results_list_options}
+                           'results_list_options': results_list_options, 'user_search_input': user_search_input}
                 return render(request, 'tests_results_list.html', context=context)
             else:
                 paginator = Paginator(total_results_list, 10)
@@ -830,7 +830,7 @@ def tests_results_list(request):
                 context = {'results': results_list_pages, 'no_search_results': no_search_result,
                            'filter_input': filter_input,
                            'position_list': position_list, 'group_list': group_list,
-                           'results_list_options': results_list_options}
+                           'results_list_options': results_list_options, 'user_search_input': user_search_input}
                 return render(request, 'tests_results_list.html', context=context)
         else:
             position = ''
@@ -931,7 +931,9 @@ def test_result_details(request, id):
 
         answer_results.append(question_block)
 
-    context = {'result': result, 'id': id, 'answers': answer_results}
+    #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
+    previous_url = request.META.get('HTTP_REFERER')
+    context = {'result': result, 'id': id, 'answers': answer_results, 'previous_url': previous_url}
     return render(request, 'test_result_details.html', context=context)
 
 
@@ -1586,7 +1588,7 @@ def user_list(request):
             return render(request, 'user_list.html', context=context)
 
 
-# Список пользователей конуретной группы
+# Список пользователей конкретной группы
 @login_required
 @group_required('KRS')
 def group_users(request, id):
@@ -1761,7 +1763,7 @@ def group_del(request, id):
 
 @login_required
 @group_required('KRS')
-def edit_user(request, id, pre_url=None):
+def edit_user(request, id):
     print('GET', request.GET)
     position_list = Profile.Position.labels  # Вырианты выбора должности пилота
     ac_type_list = Profile.ACType.labels  # Варианты выбора типа ВС пилота
