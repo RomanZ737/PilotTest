@@ -29,7 +29,7 @@ nav{
 main {
   position: relative;
   height: 10%;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 aside {
@@ -170,7 +170,7 @@ div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     left: 15px;
-    width: 450px;
+    width: 340px;
     word-wrap: break-word;
     text-align: left;
 
@@ -191,8 +191,7 @@ div.list-ac_type {  /* блок Типа ВС в таблице */
 div.list-date {     /* блок Дата в таблице */
     position: relative;
     display: inline-block;
-    width: 8%;
-    margin: 2px;
+    width: 77px%;
     text-align: center;
 }
 
@@ -219,8 +218,7 @@ div.list-groups {  /* блок Должность в таблице */
 div.list-test_result {  /* блок Результат сдачи теста в таблице */
     position: relative;
     display: inline-block;
-    width: 13%;
-    margin: 2px;
+    width: 120px;
     text-align: center;
 
 
@@ -616,7 +614,7 @@ div.list-test_name_results {    /* блок названия теста в та�
     display: inline-block;
     word-wrap: break-word;
     text-align: left;
-    width: 17%;
+    width: 160px;
     vertical-align: middle;
     color: rgb(209, 209,209);
 }
