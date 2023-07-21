@@ -16,7 +16,7 @@ nav{
 
 main {
   position: relative;
-  height: 10%;
+  height: 14%;
 }
 
 /* Форма и ёё положение */
@@ -31,7 +31,7 @@ section {
 /* Цвет и размер текста в форме */
 legend {               /* Оформление заголовка рамки */
     color: rgb(209, 209,209);
-    font-size: 17px;
+    font-size: 15px;
 }
 
 form {

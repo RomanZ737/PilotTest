@@ -81,7 +81,8 @@
                         <span style="color: black">|</span>
                         <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">
                     </div>
-                <div class="list-q_count">
+            </div>
+            <div class="list-q_count">
                     {% if filter_input %}
                         {% for theme in them_list %}
                             {% if theme.name == filter_input.0 %}
@@ -92,9 +93,8 @@
                         <span class="mark_up">Все темы: {{q_count}}</span>
                     {% endif %}
                 </div>
-            </div>
-
         </div>
+
 
         {% if no_search_results %}
         <div>

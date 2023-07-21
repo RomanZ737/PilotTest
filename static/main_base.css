@@ -65,7 +65,7 @@ button {
 
 legend {
     color: rgb(209, 209,209);
-    font-size: 17px;
+    font-size: 15px;
 }
 
 a {
@@ -169,8 +169,8 @@ div.block-list {  /* Основной блок таблицы со списко�
 div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
-    left: 15px;
-    width: 340px;
+    /* left: 15px; */
+    width: 290px;
     word-wrap: break-word;
     text-align: left;
 
@@ -218,7 +218,7 @@ div.list-groups {  /* блок Должность в таблице */
 div.list-test_result {  /* блок Результат сдачи теста в таблице */
     position: relative;
     display: inline-block;
-    width: 120px;
+    width: 160px;
     text-align: center;
 
 
@@ -227,7 +227,7 @@ div.list-test_result {  /* блок Результат сдачи теста в 
 div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
-    left: 15px;
+    /* left: 15px; */
     width: 20%;
     text-align: left;
     color: rgb(170, 39, 47);
@@ -283,30 +283,32 @@ spot.block_light_up:hover {  /* блок всей строки данных в �
 
 div.block_none_light_up {  /* блок всей строки данных в таблице, без подствеки */
     position: relative;
-    left: 3%;
-    margin-top: 10px;
+    left: 2%;
+   /* margin-top: 10px; */
     margin-bottom: 10px;
+    width: 98%;
 }
 
 div.search-form {  /* блок формы поиска */
     display: inline-block;
     position: relative;
-    width: 230px;
+    /* width: 230px; */
+    margin-right: 10px;
 }
 
 div.filter-form {   /* блок формы фильтра */
     position: relative;
     display: inline-block;
-    width: 920px;
+    /* width: 920px; */
 }
 
 div.list-test_name {    /* блок названия теста в таблице */
     position: relative;
     display: inline-block;
-    left: 15px;
+    /* left: 15px; */
     word-wrap: break-word;
     text-align: left;
-    width: 270px;
+    width: 245px;
     vertical-align: middle;
 
 }
@@ -466,13 +468,13 @@ div.filter_related_questions {
 div.filter_related_users {
     position: relative;
     display: inline-block;
-    width: 450px;
+    /* width: 450px; */
 }
 
 div.filter_related_results {
     position: relative;
     display: inline-block;
-    width: 355px;
+    /* width: 355px; */
 }
 
 div.filter_related_them {
@@ -489,8 +491,9 @@ div.button_block {
 
 div.list-q_count {
     position: relative;
-    display: inline-block;
-    margin-left: 10px;
+  /*  display: inline-block;
+    margin-left: 10px; */
+    text-align: right;
 }
 
 div.results-question {
@@ -580,7 +583,7 @@ div.test_ac-type {
 div.test_them_list {
     position: relative;
     display: inline-block;
-    width: 400px;
+    width: 155px;
     text-align: justify;
     text-justify: inter-word;
     vertical-align: middle
@@ -614,7 +617,7 @@ div.list-test_name_results {    /* блок названия теста в та�
     display: inline-block;
     word-wrap: break-word;
     text-align: left;
-    width: 160px;
+    width: 140px;
     vertical-align: middle;
     color: rgb(209, 209,209);
 }
@@ -630,15 +633,16 @@ div.test_total_users {
 div.list-user_test_list {
     position: relative;
     display: inline-block;
-    width: 270px;
+    width: 155px;
     vertical-align: middle
 }
 
 div.total_user_num {
     position: relative;
-    display: inline-block;
-    margin-left: 14px;
+    /*display: inline-block;
+    margin-left: 14px; */
     color: rgb(209, 209,209);
+    text-align: right;
 }
 
 span.comment {
