@@ -382,6 +382,7 @@ div.list-edit {
 div.new_user-field {
     position: relative;
     display: inline-block;
+    width: 180px;
     text-align: left;
     font-size: 20px;
     margin: 7px;
