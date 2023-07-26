@@ -2020,7 +2020,9 @@ def new_user(request):
 @group_required('KRS')
 def del_user(request, id):
     User.objects.get(id=id).delete()
-    return redirect('quize737:user_list')
+    previous_url = request.META.get('HTTP_REFERER')
+    return HttpResponseRedirect(previous_url)
+    #return redirect('quize737:user_list')
 
 
 @login_required
