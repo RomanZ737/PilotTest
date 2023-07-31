@@ -2238,13 +2238,11 @@ def issue_mess(request):
 def go_back_button(request):
     # Возвращаем пользователя на исходную страницу
     previous_url = request.GET.get('previous_url', '/')
-    print('previous_url', previous_url)
-    # TODO: проверить работу на реальном сервере
-    #  Вынимаем чистый хост на для тестового сервере
-    request_host = request.get_host()
-    index = (request.get_host()).find(':')
-    request_host = request_host[:index]
-    if previous_url and urlparse(previous_url).hostname == request_host:
-        return HttpResponseRedirect(previous_url)
-    else:
-        return redirect('/')
+    #  Вынимаем чистый хост
+    # request_host = request.get_host()
+    # index = (request.get_host()).find(':')
+    # request_host = request_host[:index]
+    # if previous_url and urlparse(previous_url).hostname == request_host:
+    return HttpResponseRedirect(previous_url)
+    # else:
+    #     return redirect('/')
