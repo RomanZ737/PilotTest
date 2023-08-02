@@ -626,8 +626,9 @@ def next_question(request):
                                       f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                       f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
                                       f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
-                            to = common.krs_mail_list
-                            email_msg = {'subject': subject, 'message': message, 'to': to}
+                            # Вынимаем список адресов КРС соответствующих данному тесту
+                            email_list = user_test_instance[0].test_name.email_to_send
+                            email_msg = {'subject': subject, 'message': message, 'to': email_list}
                             common.send_email(request, email_msg)
                         else:
                             # Если тест тренировочный, удаляем результаты теста
@@ -719,8 +720,9 @@ def next_question(request):
                                           f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                           f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
                                           f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
-                                to = common.krs_mail_list
-                                email_msg = {'subject': subject, 'message': message, 'to': to}
+                                # Вынимаем список адресов КРС соответствующих данному тесту
+                                email_list = user_test_instance[0].test_name.email_to_send
+                                email_msg = {'subject': subject, 'message': message, 'to': email_list}
                                 common.send_email(request, email_msg)
                             else:
                                 # Удаляем результаты теста, если тест тренировояный
@@ -1301,6 +1303,8 @@ def new_test_ac_type(request):
 @login_required
 @group_required('KRS')
 def create_new_test(request):
+    krs_list = User.objects.filter(groups__name='KRS').order_by(
+        'last_name')  # Вынимкаем список объектов группы KRS для выбора email адресов
     ac_type = request.GET.get('ac_type')
     thems = Thems.objects.all()
     total_q_num_per_them = {}
@@ -1326,15 +1330,13 @@ def create_new_test(request):
 
     if request.method == 'POST':
         ac_type = request.POST.get('ac_type')  # Вынимаем Тип ВС
-
-        print('POST', request.POST)
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)},
                                      initial=[{'theme': '5', 'q_num': '4'}],
                                      prefix="questions")
         test_name_form = NewTestFormName(request.POST, prefix="test_name")
 
-        if test_q_set.is_valid() and test_name_form.is_valid():
+        if test_q_set.is_valid() and test_name_form.is_valid() and 'krs_email' in request.POST:
             # Создаём объект теста
             training = False
             try:
@@ -1342,14 +1344,14 @@ def create_new_test(request):
                     training = True
             except MultiValueDictKeyError:
                 pass
+            emails = request.POST.getlist('krs_email')  #  Вынимаем выбраные email адреса для рассылки
             new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
                                                       pass_score=test_name_form.data['test_name-pass_score'],
                                                       training=training,
-                                                      ac_type=ac_type)
+                                                      ac_type=ac_type,
+                                                      email_to_send=emails)
             # Создаём объекты вопросов теста
-
             for question in test_q_set.cleaned_data:
-                print('question', question)
                 if not question['DELETE']:
                     them_instance = Thems.objects.get(id=question['theme'])
                     TestQuestionsBay.objects.create(theme=them_instance,
@@ -1363,17 +1365,24 @@ def create_new_test(request):
                     for value in error.values():
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
-            print('test_q_set', test_q_set)
+            email_error = ''  #  Ошибка с заполнением email адресов
+            checked_emailes = '' #  Список email адресов для отсылки уведомлений
+            if 'krs_email' not in request.POST:
+                email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+            else:
+                checked_emailes = request.POST.getlist('krs_email')
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type}
+                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type, 'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
             return render(request, 'new_test_form.html', context=context)
     else:
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)},
                                      initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
+
+
         context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them,
-                   'ac_type': ac_type}
+                   'ac_type': ac_type, 'krs_list': krs_list}
         return render(request, 'new_test_form.html', context=context)
 
 
@@ -1381,9 +1390,16 @@ def create_new_test(request):
 @group_required('KRS')
 # Редактируем Детали уже существующего конекретного теста
 def test_details(request, id):
+    # Вынимаем список объектов группы KRS для выбора email адресов
+    krs_list = User.objects.filter(groups__name='KRS').order_by(
+        'last_name')
     # Вынимаем объект теста
-    test_instance = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score', 'training', 'ac_type')
+    test_instance = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score', 'training', 'ac_type', 'email_to_send')
     ac_type = test_instance[0]['ac_type']
+
+    #  Выбранные адреса email для рассылки
+    checked_emailes = test_instance[0]['email_to_send']
+
     thems = Thems.objects.all()
     total_q_num_per_them = {}
     totla_q_num = 0
@@ -1413,7 +1429,9 @@ def test_details(request, id):
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)}, prefix="questions")
         TestQuestionsBay.objects.filter(test_id=id).delete()
-        if test_q_set.is_valid():
+        if test_q_set.is_valid() and 'krs_email' in request.POST:
+            emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
+            a.email_to_send = emails
             training = False
             a.name = test_name_form.data.get('name')
             a.pass_score = test_name_form.data.get('pass_score')
@@ -1435,8 +1453,14 @@ def test_details(request, id):
                     for value in error.values():
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
+            email_error = ''  # Ошибка с заполнением email адресов
+            checked_emailes = ''  # Список email адресов для отсылки уведомлений
+            if 'krs_email' not in request.POST:
+                email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+            else:
+                checked_emailes = request.POST.getlist('krs_email')
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type']}
+                       'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
             return render(request, 'test_detailes.html', context=context)
 
     else:
@@ -1446,7 +1470,7 @@ def test_details(request, id):
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)}, initial=test_questions,
                                      prefix='questions')
         context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
-                   'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type']}
+                   'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list, 'checked_emailes': checked_emailes}
         return render(request, 'test_detailes.html', context=context)
 
 
@@ -2004,7 +2028,7 @@ def user_detales(request, id):
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)
 
-
+# Создание нового пользователя
 @login_required
 @group_required('KRS')
 def new_user(request):
@@ -2041,7 +2065,7 @@ def new_user(request):
         context = {'form_profile': form_profile, 'form_user': form_user}
         return render(request, 'new_user.html', context=context)
 
-
+# Удаление пользователя
 @login_required
 @group_required('KRS')
 def del_user(request, id):

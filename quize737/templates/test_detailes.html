@@ -5,65 +5,75 @@
 {% load django_template_maths %}
 
 <fieldset>
-            <legend>Редактирование теста</legend>
-    <h4>{{non_form_errors}}</h4>
+            <legend>
+                <a href="{% url 'quize737:test_editor' %}">Список Тестов</a>
+                <span style="color: black;"> | </span>
+                <a href='{% url "quize737:new_test_ac_type" %}'>Добавить Тест</a>
+                <span style="color: black;"> | </span>
+                <span>РЕДАКТИРОВАНИЕ ТЕСТА</span>
+            </legend>
+    <div class="block-list">
+        <h4>{{email_error}}</h4>
+        <h4>{{non_form_errors}}</h4>
 
-    {% for error in form_errors%}
-    <h4>{{error}}</h4>
-    {% endfor %}
-
-            <!--Перебираем количество вопросов по темам-->
-    {% for them, q_num in q_num_per_them.items %}
-        <input type="hidden" id="{{them.id}}" value="{{q_num}}">
-    {% endfor %}
-
-
-    <form id="question_form" method='post'>
-      {% csrf_token %}
-
-        <p>Название теста {{test_name_form.name}}
-        <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
-        </p>
-        <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%
-            <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
-        </p>
-        <input type="hidden" id="test_id_num" value="{{test_id}}">
-        {{ test_q_set.management_form }}
-        {% for form in test_q_set %}
-        <div class="q_forms">
-            <span class="test_theme_list">Тема: {{ form.theme }} </span>
-            <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
-            <span>Max. </span><span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
-            <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
-        </div>
-        <br>
+        {% for error in form_errors%}
+        <h4>{{error}}</h4>
         {% endfor %}
 
-        <input type="button" id="add-form" value="+ Добавить тему">
+
+                <!--Перебираем количество вопросов по темам-->
+        {% for them, q_num in q_num_per_them.items %}
+            <input type="hidden" id="{{them.id}}" value="{{q_num}}">
+        {% endfor %}
+
+
+        <form id="question_form" method='post'>
+          {% csrf_token %}
+
+            <p>Название теста {{test_name_form.name}}
+            <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
+            <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
+            </p>
+            <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
+            <p>Кому отправлять письмо с результатами: <span class="comment">(Из группы KRS)</span></p>
+            <p>
+                    {% for user_krs in krs_list%}
+                        {% if user_krs.email in checked_emailes %}
+                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}" checked><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                        {% else%}
+                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}"><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                        {% endif %}
+                    {% endfor %}
+            </p>
+            <br>
+            <input type="hidden" id="test_id_num" value="{{test_id}}">
+            {{ test_q_set.management_form }}
+            {% for form in test_q_set %}
+            <div class="q_forms">
+                <span class="test_theme_list">Тема: {{ form.theme }} </span>
+                <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
+                <span>Max. </span><span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
+                <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
+            </div>
+            <br>
+            {% endfor %}
+
+            <input type="button" id="add-form" value="+ Добавить тему">
+            <br>
+            <br>
+            <br>
+        </form>
+        <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span> <input type="submit" value="Удалить тест" form="del_dest" onclick="return confirm('Удалить Тест?') || event.preventDefault()">
+
+        <form method="post" action="{% url 'quize737:del_test' test_id %}" id="del_dest">
+        {% csrf_token %}
+
+        </form>
+
         <br>
-        <br>
-        <br>
-    </form>
-    <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span> <input type="submit" value="Удалить тест" form="del_dest" onclick="return confirm('Удалить Тест?') || event.preventDefault()">
+        <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
 
-    <form method="post" action="{% url 'quize737:del_test' test_id %}" id="del_dest">
-    {% csrf_token %}
-
-</form>
-
-
-<!--    <div id="empty_form" style="display:none">-->
-<!--    {{ test_q_set.empty_form }}-->
-<!--</div>-->
-
-
-
-
-<br>
-<!--<form method='get' action='{% url "quize737:test_editor" %}'>-->
-<!--    <form method='get' action='{% url "quize737:test_editor" %}'>-->
-<input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
-<!--</form>-->
+    </div>
 </fieldset>
 
 

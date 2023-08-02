@@ -15,8 +15,8 @@ five_day_before = datetime.datetime.now().date() + datetime.timedelta(days=commo
 class MyCronJob(CronJobBase):
     """Если до конца срока сдачи теста осталось 5 дней и менее, будет отправлено уведомление пользователю.
     Если срок сдачи уже истёк, будет отправлено уведомление КРС и пользователю"""
-
-    RUN_EVERY_MINS = 720  # every 12 hors
+    RUN_EVERY_MINS = 3
+    #RUN_EVERY_MINS = 720  # every 12 hors
     RUN_AT_TIMES = ['08:00']#, '14:00', '23:15']
     #RETRY_AFTER_FAILURE_MINS = 1
     schedule = Schedule(run_at_times=RUN_AT_TIMES, run_every_mins=RUN_EVERY_MINS)#, retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
@@ -27,14 +27,12 @@ class MyCronJob(CronJobBase):
         for user_test in user_test_list:
             test_date_before = user_test.date_before.date()
             if test_date_before < now:
-                print('EXPIRED:', user_test.user.last_name)
+                user_test_instance = UserTests.objects.get(user=user_test.user, test_name=user_test.test_name)
                 try:
-                    user_test_instance = UserTests.objects.get(user=user_test.user, test_name=user_test.test_name)
                     if TestExpired.objects.get(user=user_test.user, test=user_test_instance):
                         tets_inst = TestExpired.objects.get(user=user_test.user, test=user_test_instance)
                         tets_inst.days_left = 0
                         tets_inst.save()
-
                 except Exception:
                     TestExpired.objects.create(user=user_test.user,
                                                test=user_test,
@@ -46,9 +44,8 @@ class MyCronJob(CronJobBase):
                           f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>ПРОСРОЧИЛ ТЕСТ</b></p>' \
                           f'<p style="font-size: 15px;">Название теста: <b>{user_test.test_name}</b></p>' \
                           f'<p style="font-size: 15px;">Дата: <b>{user_test.date_before.strftime("%d.%m.%Y")}</b></p>'
-
-                to = common.krs_mail_list
-                email_msg = {'subject': subject, 'message': message, 'to': to}
+                email_list = user_test_instance.test_name.email_to_send
+                email_msg = {'subject': subject, 'message': message, 'to': email_list}
                 common.send_email(user_test, email_msg)
 
                 #  Отправляем письмо пользователю если до истечения срока сдачи N дней или менее (письмо один раз)

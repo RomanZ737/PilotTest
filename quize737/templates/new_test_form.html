@@ -11,6 +11,8 @@
         <a href='{% url "quize737:new_test_ac_type" %}'>ДОБАВИТЬ ТЕСТ</a>
     </legend>
     <div class="block-list">
+            <h4>{{email_error}}</h4>
+
             <h4>{{non_form_errors}}</h4>
 
             {% for error in form_errors%}
@@ -30,12 +32,20 @@
                 <p>Название теста {{test_name_form.name}}
                     <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
                     <input type="hidden" name="ac_type" value="{{ac_type}}">
-
-
+                    <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо KRS не отправляется, результат не записывается)</span></span>
                 </p>
-                <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%
-                    <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
-                </p>
+                <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
+                <p>Кому отправлять письмо с результатами: <span class="comment">(Из группы KRS)</span></p>
+                <p>
+                    {% for user_krs in krs_list%}
+                        {% if user_krs.email in checked_emailes %}
+                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}" checked><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                        {% else%}
+                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}"><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                        {% endif %}
+                    {% endfor %}
+                 </p>
+                <br>
                 {{ test_q_set.management_form }}
                 {% for form in test_q_set.forms %}
 

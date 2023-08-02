@@ -123,6 +123,8 @@ class TestConstructor(models.Model):
 
     ac_type = models.CharField(max_length=255, verbose_name='Тип ВС')
 
+    email_to_send = models.TextField(verbose_name='email адреса для рассылки результатов', null=True)
+
     def __str__(self):
         return f'{self.name}'
 
