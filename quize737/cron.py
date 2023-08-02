@@ -34,6 +34,7 @@ class MyCronJob(CronJobBase):
                     tets_inst.days_left = 0
                     tets_inst.save()
                 except Exception:
+                    print('NOOOO Sign')
                     TestExpired.objects.create(user=user_test.user,
                                                test=user_test,
                                                days_left=0
