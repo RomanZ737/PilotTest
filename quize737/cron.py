@@ -39,13 +39,16 @@ class MyCronJob(CronJobBase):
                                                days_left=0
                                                )
                 # Отсылаем письмо руководству
+                email_list = user_test_instance.test_name.email_to_send
                 subject = f'Пилот {user_test.user.profile.family_name} {(user_test.user.profile.first_name)[0]}. {(user_test.user.profile.middle_name)[0]}. ПРОСРОЧИЛ тест'
                 message = f'<p style="font-size: 20px;"><b>{user_test.user.profile.family_name} {user_test.user.profile.first_name} {user_test.user.profile.middle_name}</b></p><br>' \
                           f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>ПРОСРОЧИЛ ТЕСТ</b></p>' \
                           f'<p style="font-size: 15px;">Название теста: <b>{user_test.test_name}</b></p>' \
-                          f'<p style="font-size: 15px;">Дата: <b>{user_test.date_before.strftime("%d.%m.%Y")}</b></p>'
-                email_list = user_test_instance.test_name.email_to_send
-                email_msg = {'subject': subject, 'message': message, 'to': email_list}
+                          f'<p style="font-size: 15px;">Дата: <b>{user_test.date_before.strftime("%d.%m.%Y")}</b></p>' \
+                          f'<p>email: {email_list}</p>'
+
+                #email_list = user_test_instance.test_name.email_to_send
+                email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}
                 common.send_email(user_test, email_msg)
 
                 #  Отправляем письмо пользователю если до истечения срока сдачи N дней или менее (письмо один раз)
