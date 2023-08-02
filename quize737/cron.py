@@ -46,7 +46,7 @@ class MyCronJob(CronJobBase):
                           f'<p style="font-size: 15px;">Название теста: <b>{user_test.test_name}</b></p>' \
                           f'<p style="font-size: 15px;">Дата: <b>{user_test.date_before.strftime("%d.%m.%Y")}</b></p>' \
                           f'<p>email: {email_list}</p>'
-
+                print('email_list:', email_list)
                 #email_list = user_test_instance.test_name.email_to_send
                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
                 common.send_email(user_test, email_msg)
