@@ -627,7 +627,8 @@ def next_question(request):
                                       f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
                                       f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
                             # Вынимаем список адресов КРС соответствующих данному тесту
-                            email_list = user_test_instance[0].test_name.email_to_send
+                            email_list = (user_test_instance[0].test_name.email_to_send).split()
+                            print('email_list', email_list)
                             email_msg = {'subject': subject, 'message': message, 'to': email_list}
                             common.send_email(request, email_msg)
                         else:
@@ -721,7 +722,7 @@ def next_question(request):
                                           f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
                                           f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
                                 # Вынимаем список адресов КРС соответствующих данному тесту
-                                email_list = user_test_instance[0].test_name.email_to_send
+                                email_list = (user_test_instance[0].test_name.email_to_send).split()
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
                                 common.send_email(request, email_msg)
                             else:
@@ -1349,7 +1350,7 @@ def create_new_test(request):
                                                       pass_score=test_name_form.data['test_name-pass_score'],
                                                       training=training,
                                                       ac_type=ac_type,
-                                                      email_to_send=emails)
+                                                      email_to_send=', '.join(emails))
             # Создаём объекты вопросов теста
             for question in test_q_set.cleaned_data:
                 if not question['DELETE']:
@@ -1431,7 +1432,7 @@ def test_details(request, id):
         TestQuestionsBay.objects.filter(test_id=id).delete()
         if test_q_set.is_valid() and 'krs_email' in request.POST:
             emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
-            a.email_to_send = emails
+            a.email_to_send = ', '.join(emails)
             training = False
             a.name = test_name_form.data.get('name')
             a.pass_score = test_name_form.data.get('pass_score')
