@@ -15,8 +15,8 @@ five_day_before = datetime.datetime.now().date() + datetime.timedelta(days=commo
 class MyCronJob(CronJobBase):
     """Если до конца срока сдачи теста осталось 5 дней и менее, будет отправлено уведомление пользователю.
     Если срок сдачи уже истёк, будет отправлено уведомление КРС и пользователю"""
-    RUN_EVERY_MINS = 3
-    #RUN_EVERY_MINS = 720  # every 12 hors
+
+    RUN_EVERY_MINS = 720  # every 12 hors
     RUN_AT_TIMES = ['08:00']#, '14:00', '23:15']
     #RETRY_AFTER_FAILURE_MINS = 1
     schedule = Schedule(run_at_times=RUN_AT_TIMES, run_every_mins=RUN_EVERY_MINS)#, retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
@@ -58,7 +58,7 @@ class MyCronJob(CronJobBase):
                               f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
                               f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
-                    email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}#user_test.user.email}
+                    email_msg = {'subject': subject, 'message': message, 'to': user_test.user.email}
                     common.send_email(user_test, email_msg)
 
             elif now < test_date_before <= five_day_before:
@@ -86,5 +86,5 @@ class MyCronJob(CronJobBase):
                               f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
                               f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
-                    email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}#user_test.user.email}
+                    email_msg = {'subject': subject, 'message': message, 'to': user_test.user.email}
                     common.send_email(user_test, email_msg)
