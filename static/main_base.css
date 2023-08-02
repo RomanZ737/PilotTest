@@ -207,7 +207,7 @@ div.list-position {  /* блок Должность в таблице */
 div.list-groups {  /* блок Должность в таблице */
     position: relative;
     display: inline-block;
-    width: 95px;
+    width: 110px;
     text-align: left;
     word-wrap: break-word;
     vertical-align: middle;
@@ -356,7 +356,7 @@ div.list-group {  /* блок группа в таблице */
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 38%;
+    width: 290px;
     text-align: left;
     font-size: 18px;
 }
@@ -633,7 +633,7 @@ div.test_total_users {
 div.list-user_test_list {
     position: relative;
     display: inline-block;
-    width: 155px;
+    width: 140px;
     vertical-align: middle
 }
 

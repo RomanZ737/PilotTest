@@ -25,7 +25,7 @@
                             </div>
                             <span style="color: black;">|</span>
                             <div class="list-group_users">
-                                <a href="{% url 'quize737:group_users' group.id %}">Список группы</a>
+                                <a href="{% url 'quize737:group_users' group.id %}">Список: {{group_user_num|get_item:group.name}}</a>
                             </div>
                         </spot>
                     </div>
@@ -49,7 +49,7 @@
                             <span style="color: black;">|</span>
 
                             <div class="list-group_users">
-                                <a href="{% url 'quize737:group_users' group.id %}">Список группы</a>
+                                <a href="{% url 'quize737:group_users' group.id %}">Список: {{group_user_num|get_item:group.name}}</a>
                             </div>
 
                                 <span style="color: black;">|</span>

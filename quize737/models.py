@@ -3,6 +3,7 @@ from datetime import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 import pytz
+from django.utils.timezone import now
 
 
 # Модель тем вопросов
@@ -68,7 +69,7 @@ class QuizeSet(models.Model):
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                        help_text='Имя пользователя, который проходит тест')
-    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=datetime.now(pytz.timezone('Europe/Moscow')))  #datetime.now(pytz.timezone('Europe/Moscow')).strftime('%d.%m.%Y %H:%M:%S')
+    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=now)  #datetime.now(pytz.timezone('Europe/Moscow')).strftime('%d.%m.%Y %H:%M:%S')
     questions_ids = models.TextField(verbose_name='Номера вопросов', null=True,
                                      help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
@@ -92,7 +93,7 @@ class QuizeResults(models.Model):
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     total_num_q = models.IntegerField(verbose_name='Количество вопросов', help_text='Общее количество вопросов в тесте')
-    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=datetime.now(pytz.timezone('Europe/Moscow')))
+    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=now)
     questions_ids = models.TextField(verbose_name='Номера вопросов', null=True)
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
     score_number = models.FloatField(verbose_name='Количество баллов')
@@ -115,7 +116,7 @@ class QuizeResults(models.Model):
 class TestConstructor(models.Model):
     name = models.CharField(max_length=255, verbose_name='Название Теста',
                             help_text='Название теста которое будет видно пользователю')
-    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=70,
+    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=80,
                                      verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
     training = models.BooleanField(verbose_name='Тренировочный тест', default=False)

@@ -74,7 +74,7 @@ class NewTestFormName(forms.Form):
         self.fields['name'].validators = [similar_test_name]
 
     name = forms.CharField(max_length=25, initial='Новый Тест')
-    pass_score = forms.IntegerField(initial=70, widget=forms.NumberInput(attrs={'size': '3',
+    pass_score = forms.IntegerField(initial=80, widget=forms.NumberInput(attrs={'size': '4',
                                                                                 'max': '100',  # For maximum number
                                                                                 'min': '0',  # For minimum number
                                                                                 }))

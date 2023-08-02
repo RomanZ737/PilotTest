@@ -1297,7 +1297,7 @@ def new_test_ac_type(request):
     context = {'ac_type': ac_types_list}
     return render(request, 'new_test_ac_type.html', context=context)
 
-
+#  Продолжение создания нового теста после выбора типа ВС
 @login_required
 @group_required('KRS')
 def create_new_test(request):
@@ -1592,6 +1592,15 @@ def user_list(request):
 @login_required
 @group_required('KRS')
 def group_users(request, id):
+    tests = TestConstructor.objects.all().values()  # Список всех тестов для фильтра
+    test_list = []
+    for test in tests:
+        test_list.append(test)
+    test_list.append({'name': 'Все'})  # Добавляем выбор всех тестов
+    position_list = Profile.Position.values
+    position_list.append('Все')  # Добавляем вариант выбора всех должностей
+    ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
+    ac_types_list.append('Все')
     groups = Group.objects.all().values()
     group_list = []
     for group in groups:
@@ -1601,18 +1610,22 @@ def group_users(request, id):
     position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
     no_search_result = False
     total_user_list = User.objects.filter(groups=id).order_by('last_name')
+    total_user_number = User.objects.filter(groups=id).count()  #  Получаем число пользователей группы
+    group_instance = Group.objects.get(id=id)
+    filter_input = ['Все', 'Все', group_instance.name, 'Все']
+    print('filter', filter_input)
     if not total_user_list:
         no_search_result = True
         group_name = Group.objects.get(id=id)  # .values('name')
         results = f'Пилоты в группе "{group_name.name}" не найдены'
         context = {'no_search_results': no_search_result, 'results': results,
-                   'position_list': position_list, 'group_list': group_list}
+                   'position_list': position_list, 'group_list': group_list, 'ac_types': ac_types_list}
         return render(request, 'user_list.html', context=context)
     paginator = Paginator(total_user_list, 20)
     page_number = request.GET.get('page', 1)
     users = paginator.page(page_number)
-    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
-               'group_list': group_list}
+    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list, 'user_num': total_user_number,
+               'group_list': group_list, 'ac_types': ac_types_list, 'tests_list': test_list, 'filter_input': filter_input}
     return render(request, 'user_list.html', context=context)
 
 
@@ -1624,13 +1637,16 @@ def group_list(request, id=None):
     if id:
         pass
     else:
+        group_user_num = {}  #  Количество пользователей в группе
         groups = Group.objects.all()
+        for group in groups:
+            user_num = User.objects.filter(groups=group.id).count()
+            group_user_num[group.name] = user_num
         fixed_groups = common.fixed_groups
-        print('fixed_groups:', fixed_groups)
         paginator = Paginator(groups, 20)
         page_number = request.GET.get('page', 1)
         groups_pages = paginator.page(page_number)
-        context = {'groups': groups_pages, 'fixed_groups': fixed_groups}
+        context = {'groups': groups_pages, 'fixed_groups': fixed_groups, 'group_user_num': group_user_num}
         return render(request, 'group_list.html', context=context)
 
 
@@ -1877,7 +1893,18 @@ def user_detales(request, id):
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
                 if test['DELETE']:
-                    UserTests.objects.filter(user=user_object, test_name=test['test_name']).delete()
+
+                    UserTests.objects.filter(user=user_object, test_name=test['test_name']).delete()  # Удаляем тест у пользователя
+                    try:  #  Ищем и удаляем начатфые, но не законченные тесты (сам сформированный временный тест с вопросами)
+                        QuizeSet.objects.get(user_under_test=user_object.username, quize_name=test['test_name']).delete()
+                    except Exception:
+                        pass
+                    try:  #  Ищем и удаляем результаты теста, если есть не законченные (in_progress=True)
+                        result_instance = QuizeResults.objects.get(user_id=user_object, quize_name=test['test_name'])
+                        if result_instance.in_progress:
+                            result_instance.delete()
+                    except Exception:
+                        pass
                 else:
                     try:
                         if UserTests.objects.get(user=user_object, test_name=test['test_name']):
@@ -1945,16 +1972,16 @@ def user_detales(request, id):
 
             # Возвращаем пользователя на исходную страницу
             previous_url = request.POST.get('previous_url', '/')
-
+            print('previous_url:', request.POST)
             # TODO: проверить работу на реальном сервере
             #  Вынимаем чистый хост на для тестового сервере
-            request_host = request.get_host()
-            index = (request.get_host()).find(':')
-            request_host = request_host[:index]
-            if previous_url and urlparse(previous_url).hostname == request_host:
-                return HttpResponseRedirect(previous_url)
-            else:
-                return render(request, 'user_ditales.html', context=context)
+            # request_host = request.get_host()
+            # index = (request.get_host()).find(':')
+            # request_host = request_host[:index]
+            # if previous_url and urlparse(previous_url).hostname == request_host:
+            return HttpResponseRedirect(previous_url)
+            # else:
+            #     return render(request, 'user_ditales.html', context=context)
 
         else:
             form_errors = []  # Ошибки при валидации формы
@@ -1972,8 +1999,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-        # user_groups = user_obj.groups.all()
-        # print('user_groups', user_groups)
+        print('previous_url_initial:', previous_url)
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)

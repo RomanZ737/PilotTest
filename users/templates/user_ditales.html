@@ -39,7 +39,7 @@
 <form id="user_tests_form" method='post'>
       {% csrf_token %}
         {{ user_tests.management_form }}
-
+        <input type="hidden" name="previous_url" value="{{ previous_url }}">
         {% if user_tests|length > 0 %}
             <div class="block_none_light_up">
                 <div class="statick_field_sign">Назначенные тесты:</div>
@@ -68,7 +68,7 @@
             <br>
 
     </form>
-    <form  id="form_edit_user" method='get' action='{% url "quize737:edit_user" user_id %}'>
+    <form id="form_edit_user" method='get' action='{% url "quize737:edit_user" user_id %}'>
         <input type="hidden" name="previous_url" value="{{ previous_url }}">
     </form>
 
