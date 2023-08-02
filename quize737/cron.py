@@ -61,7 +61,7 @@ class MyCronJob(CronJobBase):
                           f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
                           f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
-                email_msg = {'subject': subject, 'message': message, 'to': user_test.user.email}
+                email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}#user_test.user.email}
                 common.send_email(user_test, email_msg)
 
             elif now < test_date_before <= five_day_before:
