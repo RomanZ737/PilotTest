@@ -29,10 +29,10 @@ class MyCronJob(CronJobBase):
             if test_date_before < now:
                 user_test_instance = UserTests.objects.get(user=user_test.user, test_name=user_test.test_name)
                 try:
-                    if TestExpired.objects.get(user=user_test.user, test=user_test_instance):
-                        tets_inst = TestExpired.objects.get(user=user_test.user, test=user_test_instance)
-                        tets_inst.days_left = 0
-                        tets_inst.save()
+                    TestExpired.objects.get(user=user_test.user, test=user_test_instance)
+                    tets_inst = TestExpired.objects.get(user=user_test.user, test=user_test_instance)
+                    tets_inst.days_left = 0
+                    tets_inst.save()
                 except Exception:
                     TestExpired.objects.create(user=user_test.user,
                                                test=user_test,
@@ -67,13 +67,12 @@ class MyCronJob(CronJobBase):
             elif now < test_date_before <= five_day_before:
                 days_left = (test_date_before - now).days
                 print(f'{days_left} DAY LEFT:', user_test.user.last_name)
-
                 try:
                     user_test_instance = UserTests.objects.get(user=user_test.user, test_name=user_test.test_name)
-                    if TestExpired.objects.get(user=user_test.user, test=user_test_instance):
-                        tets_inst = TestExpired.objects.get(user=user_test.user, test=user_test_instance)
-                        tets_inst.days_left = days_left
-                        tets_inst.save()
+                    TestExpired.objects.get(user=user_test.user, test=user_test_instance)
+                    tets_inst = TestExpired.objects.get(user=user_test.user, test=user_test_instance)
+                    tets_inst.days_left = days_left
+                    tets_inst.save()
                 except Exception:
                     TestExpired.objects.create(user=user_test.user,
                                                test=user_test,
@@ -90,5 +89,5 @@ class MyCronJob(CronJobBase):
                               f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
                               f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
-                    email_msg = {'subject': subject, 'message': message, 'to': user_test.user.email}
+                    email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}#user_test.user.email}
                     common.send_email(user_test, email_msg)
