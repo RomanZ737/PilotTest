@@ -34,34 +34,32 @@ class MyCronJob(CronJobBase):
                     tets_inst.days_left = 0
                     tets_inst.save()
                 except Exception:
-                    print('NOOOO Sign')
                     TestExpired.objects.create(user=user_test.user,
                                                test=user_test,
                                                days_left=0
                                                )
-                # Отсылаем письмо руководству
+                    # Отсылаем письмо руководству
+                    subject = f'Пилот {user_test.user.profile.family_name} {(user_test.user.profile.first_name)[0]}. {(user_test.user.profile.middle_name)[0]}. ПРОСРОЧИЛ тест'
+                    message = f'<p style="font-size: 20px;"><b>{user_test.user.profile.family_name} {user_test.user.profile.first_name} {user_test.user.profile.middle_name}</b></p><br>' \
+                              f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>ПРОСРОЧИЛ ТЕСТ</b></p>' \
+                              f'<p style="font-size: 15px;">Название теста: <b>{user_test.test_name}</b></p>' \
+                              f'<p style="font-size: 15px;">Дата: <b>{user_test.date_before.strftime("%d.%m.%Y")}</b></p>'
+                    email_list = user_test_instance.test_name.email_to_send.split()
+                    email_msg = {'subject': subject, 'message': message, 'to': email_list}
+                    common.send_email(user_test, email_msg)
 
-                subject = f'Пилот {user_test.user.profile.family_name} {(user_test.user.profile.first_name)[0]}. {(user_test.user.profile.middle_name)[0]}. ПРОСРОЧИЛ тест'
-                message = f'<p style="font-size: 20px;"><b>{user_test.user.profile.family_name} {user_test.user.profile.first_name} {user_test.user.profile.middle_name}</b></p><br>' \
-                          f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>ПРОСРОЧИЛ ТЕСТ</b></p>' \
-                          f'<p style="font-size: 15px;">Название теста: <b>{user_test.test_name}</b></p>' \
-                          f'<p style="font-size: 15px;">Дата: <b>{user_test.date_before.strftime("%d.%m.%Y")}</b></p>'
-                email_list = user_test_instance.test_name.email_to_send.split()
-                email_msg = {'subject': subject, 'message': message, 'to': email_list}
-                common.send_email(user_test, email_msg)
+                    #  Отправляем письмо пользователю если до истечения срока сдачи N дней или менее (письмо один раз)
+                    subject = f"Срок сдачи Теста '{user_test.test_name}' Истекает"
+                    message = f"<p style='font-size: 25px;'><b>Уважаемый, {user_test.user.profile.first_name} {user_test.user.profile.middle_name}.</b></p><br>" \
+                              f"<p style='font-size: 20px;'>Истёк срок сдачи Теста <b>'{user_test.test_name}'</b></p>" \
+                              f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{user_test.date_before.strftime('%d.%m.%Y')}</b></p>" \
+                              f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
+                              f"<br>" \
+                              f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
+                              f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
 
-                #  Отправляем письмо пользователю если до истечения срока сдачи N дней или менее (письмо один раз)
-                subject = f"Срок сдачи Теста '{user_test.test_name}' Истекает"
-                message = f"<p style='font-size: 25px;'><b>Уважаемый, {user_test.user.profile.first_name} {user_test.user.profile.middle_name}.</b></p><br>" \
-                          f"<p style='font-size: 20px;'>Истёк срок сдачи Теста <b>'{user_test.test_name}'</b></p>" \
-                          f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{user_test.date_before.strftime('%d.%m.%Y')}</b></p>" \
-                          f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
-                          f"<br>" \
-                          f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
-                          f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
-
-                email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}#user_test.user.email}
-                common.send_email(user_test, email_msg)
+                    email_msg = {'subject': subject, 'message': message, 'to': 'pomanz@mail.ru'}#user_test.user.email}
+                    common.send_email(user_test, email_msg)
 
             elif now < test_date_before <= five_day_before:
                 days_left = (test_date_before - now).days
