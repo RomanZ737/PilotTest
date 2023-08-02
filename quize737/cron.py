@@ -48,7 +48,7 @@ class MyCronJob(CronJobBase):
                           f'<p>email: {email_list}</p>'
 
                 #email_list = user_test_instance.test_name.email_to_send
-                email_msg = {'subject': subject, 'message': message, 'to': ['pomanz@mail.ru']}
+                email_msg = {'subject': subject, 'message': message, 'to': email_list}
                 common.send_email(user_test, email_msg)
 
                 #  Отправляем письмо пользователю если до истечения срока сдачи N дней или менее (письмо один раз)
