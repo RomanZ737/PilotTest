@@ -59,20 +59,15 @@
     <p>Логин: {{form_user.username}}</p>
       <p>Email: {{form_user.email}}</p>
   </form>
-    <form id="user_del_form" action="{% url 'quize737:del_user' user_obj.id %}">
+    <form id="user_del_form" action="{% url 'quize737:del_user' user_obj.id %}"></form>
+    <form  id="go-back" method='get' action='{% url "quize737:go_back_button" %}'>
+        <input type="hidden" name="previous_url" value="{{ previous_url }}">
     </form>
     <input type="submit" form="user_edit_form" value="Сохранить">
     <span style="color: black;"> | </span>
+    <input type="submit" value="Вернуться" form="go-back">
+    <span style="color: black;"> | </span>
     <input type="submit" form="user_del_form" value="Удалить" onclick="return confirm('Удалить Пилота?') || event.preventDefault()">
-
-    <br>
-    <br>
-    <br>
-        <form  method='get' action='{% url "quize737:go_back_button" %}'>
-            <input type="hidden" name="previous_url" value="{{ previous_url }}">
-            <input type="submit" value="Вернуться">
-        </form>
-
 </div>
 </fieldset>
 

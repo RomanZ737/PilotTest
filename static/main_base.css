@@ -55,6 +55,15 @@ footer {
     font-size: 17px;
 }
 
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
 button {
     background-color: rgb(209, 209,209); /* Цвет NWS Dark Gray */
     text-align: center;
@@ -319,7 +328,7 @@ div.list-other_field {    /* блок для остальных типов да�
     left: 5%;
     word-wrap: break-word;
     text-align: left;
-    width: 40%;
+    width: 45%;
     vertical-align: middle;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -639,8 +648,8 @@ div.list-user_test_list {
 
 div.total_user_num {
     position: relative;
-    /*display: inline-block;
-    margin-left: 14px; */
+    display: inline-block;
+    margin-left: 30px;
     color: rgb(209, 209,209);
     text-align: right;
 }
