@@ -658,3 +658,8 @@ span.comment {
     color: rgba(209, 209,209, 0.4);
     font-size: 15px;
 }
+
+div.user_test_statick_sign {
+    position: relative;
+    display: inline-block;
+}

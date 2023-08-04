@@ -29,12 +29,9 @@
 
 
 
-    <h4>{{non_form_errors}}</h4>
-    {% for error in form_errors%}
-        <h4>{{error}}</h4>
-    {% endfor %}
 
 
+    <hr/>
 
 <form id="user_tests_form" method='post'>
       {% csrf_token %}
@@ -42,21 +39,28 @@
         <input type="hidden" name="previous_url" value="{{ previous_url }}">
         {% if user_tests|length > 0 %}
             <div class="block_none_light_up">
-                <div class="statick_field_sign">Назначенные тесты:</div>
+                <div class="user_test_statick_sign">Назначенные тесты:</div>
                 {% if test_and_data_saved %}
                     <span class="result_confirm">Данные сохранены</span>
                 {% endif %}
             </div>
         {% else %}
             <div class="block_none_light_up">
-                <div class="statick_field_sign">Назначенные тесты отсутствуют</div>
+                <div class="user_test_statick_sign">Назначенные тесты отсутствуют</div>
             </div>
         {% endif %}
+
+        <h4>{{non_form_errors}}</h4>
+        {% for error in form_errors%}
+            <h4>{{error}}</h4>
+        {% endfor %}
+
         <br>
+
         {% for form in user_tests %}
         <div class="form_set">
             <div class="block_none_light_up">
-                <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>
+                <span>Название: {{ form.test_name }} Кол-во попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить </span>
             </div>
         </div>
         <br>
@@ -71,24 +75,25 @@
     <form id="form_edit_user" method='get' action='{% url "quize737:edit_user" user_id %}'>
         <input type="hidden" name="previous_url" value="{{ previous_url }}">
     </form>
-
+    <div class="block_none_light_up" id="go_back">
+        <form id="go-back_form" method='get' action='{% url "quize737:go_back_button" %}'>
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
+        </form>
+    </div>
     <div class="block_none_light_up">
         <input type="submit" value="Сохранить" id="save_btn" form="user_tests_form">
-        <span style="color: black;" id="span_vline"> | </span>
+        <span style="color: black;" id="span_vline_1"> | </span>
         <input type="submit" value="Редактировать" id="edit_btn" form="form_edit_user">
+        <span style="color: black;" id="span_vline_2"> | </span>
+        <input type="submit" id="go-back_btn" value="Вернуться" form="go-back_form">
     </div>
     <span class="block_none_light_up" id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
     <br>
-    <div class="block_none_light_up" id="go_back">
-        <form method='get' action='{% url "quize737:go_back_button" %}'>
-            <input type="hidden" name="previous_url" value="{{ previous_url }}">
-            <input type="submit" value="Вернуться">
-        </form>
-    </div>
+
 
     <div class="form_set" style="display:none">
         <div class="block_none_light_up">
-            <span class="empty_form">Название теста: {{ user_tests.empty_form.test_name }} Количество попыток: {{ user_tests.empty_form.num_try }} Выполнить до: {{user_tests.empty_form.date_before}}</span><span>{{user_tests.empty_form.DELETE}} Удалить тест </span>
+            <span class="empty_form">Название: {{ user_tests.empty_form.test_name }} Кол-во попыток: {{ user_tests.empty_form.num_try }} Выполнить до: {{user_tests.empty_form.date_before}}</span><span>{{user_tests.empty_form.DELETE}} Удалить </span>
         </div>
     </div>
 
@@ -165,19 +170,21 @@
 
         }
 
-
+        //Скрываем кнопки и паказываем надпись
 
         let btn = document.getElementById("save_btn");
         let btn_edit = document.getElementById("edit_btn");
-        //let btn_back = document.getElementById("back_btn");
-        let vline = document.getElementById("span_vline");
+        let btn_back = document.getElementById("go-back_btn");
+        let vline_1 = document.getElementById("span_vline_1");
+        let vline_2 = document.getElementById("span_vline_2");
         let form_back = document.getElementById("go_back");
 
         btn.addEventListener('click', () => {
           btn.style.display = 'none';
           btn_edit.style.display = 'none';
-          //btn_back.style.display = 'none';
-          vline.style.display = 'none';
+          btn_back.style.display = 'none';
+          vline_1.style.display = 'none';
+          vline_2.style.display = 'none';
           form_back.style.display = 'none';
           let box = document.getElementById("wait");
           box.style.display = 'block';

@@ -1913,12 +1913,12 @@ def user_detales(request, id):
     # sent = False  # Переменная для отправки письма
 
     if request.method == 'POST':
+        previous_url = request.POST.get('previous_url')
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
         if tests_for_user_form.is_valid():
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
                 if test['DELETE']:
-
                     UserTests.objects.filter(user=user_object, test_name=test['test_name']).delete()  # Удаляем тест у пользователя
                     try:  #  Ищем и удаляем начатфые, но не законченные тесты (сам сформированный временный тест с вопросами)
                         QuizeSet.objects.get(user_under_test=user_object.username, quize_name=test['test_name']).delete()
@@ -1993,20 +1993,13 @@ def user_detales(request, id):
             user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
             tests_for_user_form = UserTestForm(initial=user_tests)
             context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True,
-                       'user_id': id}
+                       'user_id': id, 'previous_url': previous_url}
 
-            # Возвращаем пользователя на исходную страницу
-            previous_url = request.POST.get('previous_url', '/')
-            print('previous_url:', request.POST)
-            # TODO: проверить работу на реальном сервере
-            #  Вынимаем чистый хост на для тестового сервере
-            # request_host = request.get_host()
-            # index = (request.get_host()).find(':')
-            # request_host = request_host[:index]
-            # if previous_url and urlparse(previous_url).hostname == request_host:
-            return HttpResponseRedirect(previous_url)
-            # else:
-            #     return render(request, 'user_ditales.html', context=context)
+            # # Возвращаем пользователя на исходную страницу
+            # previous_url = request.POST.get('previous_url', '/')
+            # print('previous_url:', request.POST)
+            # return HttpResponseRedirect(previous_url)
+            return render(request, 'user_ditales.html', context=context)
 
         else:
             form_errors = []  # Ошибки при валидации формы
@@ -2017,7 +2010,7 @@ def user_detales(request, id):
             errors_non_form = tests_for_user_form.non_form_errors
             context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form,
                        'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'user_id': id}
+                       'form_errors': form_errors, 'user_id': id, 'previous_url': previous_url}
             return render(request, 'user_ditales.html', context=context)
     else:
         user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
