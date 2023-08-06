@@ -15,25 +15,44 @@ main {
 /* Форма и ёё положение */
 section {
     position: absolute;
-    background-color: rgb(62, 62, 62);
-    top: 30%;
-    left: 35%;
+    /* background-color: rgb(62, 62, 62); */
+    top: 14%;
+    left: 29%;
 }
 
 /* Цвет и размер текста в форме */
 
-form, label {
+label {
     color: rgb(209, 209,209);
-    font-size: 17px;
+    font-size: 25px;
+}
+
+form {
+    color: rgb(209, 209,209);
+    font-size: 25px;
+    margin: 0;
+    margin-top: 0px;
+    margin-top: 15px;
+}
+
+legend {
+    /* color: rgb(209, 209,209); */
+    font-size: 25px;
+    color: rgb(170, 39, 47);
+}
+
+fieldset {
+    background-color: rgb(62, 62, 62);
 }
 
 button {
     background-color: rgb(128,128,128); /* Цвет NWS Dark Gray */
     text-align: center;
     display: inline-block;
-    font-size: 10px;
+    font-size: 20px;
     color: black;
     width: 100%;
+    margin-bottom: 10px;
 }
 
 a {

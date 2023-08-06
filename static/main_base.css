@@ -182,6 +182,7 @@ div.list-fio {  /* блок ФИО в таблице */
     width: 290px;
     word-wrap: break-word;
     text-align: left;
+    vertical-align: middle;
 
 
 }
@@ -193,8 +194,11 @@ div.list-ac_type {  /* блок Типа ВС в таблице */
     width: 50px;
     word-wrap: break-word;
     text-align: left;
-
-
+    vertical-align: middle;
+    border-left: 1px solid black;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin: 1px;
 }
 
 div.list-date {     /* блок Дата в таблице */
@@ -202,15 +206,26 @@ div.list-date {     /* блок Дата в таблице */
     display: inline-block;
     width: 77px%;
     text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
 }
 
 div.list-position {  /* блок Должность в таблице */
     position: relative;
     display: inline-block;
-    width: 35px;
+    width: 36px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
+    /*border-right: 1px solid black; */
 }
 
 div.list-groups {  /* блок Должность в таблице */
@@ -218,8 +233,12 @@ div.list-groups {  /* блок Должность в таблице */
     display: inline-block;
     width: 110px;
     text-align: left;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* margin: 4px; */
     word-wrap: break-word;
     vertical-align: middle;
+    border-left: 1px solid black;
     color: rgb(209, 209,209);
     font-size: 18px;
 }
@@ -229,8 +248,9 @@ div.list-test_result {  /* блок Результат сдачи теста в 
     display: inline-block;
     width: 160px;
     text-align: center;
-
-
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    vertical-align: middle;
 }
 
 div.list-them {  /* блок Тема вопроса в таблице */
@@ -262,6 +282,10 @@ div.list-delete {  /* блок Удалить каки-либо запись в 
     position: relative;
     display: inline-block;
     text-align: left;
+    vertical-align: middle;
+    border-left: 1px solid black;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.hr {  /* блок горизонтальная линия, пока не используется */
@@ -317,7 +341,7 @@ div.list-test_name {    /* блок названия теста в таблиц�
     /* left: 15px; */
     word-wrap: break-word;
     text-align: left;
-    width: 245px;
+    width: 240px;
     vertical-align: middle;
 
 }
@@ -386,6 +410,10 @@ div.list-edit {
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;
+    vertical-align: middle;
+    border-left: 1px solid black;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.new_user-field {
@@ -579,7 +607,12 @@ div.test_total_q_num {
     position: relative;
     display: inline-block;
     width: 120px;
-    vertical-align: middle
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
 }
 
 div.test_ac-type {
@@ -587,15 +620,25 @@ div.test_ac-type {
     display: inline-block;
     width: 43px;
     vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
 }
 
 div.test_them_list {
     position: relative;
     display: inline-block;
     width: 155px;
-    text-align: justify;
+    /* text-align: justify; */
     text-justify: inter-word;
-    vertical-align: middle
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* margin: 3px; */
+    border-left: 1px solid black;
+
 }
 
 span.test_theme_list {
@@ -610,6 +653,11 @@ div.test_training {
     position: relative;
     display: inline-block;
     width: 43px;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
 }
 
 span.test_theme_del {
@@ -627,15 +675,26 @@ div.list-test_name_results {    /* блок названия теста в та�
     word-wrap: break-word;
     text-align: left;
     width: 140px;
+    /* text-align: justify; */
+    text-justify: inter-word;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin: 4px;
     vertical-align: middle;
     color: rgb(209, 209,209);
+    border-left: 1px solid black;
 }
 
 div.test_total_users {
     position: relative;
     display: inline-block;
-    width: 115px;
-    vertical-align: middle
+    width: 111px;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
 
 }
 
@@ -644,6 +703,12 @@ div.list-user_test_list {
     display: inline-block;
     width: 140px;
     vertical-align: middle
+    border-left: 1px solid black;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* margin: 4px; */
+    border-left: 1px solid black;
+
 }
 
 div.total_user_num {

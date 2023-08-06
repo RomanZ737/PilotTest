@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, Group
 # from models import Profile
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField
 from .models import UserTests, GroupsDescription
 from django.contrib.admin.widgets import AdminDateWidget
 from django.core.exceptions import ValidationError
@@ -31,14 +31,29 @@ class UserRegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
-class LoginForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ("username", "password")
-        labels = {
-            'username': 'Логин',
-            'password': 'Пароль'
-        }
+# class LoginForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ("username", "password")
+#         labels = {
+#             'username': 'Логин',
+#             'password': 'Пароль'
+#         }
+#         widgets = {
+#             'username': forms.Select(attrs={'size': 3}),
+#             "password": forms.PasswordInput(attrs={'style': 'font-size: 25'})
+#         }
+
+class LoginForm(AuthenticationForm):
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': ''}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'placeholder': ''}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'style': 'font-size: 25px;'})
+        self.fields['username'].label = 'Логин:'
+        self.fields['password'].widget.attrs.update({'style': 'font-size: 25px;'})
+        self.fields['password'].label = 'Пароль:'
 
 
 # class ProfileFormReadOnly(forms.ModelForm):

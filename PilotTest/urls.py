@@ -21,6 +21,7 @@ from django.conf import settings
 from users import views as users_views
 from django.contrib.auth import views as auth_views
 from quize737 import views as quize737_views
+from users.forms import LoginForm
 
 from django.contrib.auth.views import (
     LogoutView,
@@ -37,7 +38,7 @@ from django.contrib.auth.views import (
 urlpatterns = [
                   path('PilotAdmin/', admin.site.urls),
                   path('', quize737_views.start, name='start'),
-                  path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+                  path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=LoginForm), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
                   path('DBLoad/', include('DBLoad.urls', namespace='DBLoad')),
                   path('profile/', users_views.profile, name='profile'),

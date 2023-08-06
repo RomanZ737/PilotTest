@@ -28,31 +28,31 @@
                     <div class="list-test_name">
                         <a href="{{test.id}}"><span style="color: black;"></span> {{test.name}}</a>
                     </div>
-                    <span style="color: black;"> | </span>
+
                     <div class="test_ac-type">
                         {{test.ac_type}}
                     </div>
-                    <span style="color: black;"> | </span>
+
                     <div class="test_total_q_num">
                         <span>Вопросов: <span class="mark_up">{{total_q_num|get_item:test.name}}</span></span>
                     </div>
-                    <span style="color: black;"> | </span>
+
                     <div class="test_total_users">
                         <a href="/user_list/?position_filter=Все&position_filter=Все&position_filter=Все&position_filter={{test.name}}">Назначен: {{users|get_item:test.name}}</a>
                     </div>
-                    <span style="color: black;"> | </span>
+
                     <div class="test_them_list">
-                        <span>{{total_them|get_item:test.name|join:"; "}}</span>
+                        <span>{{total_them|get_item:test.name|join:"; "|truncatewords:5}}</span>
                     </div>
-                    <span style="color: black;"> | </span>
+
                     <div class="test_training">
                         {% if test.training %}
-                            <span>Трен.</span>
+                            <span class="theme_color">Трен.</span>
                         {% else %}
                             <span></span>
                         {% endif %}
                     </div>
-                    <span style="color: black;"> | </span>
+
                     <div class="list-delete">
                         <a href="{% url 'quize737:del_test' test.id %}" onclick="return confirm('Удалить Тест: {{test.name}}?') || event.preventDefault()">Удалить</a>
                     </div>
