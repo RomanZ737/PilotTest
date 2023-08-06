@@ -275,7 +275,7 @@ div.list-question {  /* блок Текст вопроса в таблице */
     padding-right: 5px;
     margin: 4px;
     border-left: 1px solid black;
-    border-right: 1px solid black;
+    /* border-right: 1px solid black; */
 }
 
 div.list-delete {  /* блок Удалить каки-либо запись в таблице */
