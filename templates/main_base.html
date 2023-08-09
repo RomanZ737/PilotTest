@@ -11,7 +11,9 @@
     <body>
 
         <header>
-			<span><img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto"></span>
+            <a href="/">
+			    <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto">
+            </a>
             <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
 
             <nav>

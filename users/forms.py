@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, Group
 # from models import Profile
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField, PasswordResetForm
 from .models import UserTests, GroupsDescription
 from django.contrib.admin.widgets import AdminDateWidget
 from django.core.exceptions import ValidationError
@@ -46,7 +46,8 @@ class UserRegisterForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': ''}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'placeholder': ''}))
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'placeholder': ''}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -54,6 +55,15 @@ class LoginForm(AuthenticationForm):
         self.fields['username'].label = 'Логин:'
         self.fields['password'].widget.attrs.update({'style': 'font-size: 25px;'})
         self.fields['password'].label = 'Пароль:'
+
+
+class RestorePasword(PasswordResetForm):
+    email = forms.EmailField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs.update({'style': 'font-size: 25px;'})
+        # self.fields['username'].label = 'Логин:'
 
 
 # class ProfileFormReadOnly(forms.ModelForm):
@@ -103,9 +113,8 @@ class GroupForm(forms.ModelForm):
         # fields = {'group', 'discription'}
         exclude = ('group',)
         widgets = {
-             'discription': forms.Textarea(attrs={'cols': 70, 'rows': 2}),
-         }
-
+            'discription': forms.Textarea(attrs={'cols': 70, 'rows': 2}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)
@@ -113,22 +122,21 @@ class GroupForm(forms.ModelForm):
         self.fields['group_name'] = forms.CharField(widget=forms.Textarea(attrs={"cols": "50", 'rows': "1"}))
         self.fields['group_name'].validators = [similar_group_name]
 
+
 # Форма для редактирования существующей группы
 class EditGroupForm(forms.ModelForm):
     class Meta:
         model = GroupsDescription
-        #fields = {'group', 'discription'}
+        # fields = {'group', 'discription'}
         exclude = ('group',)
         widgets = {
             'discription': forms.Textarea(attrs={'cols': 70, 'rows': 2}),
         }
 
-
-
     def __init__(self, *args, **kwargs):
-            super(EditGroupForm, self).__init__(*args, **kwargs)
-            # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
-            self.fields['group_name'] = forms.CharField(widget=forms.Textarea(attrs={"cols": "50", 'rows': "1"}))
-        # widgets = {
-        #     'group': forms.TextInput(),
-        #     'discription': forms.TextInput()}
+        super(EditGroupForm, self).__init__(*args, **kwargs)
+        # self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=UserDefinedCode.objects.filter(owner=user))
+        self.fields['group_name'] = forms.CharField(widget=forms.Textarea(attrs={"cols": "50", 'rows': "1"}))
+    # widgets = {
+    #     'group': forms.TextInput(),
+    #     'discription': forms.TextInput()}

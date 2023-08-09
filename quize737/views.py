@@ -2308,7 +2308,7 @@ def mess_to_admin(request):
                       f'<p style="font-size: 18px;">{mess_subject}</p>' \
                       f'<p style="font-size: 20px;"><b>Сообщение:</b></p>' \
                       f'<p style="font-size: 18px;">{message}</p><br>' \
-                      f'<a href="{request.user.email}">Ответить</a>'
+                      f'<a href="mailto:{request.user.email}">Ответить</a>'
             email_msg = {'subject': subject, 'message': message, 'to': to}
             common.send_email(request, email_msg)
             print('OOOOk')

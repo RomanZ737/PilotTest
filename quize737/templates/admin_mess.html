@@ -6,7 +6,7 @@
     <body>
         <div class="modal-form">
             <fieldset id="admin_mess_form">
-                <form hx-post="{{ request.path }}" name="message">
+                <form hx-post="{{ request.path }}">
                     {% csrf_token %}
                     <div class="block_none_light_up">
                         <div class="modal_form-static_sign">
@@ -26,7 +26,7 @@
                         <div class="modal_form_button_block">
                             <input type="submit" value="Отправить">
                             <span>|</span>
-                            <input type="submit" data-bs-dismiss="modal" value="Закрыть">
+                            <input type="reset" data-bs-dismiss="modal" value="Закрыть">
                         </div>
                     </div>
                 </form>
