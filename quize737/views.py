@@ -2294,7 +2294,23 @@ def go_back_button(request):
 
 def mess_to_admin(request):
     if request.method == "POST":
-        pass
+        form = AdminMessForm(request.POST)
+        mess_subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        if form.is_valid():
+            to = common.admin_email
+            subject = f'Сообщение Администратору'
+            message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                      f'<p style="font-size: 15px;"><b>Тема сообщения: {mess_subject}</b></p><br>' \
+                      f'<p style="font-size: 15px;"><b>{message}</b></p>' \
+
+            email_msg = {'subject': subject, 'message': message, 'to': to}
+            common.send_email(request, email_msg)
+            return HttpResponse(status=204)
+        else:
+            form = AdminMessForm()
+            context = {'form': form}
+            return render(request, 'admin_mess.html', context=context)
     else:
         form = AdminMessForm()
         context = {'form': form}

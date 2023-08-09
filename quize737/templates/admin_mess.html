@@ -1,11 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{{form}}
-</body>
+{% load static %}
+<html>
+    <head>
+
+    </head>
+    <body>
+        <div class="modal-form">
+            <fieldset id="admin_mess_form">
+                <form hx-post="{{ request.path }}" name="message">
+                    {% csrf_token %}
+                    <div class="block_none_light_up">
+                        <div class="modal_form-static_sign">
+                            <span class="mark_up">Тема Сообщения</span>
+                        </div>
+                        <div class="modal_form-dynamic_sign">
+                            {{form.subject}}
+                        </div>
+                    </div>
+                    <div class="block_none_light_up">
+                        <div class="modal_form-static_sign">
+                            <span class="mark_up">Сообщение:</span>
+                        </div>
+                        <div class="modal_form-dynamic_sign">
+                            {{form.message}}
+                        </div>
+                        <div class="modal_form_button_block">
+                            <input type="submit" value="Отправить">
+                            <span>|</span>
+                            <input type="submit" data-bs-dismiss="modal" value="Закрыть">
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+    </body>
 
 </html>
