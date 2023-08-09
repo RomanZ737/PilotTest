@@ -5,7 +5,7 @@ from email.utils import make_msgid
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 import os
 
-admin_email = 'r.zaychenko@nordwindairlies.ru'
+admin_email = 'pomanz@mail.ru'
 krs_mail_list = ['pomanz@mail.ru', '733.roman@gmail.com']
 #krs_mail_list = ['r.zaychenko@nordwindairlines.ru', 'd.dolgov@nordwindairlines.ru', 'p.leshchinskiy@nordwindairlines.ru', 's.samoylov@nordwindairlines.ru']  #  Список адресов для рассылки сообщений КРС
 fixed_groups = ['KRS', 'ВП B737', 'КВС B737', 'ПИ B737', 'Редактор', 'ВП B777', 'КВС B777', 'ПИ B777', 'ВП A32X', 'КВС A32X', 'ПИ A32X', 'ВП A33X', 'КВС A33X', 'ПИ A33X']  # Фиксированные группы, пользователи не могут удалять

@@ -2299,15 +2299,22 @@ def mess_to_admin(request):
         message = request.POST.get('message')
         if form.is_valid():
             to = common.admin_email
-            subject = f'Сообщение Администратору'
-            message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
-                      f'<p style="font-size: 15px;"><b>Тема сообщения: {mess_subject}</b></p><br>' \
-                      f'<p style="font-size: 15px;"><b>{message}</b></p>' \
-
+            subject = f'Сообщение Админу Pilot Test'
+            message = f'<p style="font-size: 20px;">Сообщение от:</p>' \
+                      f'<span style="font-size: 18px;"><b>{request.user.profile.position} </b></span>' \
+                      f'<span style="font-size: 18px;"><b>{request.user.profile.ac_type}</b></span>' \
+                      f'<p style="font-size: 18px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                      f'<p style="font-size: 20px;"><b>Тема сообщения:</b></p>' \
+                      f'<p style="font-size: 18px;">{mess_subject}</p>' \
+                      f'<p style="font-size: 20px;"><b>Сообщение:</b></p>' \
+                      f'<p style="font-size: 18px;">{message}</p><br>' \
+                      f'<a href="{request.user.email}">Ответить</a>'
             email_msg = {'subject': subject, 'message': message, 'to': to}
             common.send_email(request, email_msg)
+            print('OOOOk')
             return HttpResponse(status=204)
         else:
+            print('Noooooot OK')
             form = AdminMessForm()
             context = {'form': form}
             return render(request, 'admin_mess.html', context=context)

@@ -133,5 +133,5 @@ class NewThemeForm(forms.ModelForm):
 
 #  форма сообщения администратору (в модальном окне)
 class AdminMessForm(forms.Form):
-    subject = forms.CharField(widget=forms.Textarea(attrs={'rows': 1}), help_text="Тема сообщения", required=False)
-    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 6}), required=False)
+    subject = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'style': 'font-size: 18'}), help_text="Тема сообщения", required=False)
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 7, 'style': 'font-size: 18'}), required=False)
