@@ -50,4 +50,5 @@ urlpatterns = [
     path('pilotload/', PLView.pilotload, name='pilotload'),
     path('download_questions_bay/', views.download_questions_bay, name='download_questions_bay'),
     path('issue_mess/', views.issue_mess, name='issue_mess'),
+    path('mess_to_admin/', views.mess_to_admin, name='mess_to_admin'),
     ]

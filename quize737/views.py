@@ -31,7 +31,7 @@ from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, Quize
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
-    NewThemeForm, MyNewTestFormQuestions
+    NewThemeForm, MyNewTestFormQuestions, AdminMessForm
 from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
@@ -2290,3 +2290,12 @@ def go_back_button(request):
     return HttpResponseRedirect(previous_url)
     # else:
     #     return redirect('/')
+
+
+def mess_to_admin(request):
+    if request.method == "POST":
+        pass
+    else:
+        form = AdminMessForm()
+        context = {'form': form}
+        return render(request, 'admin_mess.html', context=context)

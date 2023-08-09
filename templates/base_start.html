@@ -3,7 +3,8 @@
 <html>
         <link href="https://fonts.cdnfonts.com/css/helveticaneuecyr-2" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'base_start.css' %}" type="text/css">
-    <head>
+        <script src="{% static 'js/htmx.min.js' %}" defer></script>
+        <head>
         <title>NWS Pilot Test</title>
         <link rel="icon" href="{% static 'nws_icon.png' %}">
     </head>
@@ -74,9 +75,34 @@
                     <span>|</span>
                     <a href="#">Написать Администратору</a>
                     <span>|</span>
+                    <button hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">
+                        Mess to Admin
+                    </button>
+
+
+
             {% endif %}
         </footer>
+    <div id="modal" class="modal fade">
+    <div id="dialog" class="modal-dialog" hx-target="this"></div>
+    </div>
+
+    <script>
+
+       const modal = document.getElementById("modal")
+
+htmx.on("htmx:afterSwap", (e) => {
+  // Response targeting #dialog => show the modal
+  if (e.detail.target.id == "dialog") {
+    modal.show()
+  }
+})
+
+
+    </script>
 
     </body>
 </html>
+
+
 

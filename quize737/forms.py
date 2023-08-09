@@ -129,3 +129,9 @@ class NewThemeForm(forms.ModelForm):
     class Meta:
         model = Thems
         fields = ['name']
+
+
+#  форма сообщения администратору (в модальном окне)
+class AdminMessForm(forms.Form):
+    subject = forms.CharField(help_text="Тема сообщения")
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows':3}))
