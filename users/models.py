@@ -12,10 +12,10 @@ class Profile(models.Model):
         INSTRUCTOR = 'ПИ', 'Пилот-инструктор'
 
     class ACType(models.TextChoices):
-        B737 = 'B737', 'ВС Boeing 737'
-        B777 = 'B777', 'ВС Boeing 777'
-        A32X = 'A32X', 'ВС Airbus 32X'
-        A33X = 'A33X', 'ВС Airbus 33X'
+        B737 = 'B737', 'Boeing 737'
+        B777 = 'B777', 'Boeing 777'
+        A32X = 'A32X', 'Airbus 32X'
+        A33X = 'A33X', 'Airbus 33X'
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')

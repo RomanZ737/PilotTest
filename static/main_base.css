@@ -262,6 +262,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     color: rgb(170, 39, 47);
     font-size: 18px;
     word-wrap: break-word;
+    vertical-align: middle;
 }
 
 div.list-question {  /* блок Текст вопроса в таблице */
@@ -601,6 +602,10 @@ div.list-them_questions_num { /*  Количество вопросов в те�
     position: relative;
     display: inline-block;
     width: 20%;
+    vertical-align: middle;
+    border-left: 1px solid black;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.test_total_q_num {

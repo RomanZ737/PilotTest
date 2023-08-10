@@ -80,11 +80,11 @@
                         </span>
                     </a>
                 </div>
-                <span style="color: black;">|</span>
+
                 <div class="list-them_questions_num">
-                    <a href="/question_list/?filter={{theme.name}}&filter=Все">Вопросов:  {{num_dict|get_item:theme.name}}</a>
+                    <a href="/question_list/?filter={{theme.name}}&filter=Все">Вопросов: {{num_dict|get_item:theme.name}}</a>
                 </div>
-                <span style="color: black;">|</span>
+
 
                 <div class="list-delete">
                     <a href="{% url 'quize737:theme_del' theme.id %}" onclick="return confirm('Внимание! При удалении темы будут удалены все связанные с ней вопросы. Продолжить?') || event.preventDefault()" name="theme_del">Удалить</a>

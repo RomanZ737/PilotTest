@@ -1152,6 +1152,7 @@ def theme_del(request, id):
 @group_required('KRS')
 def download_test_result(request, id):
     result = QuizeResults.objects.filter(id=id).values()
+    user_instance = User.objects.get(id=result[0]['user_id_id'])
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer)
     # Выясняем тукущую директорию
@@ -1159,7 +1160,8 @@ def download_test_result(request, id):
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     pdfmetrics.registerFont(TTFont('FreeSans', dir_path + '/static/FreeSans.ttf'))
-    p.setFont('FreeSans', 15)
+    pdfmetrics.registerFont(TTFont('FreeSansBold', dir_path + '/static/FreeSansBold.ttf'))
+
 
     # p.setFillColorRGB(128, 128, 128) # Цвет текста
     # p. setStrokeColorRGB(0.2, 0.5, 0.3)
@@ -1171,18 +1173,75 @@ def download_test_result(request, id):
     # p.line(10, 700, 400, 700 * inch)
 
     p.drawInlineImage(dir_path + '/static/nws_logo_white.jpg', 0, y, width=260, height=100)
+    x = 25  # Расстояние (отступ) текста справа (по горизонтали)
+    y -= 25  # Расстояние (отступ) текста сверху (по вертикали)
+    x_second = 190  # Расстояние (отступ справа) второй надписи в строке (динамическая информация)
+    p.setFont('FreeSans', 23)
+    p.drawString(120, y, f'Тестирование Лётного Состава')
+    y -= 50
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Дата:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(185, y, f'{result[0]["timestamp"].strftime("%d.%m.%Y %H:%M:%S")} UTC')
     y -= 25
-    p.drawString(20, y, f'ФИО: {result[0]["user_name"]}')
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'ФИО:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{result[0]["user_name"]}')
     y -= 25
-    p.drawString(20, y, f'Дата: {result[0]["timestamp"].strftime("%d.%m.%Y %H:%M:%S")}')
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Квалификация:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{user_instance.profile.get_position_display()}')
     y -= 25
-    p.drawString(20, y, f'Название теста: {result[0]["quize_name"]}')
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Тип ВС:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{user_instance.profile.get_ac_type_display()}')
     y -= 25
-    p.drawString(20, y, f'Общее количество вопросов: {result[0]["total_num_q"]}')
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Название теста:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'"{result[0]["quize_name"]}"')
     y -= 25
-    p.drawString(20, y, f'Количество правильных ответов: {result[0]["correct_q_num"]}')
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Количество вопросов:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{result[0]["total_num_q"]}')
     y -= 25
-    p.drawString(20, y, f'Общий результат: {result[0]["total_result"]}%')
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Правильных ответов:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{result[0]["correct_q_num"]}')
+    y -= 25
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Необходимо баллов:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{result[0]["pass_score"]}%')
+    y -= 25
+    p.setFont('FreeSans', 15)
+    p.drawString(x, y, f'Набрано баллов:')
+    p.setFont('FreeSansBold', 15)
+    p.drawString(x_second, y, f'{result[0]["total_result"]}%')
+
+    if result[0]["conclusion"] == True:
+        total_result = 'ТЕСТ СДАН'
+    else:
+        total_result = 'ТЕСТ НЕ СДАН'
+    y -= 70
+    p.setFont('FreeSansBold', size=25)
+    p.drawString(220, y, f'{total_result}')
+
+    klo_sign = 'Командир Лётного Отряда ____________________ /                                /'
+
+    if user_instance.profile.ac_type == 'B777' or 'B737':
+        klo_sign = 'Командир ЛО B737/B777 ____________________ /                                /'
+    elif user_instance.profile.ac_type == 'A32X' or 'A33X':
+        klo_sign = 'Командир ЛО A321/A330 ____________________ /                                /'
+
+    y -= 250
+    p.setFont('FreeSans', size=13)
+    p.drawString(x, y, f'{klo_sign}')
 
     p.showPage()
     p.save()
