@@ -179,7 +179,7 @@ div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 290px;
+    width: 305px;
     word-wrap: break-word;
     text-align: left;
     vertical-align: middle;
@@ -703,6 +703,7 @@ div.test_total_users {
 
 }
 
+
 div.list-user_test_list {
     position: relative;
     display: inline-block;
@@ -732,4 +733,10 @@ span.comment {
 div.user_test_statick_sign {
     position: relative;
     display: inline-block;
+}
+
+div.inline_option {
+    position:relative;
+    color: rgb(209, 209,209);
+    font-size: 18px;
 }
