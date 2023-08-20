@@ -1549,6 +1549,16 @@ def user_list(request):
         pass
 
     else:
+        # Если в запросе были отмечены пользователи (user_select)
+        selected_user_list = []  # Список пользователей, которые были отмечены
+        print(request.GET.getlist('user_selected'))
+        if 'user_selected' in request.GET.keys():
+            selected_users_ids = request.GET.getlist('user_selected')
+            for user_id in selected_users_ids:
+                user_selected = User.objects.get(id=user_id)
+                selected_user_list.append(user_selected)
+        print('selected_user_list', selected_user_list)
+
         groups = Group.objects.all().values()  # Список всех групп для фильтра
         tests = TestConstructor.objects.all().values()  # Список всех тестов для фильтра
         assign_test_list = UserTests.objects.all()  # Все тесты, назначенные кому либо
@@ -1570,6 +1580,7 @@ def user_list(request):
         ac_types_list.append('Все')
         user_search_input = request.GET.get("user_search")
         filter_input = request.GET.getlist("position_filter")
+
         no_search_result = False
         if user_search_input or filter_input:
             if user_search_input:
@@ -1597,7 +1608,7 @@ def user_list(request):
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
                                'position_list': position_list, 'group_list': group_list, 'ac_types': ac_types_list,
-                               'user_search_input': user_search_input}
+                               'user_search_input': user_search_input, 'selected_users': selected_user_list, 'user_list': selected_user_list}
                     return render(request, 'user_list.html', context=context)
                 if not total_user_list:
                     no_search_result = True
@@ -1605,17 +1616,17 @@ def user_list(request):
                     context = {'no_search_results': no_search_result, 'results': results,
                                'position_list': position_list, 'group_list': group_list,
                                'assign_test_list': assign_test_list, 'ac_types': ac_types_list, 'tests_list': test_list,
-                               'user_search_input': user_search_input}
+                               'user_search_input': user_search_input, 'selected_users': selected_user_list, 'user_list': selected_user_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
-                    paginator = Paginator(total_user_list, 20)
+                    paginator = Paginator(total_user_list, 25)
                     page_number = request.GET.get('page', 1)
                     users = paginator.page(page_number)
                     context = {'user_list': users, 'no_search_results': no_search_result,
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
                                'user_test_dict': user_test_dict, 'user_num': total_user_number,
-                               'ac_types': ac_types_list, 'user_search_input': user_search_input}
+                               'ac_types': ac_types_list, 'user_search_input': user_search_input, 'selected_users': selected_user_list}
                     return render(request, 'user_list.html', context=context)
             else:
                 ac_type = ''
@@ -1645,7 +1656,7 @@ def user_list(request):
                     results = f'Пилоты по запросу не найдены'
                     context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
-                               'ac_types': ac_types_list}
+                               'ac_types': ac_types_list, 'selected_users': selected_user_list, 'user_list': selected_user_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
@@ -1655,7 +1666,7 @@ def user_list(request):
                     context = {'user_list': users, 'no_search_results': no_search_result,
                                'position_list': position_list, 'filter_input': filter_input,
                                'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
-                               'user_num': total_user_number, 'ac_types': ac_types_list}
+                               'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list}
                     return render(request, 'user_list.html', context=context)
 
         else:

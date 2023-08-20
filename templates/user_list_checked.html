@@ -1,0 +1,45 @@
+<form id="checkboxes" name="checkboxes">
+        {% for user in user_list %}
+        {% if user.username != 'roman' %}
+        <div class="block_light_up">
+
+            <div class="list-fio">
+                <input type="checkbox" id="user_selected" name="user_selected" value="{{user.id}}" checked>&nbsp&nbsp
+                <a href="{% url 'quize737:user_detales' user.id %}">{{user.profile.family_name}}
+                    {{user.profile.first_name}} {{user.profile.middle_name}}</a>
+            </div>
+
+
+            <div class="list-ac_type">
+                <span class="theme_color">{{user.profile.ac_type}}</span>
+            </div>
+
+            <div class="list-position">
+                <span class="theme_color">{{user.profile.position}}</span>
+            </div>
+
+            <div class="list-groups">
+                <span>{{user.groups.all|join:";  "}}</span>
+            </div>
+
+            <div class="list-user_test_list">
+                {% if user_test_dict|get_item:user.username %}
+                <span>{{user_test_dict|get_item:user.username|join:";  "}}</span>
+                {% else %}
+                <span>Нет Тестов</span>
+                {% endif %}
+
+            </div>
+
+            <div class="list-edit">
+                <a href="{% url 'quize737:edit_user' user.id %}">Редактировать</a>
+            </div>
+
+            <div class="list-delete">
+                <a href="{% url 'quize737:del_user' user.id %}"
+                   onclick="return confirm('Удалить Пилота {{user.profile.family_name}} {{user.profile.first_name.0}}.{{user.profile.middle_name.0}}.?') || event.preventDefault()">Удалить</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </form>

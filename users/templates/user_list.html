@@ -1,6 +1,8 @@
 {% extends "main_base.html" %}
 
 {% block content %}
+
+
 <fieldset>
     <legend><a href="{% url 'quize737:user_list' %}">ПИЛОТЫ</a>
         <span style="color: black;"> | </span>
@@ -14,15 +16,18 @@
     <div class="block-list">
         <div class="block_none_light_up">
             <div class="search-form">
+                <div style="display: inline-block;">
                 <form id="user_search" action="{% url 'quize737:user_list' %}" method="get">
                     <input type="text" name="user_search" placeholder="Поиск пилота..." value="{{ user_search_input }}">
-                    <input type="submit" value="Искать">
                 </form>
+                </div>
+                <div style="display:inline-block;">
+                    <input type="submit" value="Искать" id="submitSearch">
+                </div>
             </div>
             <div class="filter-form">
                 <div class="filter_related_users">
-                    <form id="position_filter" name="position_filter" action="{% url 'quize737:user_list' %}"
-                          method="get">
+                    <form id="position_filter" name="position_filter" method="get">
                         <div class="filter_sign_position"></div>
                         <select class="position_filter" name="position_filter">
                             {% for option in ac_types %}
@@ -102,7 +107,7 @@
                     </form>
                 </div>
                 <div class="button_block">
-                    <input class="submit_filter" type="submit" value="Фильтр" form="position_filter">
+                    <input class="submit_filter" type="submit" value="Фильтр" id="submitFilter">
                     <span style="color: black">|</span>
                     <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">
                     <div class="total_user_num">Всего: {{user_num}}</div>
@@ -123,79 +128,56 @@
 
     {% if no_search_results %}
     <div>
+        {% comment "Если были выбраны пользователи" %}
+            Если переход на страницу был после поиска или фитрации и резльтатов поиска и фильтрации нет,
+            а выбранные пользователи есть, то они будут отображены здесь
+        {% endcomment %}
+        {% if selected_users %}
+            {% include "user_list_checked.html" with page=user_list %}
+            <hr/>
+            <br>
+        {% endif %}
         <span style="color: rgb(209, 209,209);">{{results}}</span>
     </div>
     {% else %}
-    <form>
-        {% for user in user_list %}
-        {% if user.username != 'roman' %}
-        <div class="block_light_up">
-
-            <div class="list-fio">
-                <input type="checkbox" id="user_selected" name="user_selected" value="{{user.id}}">&nbsp&nbsp
-                <a href="{% url 'quize737:user_detales' user.id %}">{{user.profile.family_name}}
-                    {{user.profile.first_name}} {{user.profile.middle_name}}</a>
-            </div>
-
-
-            <div class="list-ac_type">
-                <span class="theme_color">{{user.profile.ac_type}}</span>
-            </div>
-
-            <div class="list-position">
-                <span class="theme_color">{{user.profile.position}}</span>
-            </div>
-
-            <div class="list-groups">
-                <span>{{user.groups.all|join:";  "}}</span>
-            </div>
-
-            <div class="list-user_test_list">
-                {% if user_test_dict|get_item:user.username %}
-                <span>{{user_test_dict|get_item:user.username|join:";  "}}</span>
-                {% else %}
-                <span>Нет Тестов</span>
-                {% endif %}
-
-            </div>
-
-            <div class="list-edit">
-                <a href="{% url 'quize737:edit_user' user.id %}">Редактировать</a>
-            </div>
-
-            <div class="list-delete">
-                <a href="{% url 'quize737:del_user' user.id %}"
-                   onclick="return confirm('Удалить Пилота {{user.profile.family_name}} {{user.profile.first_name.0}}.{{user.profile.middle_name.0}}.?') || event.preventDefault()">Удалить</a>
-            </div>
-        </div>
-        {% endif %}
-        {% endfor %}
-    </form>
+    {% include "user_list_common.html" with page=user_list %}
     <br>
-    {% include "paginator_2.html" with page=user_list %}
-    {% endif %}
+    <div style="display: block;" id="paginator">
+        {% include "paginator_2.html" with page=user_list %}
+        {% endif %}
+    </div>
 </fieldset>
 
+
+
 <script>
-
-
-    let checkBox = document.querySelectorAll("input")  //Выбираем все объекты 'input'
-    let optionsBlock = document.getElementById("inline_option_block")
+    var checkBox = document.querySelectorAll("input")  //Выбираем все объекты 'input'
+    var optionsBlock = document.getElementById("inline_option_block")
+    var paginator = document.getElementById("paginator") // Берем блок paginator
 
     for (i of checkBox) {  //перебираем в цикле все элементы 'checkbox'
         i.addEventListener('change', UserSelected);
-        if (i.checked == true) {
+        if (i.checked == true) { // Если пользователь устанавливает галку
                     optionsBlock.style.display = 'block';
+                    if ( paginator != null) {
+                        console.log('paginator' + paginator);
+                        paginator.style.display = 'none';
+                       }
+
                     }
     }
-
 
     function UserSelected(event){
         event.preventDefault();
         if (event.target.checked == true) {
-            if (optionsBlock.style.display == "none") {optionsBlock.style.display = 'block';}
+            if (optionsBlock.style.display == "none") {
+            optionsBlock.style.display = 'block';
+                if ( paginator != null) {
+                    paginator.style.display = 'none'; // скрываем перелистывание страниц paginator
+                }
+            }
             } else {  //Если пользователь убирает галку, то проверяем есть ли ckeckbox с установленной галкой
-                let boxFlag = false;
+                var boxFlag = false;
                 for (i of checkBox) {
                     if (i.checked == true) {
                         boxFlag = true;
@@ -204,13 +186,46 @@
                 }
                 if (boxFlag != true) {
                 optionsBlock.style.display = 'none';
+                if ( paginator != null) {
+                    paginator.style.display = 'block';  // показываем перелистывание страниц paginator
+                }
                 }
         }
     }
 
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<script>
+
+    $('#submitFilter').click(function() {
+        var form_1 = $("#position_filter, #checkboxes").serialize();
+        $.get("{% url 'quize737:user_list' %}", form_1, function(content){
+            //console.log(form_1);
+            //$("html").html(content);
+
+            document.open();
+            document.write(content);
+            document.close();
+            });
+        });
+
+
+    $('#submitSearch').click(function() {
+        var form_2 = $("#user_search, #checkboxes").serialize();
+        $.get("{% url 'quize737:user_list' %}", form_2, function(content){
+            //console.log(form_2);
+            //$("html").html(content);
+            document.open();
+            document.write(content);
+            document.close();
+            });
+        });
 
 
 </script>
+
 
 {% endblock %}
 

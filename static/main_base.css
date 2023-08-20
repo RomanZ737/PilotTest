@@ -179,7 +179,7 @@ div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 305px;
+    width: 325px;
     word-wrap: break-word;
     text-align: left;
     vertical-align: middle;
@@ -739,4 +739,32 @@ div.inline_option {
     position:relative;
     color: rgb(209, 209,209);
     font-size: 18px;
+    width: fit-content;
+    animation: fadeInFromNone 0.5s
+}
+
+@keyframes fadeInFromNone {
+    0% {
+    display: none;
+    opacity: 0;
+    background-color: rgba(204, 198, 22, 1.0);
+  }
+
+  50% {
+    display: block;
+    opacity: 1;
+    background-color: rgba(204, 198, 22, 0.9);
+  }
+
+  70% {
+    display: block;
+    opacity: 1;
+    background-color: rgba(204, 198, 22, 0.7);
+  }
+
+  100% {
+    display: block;
+    opacity: 1;
+    background-color: rgba(204, 198, 22, 0.0);
+  }
 }
