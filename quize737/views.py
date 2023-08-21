@@ -155,7 +155,7 @@ def start(request, id=None):
                     for theme in Thems.objects.all():
                         if theme.name != 'Все темы':
                             quiz_set = QuestionSet.objects.filter(Q(them_name=them.name), (
-                                        Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
+                                    Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
                             # quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
                             quiz_set = random.sample(list(quiz_set), int(
                                 q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
@@ -543,7 +543,7 @@ def next_question(request):
 
                     # Вычисляем процент прохождения теста и округляем результат до десятой
                     total_result = ('%.0f' % (
-                                (result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
+                            (result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
 
                     # Если пользователь сдал тест
                     if int(total_result) >= int(result_data[0]['pass_score']):
@@ -1162,7 +1162,6 @@ def download_test_result(request, id):
     pdfmetrics.registerFont(TTFont('FreeSans', dir_path + '/static/FreeSans.ttf'))
     pdfmetrics.registerFont(TTFont('FreeSansBold', dir_path + '/static/FreeSansBold.ttf'))
 
-
     # p.setFillColorRGB(128, 128, 128) # Цвет текста
     # p. setStrokeColorRGB(0.2, 0.5, 0.3)
     # p.setFillColorRGB(128, 128, 128)  # choose fill colour
@@ -1359,6 +1358,7 @@ def new_test_ac_type(request):
     context = {'ac_type': ac_types_list}
     return render(request, 'new_test_ac_type.html', context=context)
 
+
 #  Продолжение создания нового теста после выбора типа ВС
 @login_required
 @group_required('KRS')
@@ -1404,7 +1404,7 @@ def create_new_test(request):
                     training = True
             except MultiValueDictKeyError:
                 pass
-            emails = request.POST.getlist('krs_email')  #  Вынимаем выбраные email адреса для рассылки
+            emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
             new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
                                                       pass_score=test_name_form.data['test_name-pass_score'],
                                                       training=training,
@@ -1425,21 +1425,21 @@ def create_new_test(request):
                     for value in error.values():
                         form_errors.append(value)
             errors_non_form = test_q_set.non_form_errors
-            email_error = ''  #  Ошибка с заполнением email адресов
-            checked_emailes = '' #  Список email адресов для отсылки уведомлений
+            email_error = ''  # Ошибка с заполнением email адресов
+            checked_emailes = ''  # Список email адресов для отсылки уведомлений
             if 'krs_email' not in request.POST:
                 email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
             else:
                 checked_emailes = request.POST.getlist('krs_email')
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type, 'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
+                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
+                       'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
             return render(request, 'new_test_form.html', context=context)
     else:
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)},
                                      initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
-
 
         context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them,
                    'ac_type': ac_type, 'krs_list': krs_list}
@@ -1454,7 +1454,8 @@ def test_details(request, id):
     krs_list = User.objects.filter(groups__name='KRS').order_by(
         'last_name')
     # Вынимаем объект теста
-    test_instance = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score', 'training', 'ac_type', 'email_to_send')
+    test_instance = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score', 'training', 'ac_type',
+                                                                 'email_to_send')
     ac_type = test_instance[0]['ac_type']
 
     #  Выбранные адреса email для рассылки
@@ -1520,7 +1521,8 @@ def test_details(request, id):
             else:
                 checked_emailes = request.POST.getlist('krs_email')
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
+                       'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
+                       'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
             return render(request, 'test_detailes.html', context=context)
 
     else:
@@ -1530,7 +1532,8 @@ def test_details(request, id):
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)}, initial=test_questions,
                                      prefix='questions')
         context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
-                   'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list, 'checked_emailes': checked_emailes}
+                   'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list,
+                   'checked_emailes': checked_emailes}
         return render(request, 'test_detailes.html', context=context)
 
 
@@ -1551,13 +1554,12 @@ def user_list(request):
     else:
         # Если в запросе были отмечены пользователи (user_select)
         selected_user_list = []  # Список пользователей, которые были отмечены
-        print(request.GET.getlist('user_selected'))
+
         if 'user_selected' in request.GET.keys():
             selected_users_ids = request.GET.getlist('user_selected')
             for user_id in selected_users_ids:
                 user_selected = User.objects.get(id=user_id)
                 selected_user_list.append(user_selected)
-        print('selected_user_list', selected_user_list)
 
         groups = Group.objects.all().values()  # Список всех групп для фильтра
         tests = TestConstructor.objects.all().values()  # Список всех тестов для фильтра
@@ -1608,7 +1610,8 @@ def user_list(request):
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
                     context = {'no_search_results': no_search_result, 'results': results,
                                'position_list': position_list, 'group_list': group_list, 'ac_types': ac_types_list,
-                               'user_search_input': user_search_input, 'selected_users': selected_user_list, 'user_list': selected_user_list}
+                               'user_search_input': user_search_input, 'selected_users': selected_user_list,
+                               'user_list': selected_user_list}
                     return render(request, 'user_list.html', context=context)
                 if not total_user_list:
                     no_search_result = True
@@ -1616,7 +1619,8 @@ def user_list(request):
                     context = {'no_search_results': no_search_result, 'results': results,
                                'position_list': position_list, 'group_list': group_list,
                                'assign_test_list': assign_test_list, 'ac_types': ac_types_list, 'tests_list': test_list,
-                               'user_search_input': user_search_input, 'selected_users': selected_user_list, 'user_list': selected_user_list}
+                               'user_search_input': user_search_input, 'selected_users': selected_user_list,
+                               'user_list': selected_user_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
@@ -1626,7 +1630,8 @@ def user_list(request):
                     context = {'user_list': users, 'no_search_results': no_search_result,
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
                                'user_test_dict': user_test_dict, 'user_num': total_user_number,
-                               'ac_types': ac_types_list, 'user_search_input': user_search_input, 'selected_users': selected_user_list}
+                               'ac_types': ac_types_list, 'user_search_input': user_search_input,
+                               'selected_users': selected_user_list}
                     return render(request, 'user_list.html', context=context)
             else:
                 ac_type = ''
@@ -1656,7 +1661,8 @@ def user_list(request):
                     results = f'Пилоты по запросу не найдены'
                     context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
-                               'ac_types': ac_types_list, 'selected_users': selected_user_list, 'user_list': selected_user_list}
+                               'ac_types': ac_types_list, 'selected_users': selected_user_list,
+                               'user_list': selected_user_list}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
@@ -1666,7 +1672,8 @@ def user_list(request):
                     context = {'user_list': users, 'no_search_results': no_search_result,
                                'position_list': position_list, 'filter_input': filter_input,
                                'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
-                               'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list}
+                               'user_num': total_user_number, 'ac_types': ac_types_list,
+                               'selected_users': selected_user_list}
                     return render(request, 'user_list.html', context=context)
 
         else:
@@ -1679,7 +1686,7 @@ def user_list(request):
             users = paginator.page(page_number)
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
                        'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
-                       'user_num': total_user_number, 'ac_types': ac_types_list}
+                       'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list}
             return render(request, 'user_list.html', context=context)
 
 
@@ -1705,7 +1712,7 @@ def group_users(request, id):
     position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
     no_search_result = False
     total_user_list = User.objects.filter(groups=id).order_by('last_name')
-    total_user_number = User.objects.filter(groups=id).count()  #  Получаем число пользователей группы
+    total_user_number = User.objects.filter(groups=id).count()  # Получаем число пользователей группы
     group_instance = Group.objects.get(id=id)
     filter_input = ['Все', 'Все', group_instance.name, 'Все']
     print('filter', filter_input)
@@ -1719,8 +1726,10 @@ def group_users(request, id):
     paginator = Paginator(total_user_list, 20)
     page_number = request.GET.get('page', 1)
     users = paginator.page(page_number)
-    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list, 'user_num': total_user_number,
-               'group_list': group_list, 'ac_types': ac_types_list, 'tests_list': test_list, 'filter_input': filter_input}
+    context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
+               'user_num': total_user_number,
+               'group_list': group_list, 'ac_types': ac_types_list, 'tests_list': test_list,
+               'filter_input': filter_input}
     return render(request, 'user_list.html', context=context)
 
 
@@ -1732,7 +1741,7 @@ def group_list(request, id=None):
     if id:
         pass
     else:
-        group_user_num = {}  #  Количество пользователей в группе
+        group_user_num = {}  # Количество пользователей в группе
         groups = Group.objects.all()
         for group in groups:
             user_num = User.objects.filter(groups=group.id).count()
@@ -1875,7 +1884,7 @@ def group_del(request, id):
 @login_required
 @group_required('KRS')
 def edit_user(request, id):
-    print('GET', request.GET)
+
     position_list = Profile.Position.labels  # Вырианты выбора должности пилота
     ac_type_list = Profile.ACType.labels  # Варианты выбора типа ВС пилота
     user_obj = User.objects.get(id=id)  # Объект пользователя
@@ -1989,12 +1998,14 @@ def user_detales(request, id):
             for test in tests_for_user_form.cleaned_data:
                 #  Удаляем все объекты
                 if test['DELETE']:
-                    UserTests.objects.filter(user=user_object, test_name=test['test_name']).delete()  # Удаляем тест у пользователя
-                    try:  #  Ищем и удаляем начатфые, но не законченные тесты (сам сформированный временный тест с вопросами)
-                        QuizeSet.objects.get(user_under_test=user_object.username, quize_name=test['test_name']).delete()
+                    UserTests.objects.filter(user=user_object,
+                                             test_name=test['test_name']).delete()  # Удаляем тест у пользователя
+                    try:  # Ищем и удаляем начатфые, но не законченные тесты (сам сформированный временный тест с вопросами)
+                        QuizeSet.objects.get(user_under_test=user_object.username,
+                                             quize_name=test['test_name']).delete()
                     except Exception:
                         pass
-                    try:  #  Ищем и удаляем результаты теста, если есть не законченные (in_progress=True)
+                    try:  # Ищем и удаляем результаты теста, если есть не законченные (in_progress=True)
                         result_instance = QuizeResults.objects.get(user_id=user_object, quize_name=test['test_name'])
                         if result_instance.in_progress:
                             result_instance.delete()
@@ -2092,6 +2103,7 @@ def user_detales(request, id):
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)
 
+
 # Создание нового пользователя
 @login_required
 @group_required('KRS')
@@ -2129,6 +2141,7 @@ def new_user(request):
         context = {'form_profile': form_profile, 'form_user': form_user}
         return render(request, 'new_user.html', context=context)
 
+
 # Удаление пользователя
 @login_required
 @group_required('KRS')
@@ -2136,7 +2149,7 @@ def del_user(request, id):
     User.objects.get(id=id).delete()
     previous_url = request.META.get('HTTP_REFERER')
     return HttpResponseRedirect(previous_url)
-    #return redirect('quize737:user_list')
+    # return redirect('quize737:user_list')
 
 
 @login_required
@@ -2347,6 +2360,7 @@ def issue_mess(request):
 
     return HttpResponse(request.POST)
 
+
 #  Функция кнопки возврата, с йчётом результатов поиска или фильтрации
 @login_required
 def go_back_button(request):
@@ -2357,6 +2371,7 @@ def go_back_button(request):
     # index = (request.get_host()).find(':')
     # request_host = request_host[:index]
     # if previous_url and urlparse(previous_url).hostname == request_host:
+    #print('previous_url:::::', previous_url)
     return HttpResponseRedirect(previous_url)
     # else:
     #     return redirect('/')
@@ -2392,3 +2407,20 @@ def mess_to_admin(request):
         form = AdminMessForm()
         context = {'form': form}
         return render(request, 'admin_mess.html', context=context)
+
+
+@login_required
+def selected_users_test(request):
+    previous_url = '?' + request.META.get('QUERY_STRING')
+    # print('get', request.META)
+    #print('url', previous_url)
+    selected_user_list = []  # Список пользователей, которые были отмечены
+
+    selected_users_ids = request.GET.getlist('user_selected')
+    for user_id in selected_users_ids:
+        user_selected = User.objects.get(id=user_id)
+        selected_user_list.append(user_selected)
+
+    context = {'selected_user_list': selected_user_list, 'previous_url': previous_url}
+
+    return render(request, 'selected_users_test.html', context=context)

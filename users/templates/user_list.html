@@ -103,13 +103,13 @@
                     </form>
                 </div>
                 <div style="display: inline-block;">
-                    <form id="reset_filter" action="{% url 'quize737:user_list' %}" method="get">
+                    <form id="filter_reset_form" action="{% url 'quize737:user_list' %}" method="get">
                     </form>
                 </div>
                 <div class="button_block">
                     <input class="submit_filter" type="submit" value="Фильтр" id="submitFilter">
                     <span style="color: black">|</span>
-                    <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">
+                    <input class="submit_filter" type="submit" value="Сбросить Фильтр" id="resetFilterButton">
                     <div class="total_user_num">Всего: {{user_num}}</div>
                 </div>
             </div>
@@ -117,11 +117,15 @@
         </div>
         <div style="position: relative;display: block;height: 22px;">
             <div style="display: none;" class="inline_option" id="inline_option_block">
+
+                <a id="assign_test_to_selected_users" href="#">Назначить Тест</a>
                 <span style="color: black">|</span>
-                <span>Назначить Тест</span>
+                <span>Создать группу</span>
                 <span style="color: black">|</span>
-                <span>Отменить Выделение</span>
+                <span>Добавить в группу</span>
                 <span style="color: black">|</span>
+                <a href="{% url 'quize737:user_list' %}"><span>Отменить Выделение</span></a>
+
             </div>
         </div>
     </div>
@@ -199,22 +203,50 @@
 
 <script>
 
+    // При нажатии кнопки "Фильтр", собираются данные из двух форм и отправляются на обработку
+    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
     $('#submitFilter').click(function() {
         var form_1 = $("#position_filter, #checkboxes").serialize();
         $.get("{% url 'quize737:user_list' %}", form_1, function(content){
             //console.log(form_1);
             //$("html").html(content);
-
             document.open();
             document.write(content);
             document.close();
             });
         });
 
-
+    // При нажатии кнопки "Поиск", собираются данные из двух форм и отправляются на обработку
+    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
     $('#submitSearch').click(function() {
         var form_2 = $("#user_search, #checkboxes").serialize();
         $.get("{% url 'quize737:user_list' %}", form_2, function(content){
+            //console.log(form_2);
+            //$("html").html(content);
+            document.open();
+            document.write(content);
+            document.close();
+            });
+        });
+
+    // При нажатии кнопки "Сбросить Фильтр", собираются данные из двух форм и отправляются на обработку
+    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
+    $('#resetFilterButton').click(function() {
+        var form_3 = $("#checkboxes").serialize();
+        $.get("{% url 'quize737:user_list' %}", form_3, function(content){
+            //console.log(form_2);
+            //$("html").html(content);
+            document.open();
+            document.write(content);
+            document.close();
+            });
+        });
+
+    // При нажатии кнопки "Назначить Тест", собираются данные из формы "checkboxes" и отправляются на обработку
+    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
+    $('#assign_test_to_selected_users').click(function() {
+        var form_4 = $("#checkboxes").serialize();
+        $.get("{% url 'quize737:selected_users_test' %}", form_4, function(content){
             //console.log(form_2);
             //$("html").html(content);
             document.open();

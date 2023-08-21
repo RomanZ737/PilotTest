@@ -768,3 +768,17 @@ div.inline_option {
     background-color: rgba(204, 198, 22, 0.0);
   }
 }
+
+div.fio_column_short {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-left: 1px solid black;
+}
+
+div.fio_row {
+    display: block;
+    margin: 20px;
+}
