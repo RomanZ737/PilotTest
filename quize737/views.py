@@ -154,7 +154,7 @@ def start(request, id=None):
                 if q_set['theme'] == 5:
                     for theme in Thems.objects.all():
                         if theme.name != 'Все темы':
-                            quiz_set = QuestionSet.objects.filter(Q(them_name=them.name), (
+                            quiz_set = QuestionSet.objects.filter(Q(them_name=theme.name), (
                                     Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
                             # quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
                             quiz_set = random.sample(list(quiz_set), int(
@@ -1489,8 +1489,9 @@ def test_details(request, id):
         test_name_form = NewTestFormName(request.POST)
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)}, prefix="questions")
-        TestQuestionsBay.objects.filter(test_id=id).delete()
+        # TestQuestionsBay.objects.filter(test_id=id).delete()
         if test_q_set.is_valid() and 'krs_email' in request.POST:
+            TestQuestionsBay.objects.filter(test_id=id).delete()
             emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
             a.email_to_send = ', '.join(emails)
             training = False
@@ -1522,10 +1523,12 @@ def test_details(request, id):
                 checked_emailes = request.POST.getlist('krs_email')
             context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                        'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
-                       'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
+                       'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes,
+                       'q_num_per_them': total_q_num_per_them}
             return render(request, 'test_detailes.html', context=context)
 
     else:
+        previous_url = request.META.get('HTTP_REFERER')
         test_name_form = NewTestFormName(test_instance[0])  # Форма с названием теста
         test_questions = TestQuestionsBay.objects.filter(test_id=id).values('theme', 'q_num')
         # Создаём набор форм
@@ -1533,7 +1536,7 @@ def test_details(request, id):
                                      prefix='questions')
         context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
                    'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list,
-                   'checked_emailes': checked_emailes}
+                   'checked_emailes': checked_emailes, 'previous_url': previous_url}
         return render(request, 'test_detailes.html', context=context)
 
 
@@ -1557,7 +1560,7 @@ def user_list(request):
 
         if 'user_selected' in request.GET.keys():
             selected_users_ids = request.GET.getlist('user_selected')
-            for user_id in selected_users_ids:
+            for user_id in set(selected_users_ids):  # Переводим список во множество, что бы элементы не повторялись
                 user_selected = User.objects.get(id=user_id)
                 selected_user_list.append(user_selected)
 
@@ -2361,7 +2364,7 @@ def issue_mess(request):
     return HttpResponse(request.POST)
 
 
-#  Функция кнопки возврата, с йчётом результатов поиска или фильтрации
+#  Функция кнопки возврата, с учётом результатов поиска или фильтрации
 @login_required
 def go_back_button(request):
     # Возвращаем пользователя на исходную страницу
@@ -2495,3 +2498,43 @@ def selected_users_test(request):
                    'previous_url': previous_url}
 
         return render(request, 'selected_users_test.html', context=context)
+
+
+@login_required
+def selected_users_new_group(request):
+    if request.method == 'POST':
+        pass
+
+    else:
+        # Формируем ссылку для кнопки "Вернуться"
+        previous_url = '?' + request.META.get('QUERY_STRING')
+        selected_user_list = []  # Список пользователей, которые были отмечены
+
+        selected_users_ids = request.GET.getlist('user_selected')
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            selected_user_list.append(user_selected)
+        context = {'selected_user_list': selected_user_list,
+                   'previous_url': previous_url}
+
+        return render(request, 'selected_users_new_group.html', context=context)
+
+
+@login_required
+def selected_users_add_to_group(request):
+    if request.method == 'POST':
+        pass
+
+    else:
+        # Формируем ссылку для кнопки "Вернуться"
+        previous_url = '?' + request.META.get('QUERY_STRING')
+        selected_user_list = []  # Список пользователей, которые были отмечены
+
+        selected_users_ids = request.GET.getlist('user_selected')
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            selected_user_list.append(user_selected)
+        context = {'selected_user_list': selected_user_list,
+                   'previous_url': previous_url}
+
+        return render(request, 'selected_users_add_to_group.html', context=context)

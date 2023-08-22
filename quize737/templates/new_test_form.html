@@ -11,64 +11,81 @@
         <a href='{% url "quize737:new_test_ac_type" %}'>ДОБАВИТЬ ТЕСТ</a>
     </legend>
     <div class="block-list">
-            <h4>{{email_error}}</h4>
-
-            <h4>{{non_form_errors}}</h4>
-
-            {% for error in form_errors%}
-            <h4>{{error}}</h4>
-            {% endfor %}
-
-            <!--Перебираем количество вопросов по темам-->
-            {% for them, q_num in q_num_per_them.items %}
-                <input type="hidden" id="{{them.id}}" value="{{q_num}}">
-            {% endfor %}
-
-            <form id="question_form" method='post'>
-              {% csrf_token %}
-                <p>{% for name_error in test_name_form.errors.values %}</p>
-                    <p>{{name_error}}</p>
+        <div class="block_none_light_up">
+            <div class="form_errors">
+                <p>{{email_error}}</p>
+                <p>{{non_form_errors}}</p>
+                {% for error in form_errors%}
+                <p>{{error}}</p>
                 {% endfor %}
-                <p>Название теста {{test_name_form.name}}
-                    <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
-                    <input type="hidden" name="ac_type" value="{{ac_type}}">
-                    <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо KRS не отправляется, результат не записывается)</span></span>
-                </p>
-                <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
-                <p>Кому отправлять письмо с результатами: <span class="comment">(Из группы KRS)</span></p>
-                <p>
+            </div>
+        </div>
+
+        <!--Перебираем количество вопросов по темам-->
+        {% for them, q_num in q_num_per_them.items %}
+        <input type="hidden" id="{{them.id}}" value="{{q_num}}">
+        {% endfor %}
+
+        <form id="question_form" method='post'>
+            {% csrf_token %}
+            <p>{% for name_error in test_name_form.errors.values %}</p>
+            <p>{{name_error}}</p>
+            {% endfor %}
+            <p>Название теста {{test_name_form.name}}
+                <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
+                <input type="hidden" name="ac_type" value="{{ac_type}}">
+                <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо KRS не отправляется, результат не записывается)</span></span>
+            </p>
+            <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
+            <p>Кому отправлять письмо с результатами: <span class="comment">(Из группы KRS)</span></p>
+
+                <div class="fio_row">
                     {% for user_krs in krs_list%}
                         {% if user_krs.email in checked_emailes %}
-                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}" checked><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                            <div class="fio_column_short">
+                                <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}" checked>
+                                <span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                            </div>
+                            {% if forloop.counter|divisibleby:4 %}
+                                </div>
+                                <div class="fio_row">
+                                    {% endif %}
                         {% else%}
-                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}"><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                            <div class="fio_column_short">
+                                <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}"><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                            </div>
+                            {% if forloop.counter|divisibleby:4 %}
+                                </div>
+                                <div class="fio_row">
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
-                 </p>
-                <hr/>
-                {{ test_q_set.management_form }}
-                {% for form in test_q_set.forms %}
-
-                <div class="q_forms">
-                    <span class="test_theme_list">Тема: {{form.theme}}</span>
-                    <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
-                    <span>Max. </span>
-                    <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
-                    <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
-
                 </div>
-                <br>
-                {% endfor %}
-                <input id="add-form" type="button" value="+ Добавить тему">
-                <br>
-                <br>
-            </form>
+
+            <hr/>
+            {{ test_q_set.management_form }}
+            {% for form in test_q_set.forms %}
+
+            <div class="q_forms">
+                <span class="test_theme_list">Тема: {{form.theme}}</span>
+                <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
+                <span>Max. </span>
+                <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
+                <span class="test_theme_del">{{ form.DELETE }} Удалить тему</span>
+
+            </div>
+            <br>
+            {% endfor %}
+            <input id="add-form" type="button" value="+ Добавить тему">
+            <br>
+            <br>
+        </form>
         <form method='get' id="go_back" action='{% url "quize737:new_test_ac_type" %}'></form>
-            <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input type="submit" value="Вернуться" form="go_back">
+        <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input
+            type="submit" value="Вернуться" form="go_back">
 
     </div>
 </fieldset>
-
 
 
 <p id="demo_0"></p>
@@ -167,6 +184,7 @@
 
 
         }
+
 
 
 

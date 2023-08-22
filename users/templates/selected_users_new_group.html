@@ -1,0 +1,55 @@
+{% extends "main_base.html" %}
+
+{% block content %}
+<fieldset>
+    <legend>
+        <a href="{% url 'quize737:user_list' %}"> Список Пилотов </a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:group_list' %}">Список групп</a>
+        <span style="color: black;"> | </span>
+        <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
+        <span style="color: black;"> | </span>
+        <a href="#">НОВАЯ ГРУППА С ВЫБРАННЫМИ ПИЛОТАМИ</a>
+    </legend>
+    <div class="block_none_light_up">
+        <div class="form_errors">
+            <p>{{non_form_errors}}</p>
+            {% for error in form_errors%}
+            <p>{{error}}</p>
+            {% endfor %}
+        </div>
+
+        <form id="new_users_group" method='post' action="{% url 'quize737:selected_users_test' %}">
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
+            <div class="fio_row">
+                {% for user in selected_user_list %}
+                <div class="fio_column_short">
+                    <input name="user_selected" type="hidden" value="{{user.id}}"><span class="mark_up">{{ user.profile.family_name}} {{user.profile.first_name.0}}.{{user.profile.middle_name.0}}.</span>
+                </div>
+                {% if forloop.counter|divisibleby:4 %}
+            </div>
+            <div class="fio_row">
+                {% endif %}
+                {% endfor %}
+            </div>
+            <hr/>
+            <br>
+
+            </form>
+        <div class="block_none_light_up" id="go_back">
+        <form id="go-back_form" method='get' action='{% url "quize737:go_back_button" %}'>
+            <input type="hidden" name="previous_url" value="/user_list/{{ previous_url }}">
+        </form>
+        </div>
+    <div class="block_none_light_up">
+        <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+        <input type="submit" value="Сохранить" id="save_btn" form="new_users_group">
+        <span style="color: black;" id="span_vline_1"> | </span>
+        <input type="submit" id="go-back_btn" value="Вернуться" form="go-back_form">
+    </div>
+    </div>
+</fieldset>
+
+{% endblock %}

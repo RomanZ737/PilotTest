@@ -50,11 +50,14 @@
             </div>
         {% endif %}
 
-        <h4>{{non_form_errors}}</h4>
-        {% for error in form_errors%}
-            <h4>{{error}}</h4>
-        {% endfor %}
-
+        <div class="block_none_light_up">
+            <div class="form_errors">
+                <p>{{non_form_errors}}</p>
+                {% for error in form_errors%}
+                <p>{{error}}</p>
+                {% endfor %}
+            </div>
+        </div>
         <br>
 
         {% for form in user_tests %}
@@ -180,14 +183,25 @@
         let form_back = document.getElementById("go_back");
 
         btn.addEventListener('click', () => {
-          btn.style.display = 'none';
-          btn_edit.style.display = 'none';
-          btn_back.style.display = 'none';
-          vline_1.style.display = 'none';
-          vline_2.style.display = 'none';
-          form_back.style.display = 'none';
-          let box = document.getElementById("wait");
-          box.style.display = 'block';
+          var validFlag = true
+          var inputFields = $(':input[type="number"]'); // Выбираем все поля input type=number
+          // Прежде, чем выполнить скрипт проверяем "валидность" полей, в противном кнопки скроются, а перехода не произойдёт
+          for (field of inputFields) {
+            if (field.checkValidity() != true) {
+            validFlag = false
+            };
+          };
+
+          if (validFlag == true) {
+              btn.style.display = 'none';
+              btn_edit.style.display = 'none';
+              btn_back.style.display = 'none';
+              vline_1.style.display = 'none';
+              vline_2.style.display = 'none';
+              form_back.style.display = 'none';
+              let box = document.getElementById("wait");
+              box.style.display = 'block';
+          };
         });
 
 </script>

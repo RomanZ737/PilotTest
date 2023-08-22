@@ -52,4 +52,6 @@ urlpatterns = [
     path('issue_mess/', views.issue_mess, name='issue_mess'),
     path('mess_to_admin/', views.mess_to_admin, name='mess_to_admin'),
     path('selected_users_test/', views.selected_users_test, name='selected_users_test'),
+    path('selected_users_new_group/', views.selected_users_new_group, name='selected_users_new_group'),
+    path('selected_users_add_to_group/', views.selected_users_add_to_group, name='selected_users_add_to_group'),
     ]

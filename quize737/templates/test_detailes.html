@@ -5,46 +5,64 @@
 {% load django_template_maths %}
 
 <fieldset>
-            <legend>
-                <a href="{% url 'quize737:test_editor' %}">Список Тестов</a>
-                <span style="color: black;"> | </span>
-                <a href='{% url "quize737:new_test_ac_type" %}'>Добавить Тест</a>
-                <span style="color: black;"> | </span>
-                <span>РЕДАКТИРОВАНИЕ ТЕСТА</span>
-            </legend>
+    <legend>
+        <a href="{% url 'quize737:test_editor' %}">Список Тестов</a>
+        <span style="color: black;"> | </span>
+        <a href='{% url "quize737:new_test_ac_type" %}'>Добавить Тест</a>
+        <span style="color: black;"> | </span>
+        <span>РЕДАКТИРОВАНИЕ ТЕСТА</span>
+    </legend>
     <div class="block-list">
-        <h4>{{email_error}}</h4>
-        <h4>{{non_form_errors}}</h4>
+        <div class="block_none_light_up">
+            <div class="form_errors">
+                <p>{{email_error}}</p>
+                <p>{{non_form_errors}}</p>
+                {% for error in form_errors%}
+                <p>{{error}}</p>
+                {% endfor %}
+            </div>
+        </div>
 
-        {% for error in form_errors%}
-        <h4>{{error}}</h4>
-        {% endfor %}
 
-
-                <!--Перебираем количество вопросов по темам-->
+        <!--Перебираем количество вопросов по темам-->
         {% for them, q_num in q_num_per_them.items %}
-            <input type="hidden" id="{{them.id}}" value="{{q_num}}">
+        <input type="hidden" id="{{them.id}}" value="{{q_num}}">
         {% endfor %}
 
 
         <form id="question_form" method='post'>
-          {% csrf_token %}
+            {% csrf_token %}
 
             <p>Название: {{test_name_form.name}}
-            <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
-            <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
+                <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
+                <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
             </p>
             <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
             <p>Кому отправлять письмо с результатами: <span class="comment">(Из группы KRS)</span></p>
-            <p>
-                    {% for user_krs in krs_list%}
-                        {% if user_krs.email in checked_emailes %}
-                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}" checked><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
-                        {% else%}
-                            <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}"><span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
-                        {% endif %}
-                    {% endfor %}
-            </p>
+            <div class="fio_row">
+                {% for user_krs in krs_list%}
+                {% if user_krs.email in checked_emailes %}
+                <div class="fio_column_short">
+                    <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}" checked>
+                    <span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                </div>
+                {% if forloop.counter|divisibleby:4 %}
+            </div>
+            <div class="fio_row">
+                {% endif %}
+                {% else%}
+                <div class="fio_column_short">
+                    <input type="checkbox" id="krs_email" name="krs_email" value="{{user_krs.email}}">
+                    <span class="mark_up">{{user_krs.last_name}} {{user_krs.first_name.0}}.{{user_krs.profile.middle_name.0}}.</span>
+                </div>
+                {% if forloop.counter|divisibleby:4 %}
+            </div>
+            <div class="fio_row">
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+            </div>
+
 
             <hr/>
 
@@ -65,14 +83,18 @@
             <br>
             <br>
         </form>
+        <form id="go-back"  action="{% url 'quize737:go_back_button' %}">
+            <input type="hidden" name="previous_url" value="{{previous_url}}">
+        </form>
         <input type="submit" value="Сохранить" form="question_form">
         <span style="color: black;"> | </span>
-        <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
+        <input type="submit" value="Вернуться" form="go-back">
         <span style="color: black;"> | </span>
-        <input type="submit" value="Удалить тест" form="del_dest" onclick="return confirm('Удалить Тест?') || event.preventDefault()">
+        <input type="submit" value="Удалить тест" form="del_dest"
+               onclick="return confirm('Удалить Тест?') || event.preventDefault()">
 
         <form method="post" action="{% url 'quize737:del_test' test_id %}" id="del_dest">
-        {% csrf_token %}
+            {% csrf_token %}
 
         </form>
 
@@ -81,8 +103,6 @@
 
     </div>
 </fieldset>
-
-
 
 
 <!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
@@ -173,6 +193,7 @@
 
 
         }
+
 
 
 

@@ -257,7 +257,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 20%;
+    width: 230px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -268,7 +268,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
 div.list-question {  /* блок Текст вопроса в таблице */
     position: relative;
     display: inline-block;
-    width: 65%;
+    width: 960px;
     vertical-align: middle;
     text-align: justify;
     text-justify: inter-word;
@@ -309,6 +309,7 @@ div.block_light_up:hover {  /* блок всей строки данных в т
 div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
     margin-bottom: -1px;
+    width: fit-content;
 }
 
 spot.block_light_up:hover {  /* блок всей строки данных в таблице */

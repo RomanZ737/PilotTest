@@ -120,11 +120,11 @@
 
                 <a id="assign_test_to_selected_users" href="#">Назначить Тест</a>
                 <span style="color: black">|</span>
-                <span>Создать группу</span>
+                <a id="make_new_group_to_selected_users" href="#">Создать группу</a>
                 <span style="color: black">|</span>
-                <span>Добавить в группу</span>
+                <a id="add_to_group_selected_users" href="#">Добавить в группу</a>
                 <span style="color: black">|</span>
-                <a href="{% url 'quize737:user_list' %}"><span>Отменить Выделение</span></a>
+                <a href="{% url 'quize737:user_list' %}"><span>Отменить</span></a>
 
             </div>
         </div>
@@ -221,8 +221,6 @@
     $('#submitSearch').click(function() {
         var form_2 = $("#user_search, #checkboxes").serialize();
         $.get("{% url 'quize737:user_list' %}", form_2, function(content){
-            //console.log(form_2);
-            //$("html").html(content);
             document.open();
             document.write(content);
             document.close();
@@ -234,8 +232,6 @@
     $('#resetFilterButton').click(function() {
         var form_3 = $("#checkboxes").serialize();
         $.get("{% url 'quize737:user_list' %}", form_3, function(content){
-            //console.log(form_2);
-            //$("html").html(content);
             document.open();
             document.write(content);
             document.close();
@@ -247,8 +243,6 @@
     $('#assign_test_to_selected_users').click(function() {
         var form_4 = $("#checkboxes").serialize();
         $.get("{% url 'quize737:selected_users_test' %}", form_4, function(content){
-            //console.log(form_2);
-            //$("html").html(content);
             document.open();
             document.write(content);
             document.close();
@@ -256,6 +250,27 @@
         });
 
 
+    // При нажатии кнопки "Создать группу", собираются данные из формы "checkboxes" и отправляются на обработку
+    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
+    $('#make_new_group_to_selected_users').click(function() {
+        var form_5 = $("#checkboxes").serialize();
+        $.get("{% url 'quize737:selected_users_new_group' %}", form_5, function(content){
+            document.open();
+            document.write(content);
+            document.close();
+            });
+        });
+
+    // При нажатии кнопки "Добавить в группу", собираются данные из формы "checkboxes" и отправляются на обработку
+    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
+    $('#add_to_group_selected_users').click(function() {
+        var form_6 = $("#checkboxes").serialize();
+        $.get("{% url 'quize737:selected_users_add_to_group' %}", form_6, function(content){
+            document.open();
+            document.write(content);
+            document.close();
+            });
+        });
 </script>
 
 
