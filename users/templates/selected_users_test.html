@@ -13,31 +13,157 @@
         <span style="color: black;"> | </span>
         <a href="#">ТЕСТ ПРОИЗВОЛЬНОЙ ГРУППЕ ПИЛОТОВ</a>
     </legend>
+    <div class="block_none_light_up">
+        <div class="form_errors">
+            <p>{{non_form_errors}}</p>
+            {% for error in form_errors%}
+            <p>{{error}}</p>
+            {% endfor %}
+        </div>
 
-
-  <div class="fio_row">
-    {% for user in selected_user_list %}
-            <div class="fio_column_short">
-                <span class="mark_up">{{ user.profile.family_name}} {{user.profile.first_name.0}}.{{user.profile.middle_name.0}}.</span>
+        <form id="user_tests_form" method='post' action="{% url 'quize737:selected_users_test' %}">
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
+            <div class="fio_row">
+                {% for user in selected_user_list %}
+                <div class="fio_column_short">
+                    <input name="user_selected" type="hidden" value="{{user.id}}"><span class="mark_up">{{ user.profile.family_name}} {{user.profile.first_name.0}}.{{user.profile.middle_name.0}}.</span>
+                </div>
+                {% if forloop.counter|divisibleby:4 %}
             </div>
-            {% if forloop.counter|divisibleby:4 %}
+            <div class="fio_row">
+                {% endif %}
+                {% endfor %}
+            </div>
+            <hr/>
+            <br>
+
+            {% csrf_token %}
+            {{ group_tests.management_form }}
+            {% for form in group_tests %}
+            <div class="form_set">
+                <span>Название теста: {{ form.test_name }} Количество попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить тест </span>
+            </div>
+            <br>
+            {% endfor %}
+            <input id="add-form" type="submit" value="+ Назначить новый тест">
+            <br>
+            <br>
+
+        </form>
+
+        <div class="form_set" style="display:none">
+            <span class="empty_form">Название теста: {{ group_tests.empty_form.test_name }} Количество попыток: {{ group_tests.empty_form.num_try }} Выполнить до: {{group_tests.empty_form.date_before}}</span><span>{{group_tests.empty_form.DELETE}} Удалить тест </span>
         </div>
-        <div class="fio_row">
-            {% endif %}
-    {% endfor %}
-        </div>
-<hr/>
-<br>
+
+    </div>
+
     <div class="block_none_light_up" id="go_back">
         <form id="go-back_form" method='get' action='{% url "quize737:go_back_button" %}'>
             <input type="hidden" name="previous_url" value="/user_list/{{ previous_url }}">
         </form>
     </div>
     <div class="block_none_light_up">
-        <input type="submit" value="Сохранить" id="save_btn">
+        <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+        <input type="submit" value="Сохранить" id="save_btn" form="user_tests_form">
         <span style="color: black;" id="span_vline_1"> | </span>
         <input type="submit" id="go-back_btn" value="Вернуться" form="go-back_form">
     </div>
 
 </fieldset>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+
+        let qForm = document.querySelectorAll(".form_set")  // Подсчитывем изначальное количество форм
+        let container = document.querySelector("#user_tests_form")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+
+
+        let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
+
+        addButton.addEventListener('click', addForm)
+
+        function addForm(e){
+            e.preventDefault()
+
+            qForm = document.querySelectorAll(".form_set")
+
+            formNum = qForm.length-1
+
+            //document.getElementById("demo_1").innerHTML = 'AFTER: ' + ' formNum: ' + formNum
+
+            if (formNum > 0) {
+                let newForm = qForm[0].cloneNode(true)
+                let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+                container.insertBefore(newForm, addButton)
+                var sp1 = document.createElement("br")
+                container.insertBefore(sp1, addButton)
+                formNum++
+
+                newForm.setAttribute('style', 'display')
+
+                totalForms.setAttribute('value', `${formNum}`)
+
+                //let test_name = document.getElementById(`id_form-${formNum}-test_name`) // Ищем новое поле с количеством вопросов
+                //test_name.setAttribute('value', '1')
+                //let them_field = document.querySelector(`#id_form-${formNum}-num_try`) // Ищем новое поле с темой
+                //them_field.value = '3'
+                //let form_vis = document.getElementById
+
+            } else {
+
+                let newForm = qForm[0].cloneNode(true)
+                let formRegex = RegExp('__prefix__', 'g')
+
+                formNum++
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `0`)
+                container.insertBefore(newForm, addButton)
+                var sp1 = document.createElement("br")
+                container.insertBefore(sp1, addButton)
+
+                newForm.setAttribute('style', 'display')
+
+
+                totalForms.setAttribute('value', `${formNum}`)
+            }
+
+
+
+        }
+
+
+        //Убираем кнопки и подставляем надпись "Сохраняю данные, ожидайте..."
+        const btn = document.getElementById('save_btn');
+        var btnBack = document.getElementById('go-back_btn');
+        var separator = document.getElementById('span_vline_1');
+        btn.addEventListener('click', () => {
+          var validFlag = true
+          var inputFields = $(':input[type="number"]'); // Выбираем все поля input type=number
+          // Прежде, чем выполнить скрипт проверяем "валидность" полей, в противном кнопки скроются, а перехода не произойдёт
+          for (field of inputFields) {
+            //console.log(field.checkValidity());
+            if (field.checkValidity() != true) {
+                    validFlag = false
+            };
+          };
+
+          if (validFlag == true) {
+            btn.style.display = 'none';
+            const box = document.getElementById('wait');
+            box.style.display = 'block';
+            btnBack.style.display = 'none';
+            separator.style.display = 'none';
+          };
+        });
+
+
+
+</script>
+
+
 {% endblock %}

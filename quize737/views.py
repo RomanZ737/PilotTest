@@ -1762,7 +1762,8 @@ def group_details(request, id):
                                    can_delete=True)  # Extra - количество строк формы
     group = Group.objects.get(id=id)
     if request.method == 'POST':
-        tests_for_group_form = UserTestForm(request.POST, request.FILES)
+        tests_for_group_form = UserTestForm(request.POST,
+                                            request.FILES)  # Вынимаем данные из запроса и заполняем ими форму
         if tests_for_group_form.is_valid():
             for test in tests_for_group_form.cleaned_data:
                 #  Удаляем все объекты
@@ -1776,7 +1777,7 @@ def group_details(request, id):
                 if not test['DELETE']:
                     #  Вынимаем всех пользователей группы
                     total_user_list = User.objects.filter(groups=id)
-                    print('total_user_list', total_user_list)
+                    # print('total_user_list', total_user_list)
                     #  Перебираем всех пользователей группы
                     for user in total_user_list:
                         # Проверяем есть ли у пользователя этот тест
@@ -1820,7 +1821,7 @@ def group_details(request, id):
             return render(request, 'group_details.html', context=context)
     else:
         tests_for_group_form = UserTestForm()
-        print('tests_for_group_form', tests_for_group_form)
+        # print('tests_for_group_form', tests_for_group_form)
         context = {'group': group, 'group_tests': tests_for_group_form, 'group_id': id}
         return render(request, 'group_details.html', context=context)
 
@@ -1884,7 +1885,6 @@ def group_del(request, id):
 @login_required
 @group_required('KRS')
 def edit_user(request, id):
-
     position_list = Profile.Position.labels  # Вырианты выбора должности пилота
     ac_type_list = Profile.ACType.labels  # Варианты выбора типа ВС пилота
     user_obj = User.objects.get(id=id)  # Объект пользователя
@@ -2371,12 +2371,13 @@ def go_back_button(request):
     # index = (request.get_host()).find(':')
     # request_host = request_host[:index]
     # if previous_url and urlparse(previous_url).hostname == request_host:
-    #print('previous_url:::::', previous_url)
+    # print('previous_url:::::', previous_url)
     return HttpResponseRedirect(previous_url)
     # else:
     #     return redirect('/')
 
 
+@login_required
 def mess_to_admin(request):
     if request.method == "POST":
         form = AdminMessForm(request.POST)
@@ -2411,16 +2412,86 @@ def mess_to_admin(request):
 
 @login_required
 def selected_users_test(request):
-    previous_url = '?' + request.META.get('QUERY_STRING')
-    # print('get', request.META)
-    #print('url', previous_url)
-    selected_user_list = []  # Список пользователей, которые были отмечены
+    #  Формируем формы для назначения тестов
+    UserTestForm = formset_factory(TestsForUser, extra=0, formset=BaseUserTestFormSet,
+                                   can_delete=True)  # Extra - количество строк формы
 
-    selected_users_ids = request.GET.getlist('user_selected')
-    for user_id in selected_users_ids:
-        user_selected = User.objects.get(id=user_id)
-        selected_user_list.append(user_selected)
+    if request.method == 'POST':
+        previous_url = request.POST.get('previous_url')  # Вынимаем ссылку на изначальную страницу
+        selected_users_ids = request.POST.getlist('user_selected')  # ID выбраных пользователей
+        total_user_list = []  # Список пользователей, которым надо назначить тест
+        # Формируем список объектов пользователей из списка id пользователей
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            total_user_list.append(user_selected)
+        # print('selected_users_ids', selected_users_ids)
+        tests_for_group_form = UserTestForm(request.POST,
+                                            request.FILES)  # Вынимаем данные из запроса и заполняем ими форму
+        if tests_for_group_form.is_valid():
+            for test in tests_for_group_form.cleaned_data:
+                #  Удаляем все объекты
+                # Проверяем было ли указано имя объекта
+                try:
+                    if UserTests.objects.get(test_name=test['test_name']):
+                        UserTests.objects.filter(test_name=test['test_name']).delete()
+                except Exception:
+                    pass
+                # Создаём только те объекты, которые не помечены для удаления
+                if not test['DELETE']:
+                    #  Перебираем всех выбранных пользователей
+                    for user in total_user_list:
+                        # Проверяем есть ли у пользователя этот тест
+                        try:
+                            user_test_exists = UserTests.objects.get(user=user, test_name=test['test_name'])
+                        except UserTests.DoesNotExist:
+                            user_test_exists = None
+                        if user_test_exists is None:
+                            UserTests.objects.create(user=user,
+                                                     test_name=test['test_name'],
+                                                     num_try_initial=test['num_try'],
+                                                     num_try=test['num_try'],
+                                                     date_before=test['date_before'])
 
-    context = {'selected_user_list': selected_user_list, 'previous_url': previous_url}
+                            #  Отправляем письмо пользователю о назначенном тесте
+                            subject = f"Вам назначен Тест: '{test['test_name']}'"
+                            message = f"<p style='font-size: 25px;'><b>Уважаемый, {user.profile.first_name} {user.profile.middle_name}.</b></p><br>" \
+                                      f"<p style='font-size: 20px;'>Вам назначен тест: <b>'{test['test_name']}'</b></p>" \
+                                      f"<p style='font-size: 20px;'>На портале {config('SITE_URL', default='')}</p>" \
+                                      f"<p style='font-size: 20px;'>Тест необходимо выполнить до <b>{test['date_before'].strftime('%d.%m.%Y')}</b></p>"
 
-    return render(request, 'selected_users_test.html', context=context)
+                            email_msg = {'subject': subject, 'message': message, 'to': user.email}
+                            send_email(request, email_msg)
+
+            # Загружаем новые данные в форму
+            # user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
+            # tests_for_user_form = UserTestForm(initial=user_tests)
+            # context = {'group': group, 'test_and_data_saved': True}
+            # return render(request, 'group_details.html', context=context)
+            return redirect('quize737:user_list')
+
+        else:
+            form_errors = []  # Ошибки при валидации формы
+            for error in tests_for_group_form.errors:
+                if len(error) > 0:
+                    for value in error.values():
+                        form_errors.append(value)
+            errors_non_form = tests_for_group_form.non_form_errors
+            context = {'selected_user_list': total_user_list, 'group_tests': tests_for_group_form,
+                       'non_form_errors': errors_non_form,
+                       'form_errors': form_errors, 'previous_url': previous_url}
+            return render(request, 'selected_users_test.html', context=context)
+    else:
+        # Формируем ссылку для кнопки "Вернуться"
+        previous_url = '?' + request.META.get('QUERY_STRING')
+        selected_user_list = []  # Список пользователей, которые были отмечены
+
+        selected_users_ids = request.GET.getlist('user_selected')
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            selected_user_list.append(user_selected)
+
+        tests_for_group_form = UserTestForm()  # Формируем изначальную форму
+        context = {'selected_user_list': selected_user_list, 'group_tests': tests_for_group_form,
+                   'previous_url': previous_url}
+
+        return render(request, 'selected_users_test.html', context=context)

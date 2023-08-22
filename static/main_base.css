@@ -782,3 +782,36 @@ div.fio_row {
     display: block;
     margin: 20px;
 }
+
+div.form_errors {
+    color: rgb(142, 15, 23);
+    font-size: 22px;
+    width: fit-content;
+    animation: ErrorAppear 0.5s
+}
+
+@keyframes ErrorAppear {
+    0% {
+    display: none;
+    opacity: 0;
+    background-color: rgba(204, 198, 22, 1.0);
+  }
+
+  50% {
+    display: block;
+    opacity: 1;
+    background-color: rgba(204, 198, 22, 0.9);
+  }
+
+  70% {
+    display: block;
+    opacity: 1;
+    background-color: rgba(204, 198, 22, 0.7);
+  }
+
+  100% {
+    display: block;
+    opacity: 1;
+    background-color: rgba(204, 198, 22, 0.0);
+  }
+}
