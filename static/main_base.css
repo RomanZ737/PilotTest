@@ -257,7 +257,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 230px;
+    width: 177px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -268,7 +268,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
 div.list-question {  /* блок Текст вопроса в таблице */
     position: relative;
     display: inline-block;
-    width: 960px;
+    width: 680px;
     vertical-align: middle;
     text-align: justify;
     text-justify: inter-word;
