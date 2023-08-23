@@ -406,7 +406,7 @@ div.list-group_description { /* блок описание группы в таб
 div.list-group_users {
     position: relative;
     display: inline-block;
-    width: 110px;
+    width: 95px;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;
