@@ -2545,9 +2545,19 @@ def selected_users_new_group(request):
 @login_required
 def selected_users_add_to_group(request):
     if request.method == 'POST':
-        pass
+        selected_user_list = []
+        selected_groups = request.POST.getlist('group_selected')
+        selected_users_ids = request.POST.getlist('user_selected')
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            selected_user_list.append(user_selected)
+        for user in selected_user_list:
+            for group in selected_groups:
+                user.groups.add(group)
+        return redirect('quize737:group_list')
 
     else:
+        groups = Group.objects.all()
         # Формируем ссылку для кнопки "Вернуться"
         previous_url = '?' + request.META.get('QUERY_STRING')
         selected_user_list = []  # Список пользователей, которые были отмечены
@@ -2557,6 +2567,6 @@ def selected_users_add_to_group(request):
             user_selected = User.objects.get(id=user_id)
             selected_user_list.append(user_selected)
         context = {'selected_user_list': selected_user_list,
-                   'previous_url': previous_url}
+                   'previous_url': previous_url, 'groups': groups}
 
         return render(request, 'selected_users_add_to_group.html', context=context)
