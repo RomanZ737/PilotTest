@@ -57,19 +57,13 @@
     </div>
 
 
-<script src="{% static 'no_back.js' %}" type="text/javascript"></script>
-<script src="{% static 'answer_accepted.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/start_test_check/answer_accepted.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
-<script src="https://code.jquery.com/jquery-3.5.1.js"
-          integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-            crossorigin="anonymous"></script>
-
-<script>
-            $('#issue_form').on('click','#issue_send',function(e){
-
+<script type="text/javascript">
+    $('#issue_form').on('click','#issue_send',function(e){
            let issue_form = document.getElementById("report_issue_block");
            issue_form.style.display = 'none';
-
         e.preventDefault();
         $.ajax({
             type:'POST',
@@ -84,7 +78,14 @@
                     }
             })
         });
+</script>
 
+
+<script>
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+    window.history.pushState(null, "", window.location.href);
+    };
 </script>
 
 {% endblock %}

@@ -15,17 +15,17 @@
 
  <form id="new_group" method='post'>
         {% csrf_token %}
+     <div class="form_errors">
         {% for error in form.errors.values %}
         <p>{{error}}</p>
         {% endfor %}
+     </div>
         <p>Название Группы: {{form.group_name}} </p>
         <p>Описание группы: {{form.discription}} </p>
         <br>
         <input type="submit" value="Добавить">
     </form>
-<!--    <form method='get' action='{% url "quize737:theme_editor" %}'>-->
-<!--        <button type="submit" >Вернуться</button>-->
-<!--    </form>-->
+
 </fieldset>
 
 {% endblock %}

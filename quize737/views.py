@@ -2003,7 +2003,7 @@ def user_detales(request, id):
                 if test['DELETE']:
                     UserTests.objects.filter(user=user_object,
                                              test_name=test['test_name']).delete()  # Удаляем тест у пользователя
-                    try:  # Ищем и удаляем начатфые, но не законченные тесты (сам сформированный временный тест с вопросами)
+                    try:  # Ищем и удаляем начатые, но не законченные тесты (сам сформированный временный тест с вопросами)
                         QuizeSet.objects.get(user_under_test=user_object.username,
                                              quize_name=test['test_name']).delete()
                     except Exception:
@@ -2503,7 +2503,27 @@ def selected_users_test(request):
 @login_required
 def selected_users_new_group(request):
     if request.method == 'POST':
-        pass
+        group_form = GroupForm(request.POST)
+        previous_url = request.POST.get('previous_url')  # Вынимаем ссылку на изначальную страницу
+        selected_users_ids = request.POST.getlist('user_selected')  # ID выбраных пользователей
+        total_user_list = []  # Список пользователей, которым надо назначить тест
+        # Формируем список объектов пользователей из списка id пользователей
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            total_user_list.append(user_selected)
+        if group_form.is_valid():
+            #  Создаём группу
+            group = Group.objects.create(name=group_form.cleaned_data.get('group_name'))  # Добавить группу разрешений
+            #  Добавляем группе описание
+            GroupsDescription.objects.create(group=group, discription=group_form.cleaned_data.get('discription'))
+            # Добаляем пользователей в группу
+            for user in total_user_list:
+                user.groups.add(group)
+            # Возвращаем пользователя на страницу с группами
+            return redirect('quize737:group_list')
+        else:
+            context = {'selected_user_list': total_user_list, 'previous_url': previous_url, 'form': group_form}
+            return render(request, 'selected_users_new_group.html', context=context)
 
     else:
         # Формируем ссылку для кнопки "Вернуться"
@@ -2514,8 +2534,10 @@ def selected_users_new_group(request):
         for user_id in selected_users_ids:
             user_selected = User.objects.get(id=user_id)
             selected_user_list.append(user_selected)
+
+        group_form = GroupForm()
         context = {'selected_user_list': selected_user_list,
-                   'previous_url': previous_url}
+                   'previous_url': previous_url, 'form': group_form}
 
         return render(request, 'selected_users_new_group.html', context=context)
 

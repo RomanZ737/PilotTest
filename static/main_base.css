@@ -308,7 +308,7 @@ div.block_light_up:hover {  /* блок всей строки данных в т
 
 div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
-    margin-bottom: -1px;
+    margin-bottom: 2px;
     width: fit-content;
 }
 
@@ -381,28 +381,39 @@ div.hide_block {
 div.list-group {  /* блок группа в таблице */
     position: relative;
     display: inline-block;
-    width: 23%;
+    width: 290px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
     word-wrap: break-word;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 290px;
+    width: 460px;
     text-align: left;
     font-size: 18px;
+    border-left: 1px solid black;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.list-group_users {
     position: relative;
     display: inline-block;
-    width: 14%;
+    width: 110px;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;
+    border-left: 1px solid black;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.list-edit {
@@ -815,4 +826,14 @@ div.form_errors {
     opacity: 1;
     background-color: rgba(204, 198, 22, 0.0);
   }
+}
+
+div.new_group_sign {
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: top;
+}
+
+div.new_group_field {
+    display: inline-block;
 }
