@@ -13,19 +13,31 @@
         <a href="{% url 'quize737:new_group' %}">ДОБАВИТЬ ГРУППУ</a>
     </legend>
 
- <form id="new_group" method='post'>
-        {% csrf_token %}
-     <div class="form_errors">
-        {% for error in form.errors.values %}
-        <p>{{error}}</p>
-        {% endfor %}
-     </div>
-        <p>Название Группы: {{form.group_name}} </p>
-        <p>Описание группы: {{form.discription}} </p>
-        <br>
-        <input type="submit" value="Добавить">
-    </form>
 
+
+<div class="block_none_light_up">
+
+         <div class="form_errors">
+            {% for error in form.errors.values %}
+            <p>{{error}}</p>
+            {% endfor %}
+         </div>
+
+     <form id="new_group" method='post' style="margin-top: 30px;">
+            {% csrf_token %}
+         <div style="margin-bottom: 20px;">
+             <div class="new_group_sign">Название Группы:</div>
+             <div class="new_group_field">{{form.group_name}} </div>
+         </div>
+         <div>
+             <div class="new_group_sign">Описание группы:</div>
+             <div class="new_group_field">{{form.discription}} </div>
+         </div>
+         <br>
+         <br>
+            <input type="submit" value="Добавить">
+        </form>
+</div>
 </fieldset>
 
 {% endblock %}
