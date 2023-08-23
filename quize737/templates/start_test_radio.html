@@ -83,15 +83,10 @@
 </script>
 
 <script>
-    window.setTimeout(() => {
-        window.location.hash = "no-back-button";
-
-    window.location.hash = "Again-No-back-button";
-
-    window.onhashchange = function(){
-    window.location.hash = "no-back-button";
-  }
-    }, 1000)
+    window.history.pushState(null, "", window.location.href);
+window.onpopstate = function () {
+    window.history.pushState(null, "", window.location.href);
+};
 
 </script>
 
