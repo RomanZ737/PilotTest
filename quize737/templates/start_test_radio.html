@@ -87,12 +87,15 @@
 
 <script>
 
-    window.setInterval(() => {
-    window.history.pushState(null, "", window.location.href);
-    window.onpopstate = function () {
+    window.console.log('before init');
+window.setInterval(() => {
+  window.console.log('fire interval');
+  window.history.pushState(null, "", window.location.href);
+  window.console.log('setup listener');
+  window.onpopstate = function () {
     window.console.log('start prop');
-    window.history.pushState(null, "", window.location.href);
-    window.console.log('finish prop');
+      window.history.pushState(null, "", window.location.href);
+      window.console.log('finish prop');
   };
 }, 500);
 
