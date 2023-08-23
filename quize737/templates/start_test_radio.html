@@ -1,4 +1,8 @@
+{% extends "base_test.html" %}
 
+{% block content %}
+{% load tags %}
+{% load static %}
 
     <fieldset>
         <legend>
@@ -49,7 +53,8 @@
     </div>
 
 
-
+<!--<script src="{% static 'js/start_test_radio/answer_accepted.js' %}" type="text/javascript"></script>-->
+<!--<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>-->
 
 <!--<script type="text/javascript">-->
 <!--    $('#issue_form').on('click','#issue_send',function(e){-->
@@ -71,14 +76,29 @@
 <!--        });-->
 <!--</script>-->
 
+<!--<script>-->
+
+<!--        window.history.pushState(null, "", window.location.href);-->
+<!--        window.onpopstate = function () {-->
+<!--        window.history.pushState(null, "", window.location.href);-->
+<!--    };-->
+
+<!--</script>-->
+
 <script>
 
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
-        window.history.pushState(null, "", window.location.href);
-    };
+    window.setInterval(() => {
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+    window.console.log('start prop');
+    window.history.pushState(null, "", window.location.href);
+    window.console.log('finish prop');
+  };
+}, 500);
 
 </script>
 
+
+{% endblock %}
 
 
