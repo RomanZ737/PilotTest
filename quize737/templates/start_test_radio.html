@@ -53,28 +53,28 @@
     </div>
 
 
-<!--<script src="{% static 'js/start_test_radio/answer_accepted.js' %}" type="text/javascript"></script>-->
-<!--<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>-->
+<script src="{% static 'js/start_test_radio/answer_accepted.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
-<!--<script type="text/javascript">-->
-<!--    $('#issue_form').on('click','#issue_send',function(e){-->
-<!--           let issue_form = document.getElementById("report_issue_block");-->
-<!--           issue_form.style.display = 'none';-->
-<!--        e.preventDefault();-->
-<!--        $.ajax({-->
-<!--            type:'POST',-->
-<!--            url:'{% url "quize737:issue_mess" %}',-->
-<!--            data:-->
-<!--            {-->
-<!--                issue_q_id:$("#issue_q_id").val(),-->
-<!--                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()-->
-<!--            },-->
-<!--            success:function(){-->
-<!--                  alert('Сообщение отправлено. Спасибо!');-->
-<!--                    }-->
-<!--            })-->
-<!--        });-->
-<!--</script>-->
+<script type="text/javascript">
+    $('#issue_form').on('click','#issue_send',function(e){
+           let issue_form = document.getElementById("report_issue_block");
+           issue_form.style.display = 'none';
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url "quize737:issue_mess" %}',
+            data:
+            {
+                issue_q_id:$("#issue_q_id").val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+            },
+            success:function(){
+                  alert('Сообщение отправлено. Спасибо!');
+                    }
+            })
+        });
+</script>
 
 
 <script>
