@@ -1,5 +1,5 @@
 {% extends "main_base.html" %}
-
+{% load static %}
 {% block content %}
 
 
@@ -154,124 +154,13 @@
 
 
 
-<script>
-    var checkBox = document.querySelectorAll("input")  //Выбираем все объекты 'input'
-    var optionsBlock = document.getElementById("inline_option_block")
-    var paginator = document.getElementById("paginator") // Берем блок paginator
+<script src="{% static 'js/user_list/checkbox_check.js' %}"></script>
 
-    for (i of checkBox) {  //перебираем в цикле все элементы 'checkbox'
-        i.addEventListener('change', UserSelected);
-        if (i.checked == true) { // Если пользователь устанавливает галку
-                    optionsBlock.style.display = 'block';
-                    if ( paginator != null) {
-                        console.log('paginator' + paginator);
-                        paginator.style.display = 'none';
-                       }
+<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
-                    }
-    }
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>-->
 
-    function UserSelected(event){
-        event.preventDefault();
-        if (event.target.checked == true) {
-            if (optionsBlock.style.display == "none") {
-            optionsBlock.style.display = 'block';
-                if ( paginator != null) {
-                    paginator.style.display = 'none'; // скрываем перелистывание страниц paginator
-                }
-            }
-            } else {  //Если пользователь убирает галку, то проверяем есть ли ckeckbox с установленной галкой
-                var boxFlag = false;
-                for (i of checkBox) {
-                    if (i.checked == true) {
-                        boxFlag = true;
-                        break;
-                    }
-                }
-                if (boxFlag != true) {
-                optionsBlock.style.display = 'none';
-                if ( paginator != null) {
-                    paginator.style.display = 'block';  // показываем перелистывание страниц paginator
-                }
-                }
-        }
-    }
-
-</script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-
-<script>
-
-    // При нажатии кнопки "Фильтр", собираются данные из двух форм и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#submitFilter').click(function() {
-        var form_1 = $("#position_filter, #checkboxes").serialize();
-        $.get("{% url 'quize737:user_list' %}", form_1, function(content){
-            //console.log(form_1);
-            //$("html").html(content);
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Поиск", собираются данные из двух форм и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#submitSearch').click(function() {
-        var form_2 = $("#user_search, #checkboxes").serialize();
-        $.get("{% url 'quize737:user_list' %}", form_2, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Сбросить Фильтр", собираются данные из двух форм и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#resetFilterButton').click(function() {
-        var form_3 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:user_list' %}", form_3, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Назначить Тест", собираются данные из формы "checkboxes" и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#assign_test_to_selected_users').click(function() {
-        var form_4 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:selected_users_test' %}", form_4, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-
-    // При нажатии кнопки "Создать группу", собираются данные из формы "checkboxes" и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#make_new_group_to_selected_users').click(function() {
-        var form_5 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:selected_users_new_group' %}", form_5, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Добавить в группу", собираются данные из формы "checkboxes" и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#add_to_group_selected_users').click(function() {
-        var form_6 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:selected_users_add_to_group' %}", form_6, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-</script>
+<script src="{% static 'js/user_list/link_click.js' %}"></script>
 
 
 {% endblock %}
