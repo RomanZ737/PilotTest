@@ -71,20 +71,14 @@
 <!--        });-->
 <!--</script>-->
 
-<!--<script>-->
+<script>
 
-<!--        window.history.pushState(null, "", window.location.href);-->
-<!--        history.back();-->
-<!--        history.forward();-->
-<!--        window.onpopstate = function () {-->
-<!--        window.history.pushState(null, "", window.location.href);-->
-<!--    };-->
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+        window.history.pushState(null, "", window.location.href);
+    };
 
-<!--</script>-->
-
-<script type="text/javascript">
-    function preventbackbutton() { window.history.forward(); }
-    setTimeout("preventbackbutton()", 0);
-    window.onunload = function () { null };
 </script>
+
+
 
