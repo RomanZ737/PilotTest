@@ -625,7 +625,10 @@ def next_question(request):
                                       f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                       f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                       f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                                      f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
+                                      f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
+                                      f'<br>' \
+                                      f'<br>' \
+                                      f'<a href="{site_url}/download_test_result/{results_instance[0].id}">Скачать результаты теста</a>'
                             # Вынимаем список адресов КРС соответствующих данному тесту
                             email_list = (user_test_instance[0].test_name.email_to_send).split()
                             print('email_list', email_list)
@@ -720,7 +723,10 @@ def next_question(request):
                                           f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                           f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                           f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
+                                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
+                                          f'<br>' \
+                                          f'<br>' \
+                                          f'<a href="{site_url}/download_test_result/{results_instance[0].id}">Скачать результаты теста</a>'
                                 # Вынимаем список адресов КРС соответствующих данному тесту
                                 email_list = (user_test_instance[0].test_name.email_to_send).split()
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
@@ -1245,7 +1251,15 @@ def download_test_result(request, id):
     p.showPage()
     p.save()
     buffer.seek(0)
-    filename = result[0]['user_name'].replace(' ', '')
+    user_name_for_file = result[0]['user_name'].replace(' ', '')
+    result_for_file = ''
+    result_id_for_file = str(result[0]['id'])
+    if result[0]['conclusion']:
+        result_for_file = "PASSED"
+    else:
+        result_for_file = "FAIL"
+
+    filename = result_for_file + '_' + user_name_for_file + '_' + result_id_for_file  # Имя фала
     return FileResponse(buffer, as_attachment=True, filename=f'{filename}.pdf')
 
 
@@ -2380,6 +2394,7 @@ def go_back_button(request):
     #     return redirect('/')
 
 
+# Отправка сообщения администратору
 @login_required
 def mess_to_admin(request):
     if request.method == "POST":
@@ -2413,6 +2428,7 @@ def mess_to_admin(request):
         return render(request, 'admin_mess.html', context=context)
 
 
+#  Назначение теста произвольной группе пользователей выбранных из общего списка пользователей
 @login_required
 def selected_users_test(request):
     #  Формируем формы для назначения тестов
@@ -2500,6 +2516,7 @@ def selected_users_test(request):
         return render(request, 'selected_users_test.html', context=context)
 
 
+# Создание новой группы с пользователями выбранными из общего списка пользователей
 @login_required
 def selected_users_new_group(request):
     if request.method == 'POST':
@@ -2542,6 +2559,7 @@ def selected_users_new_group(request):
         return render(request, 'selected_users_new_group.html', context=context)
 
 
+# Добавление в существующую(щие) группу(ы) пользователей выбранных из общего списка пользователей
 @login_required
 def selected_users_add_to_group(request):
     if request.method == 'POST':
