@@ -9,7 +9,7 @@
 
   {% if page.has_previous %}
 
-      <a href="?{% param_replace page=page.previous_page_number %}">Предыдущая</a>
+      <a href="?{% param_replace page=page.previous_page_number  %}" onclick="location.href=this.href+'&'+checkBoxForm;return false;">Предыдущая</a>
 
   {% endif %}
 
@@ -17,7 +17,7 @@
 
   {% if page.has_next %}
 
-      <a href="?{% param_replace page=page.next_page_number %}">Следующая</a>
+      <a href="?{% param_replace page=page.next_page_number %}" onclick="location.href=this.href+'&'+checkBoxForm;return false;">Следующая</a>
 
   {% endif %}
 

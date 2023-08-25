@@ -1251,7 +1251,8 @@ def download_test_result(request, id):
     p.showPage()
     p.save()
     buffer.seek(0)
-    user_name_for_file = result[0]['user_name'].replace(' ', '')
+    user_name = user_instance.profile.family_name + user_instance.profile.first_name[:1] + user_instance.profile.middle_name[:1]
+    print('user.name:', user_name)
     result_for_file = ''
     result_id_for_file = str(result[0]['id'])
     if result[0]['conclusion']:
@@ -1259,7 +1260,7 @@ def download_test_result(request, id):
     else:
         result_for_file = "FAIL"
 
-    filename = result_for_file + '_' + user_name_for_file + '_' + result_id_for_file  # Имя фала
+    filename = result_for_file + '_' + user_name + '_' + result_id_for_file  # Имя фала
     return FileResponse(buffer, as_attachment=True, filename=f'{filename}.pdf')
 
 
@@ -1694,6 +1695,8 @@ def user_list(request):
                     return render(request, 'user_list.html', context=context)
 
         else:
+            print('GET:', request.GET)
+
             total_user_list = User.objects.all().order_by('last_name').exclude(
                 username='roman')  # Вынимаем всех пользователей, кроме superuser
             total_user_number = User.objects.all().exclude(username='roman').count()
@@ -1701,6 +1704,7 @@ def user_list(request):
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
             users = paginator.page(page_number)
+
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
                        'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
                        'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list}

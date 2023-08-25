@@ -138,16 +138,17 @@
             а выбранные пользователи есть, то они будут отображены здесь
         {% endcomment %}
         {% if selected_users %}
-            {% include "user_list_checked.html" with page=user_list %}
+            {% include "user_list_checked.html" %}
             <hr/>
             <br>
         {% endif %}
         <span style="color: rgb(209, 209,209);">{{results}}</span>
     </div>
     {% else %}
-    {% include "user_list_common.html" with page=user_list %}
+    {% include "user_list_common.html" %}
     <br>
     <div style="display: block;" id="paginator">
+
         {% include "paginator_2.html" with page=user_list %}
         {% endif %}
     </div>
@@ -155,11 +156,59 @@
 
 
 
-<script src="{% static 'js/user_list/checkbox_check.js' %}"></script>
+<!--<script src="{% static 'js/user_list/checkbox_check.js' %}"></script>-->
 
 <script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
 <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>-->
+
+<script>
+
+    var checkBox = document.querySelectorAll("input")  //Выбираем все объекты 'input'
+    var optionsBlock = document.getElementById("inline_option_block")
+    var paginator = document.getElementById("paginator") // Берем блок paginator
+    var checkBoxForm
+
+    for (i of checkBox) {  //перебираем в цикле все элементы 'checkbox'
+        i.addEventListener('change', UserSelected);
+        if (i.checked == true) { // Если пользователь устанавливает галку
+                    optionsBlock.style.display = 'block';
+                    checkBoxForm = $("#checkboxes").serialize();
+                    console.log('boxes:' + checkBoxForm);
+//                    if ( paginator != null) {
+//                        //console.log('paginator' + paginator);
+//                        paginator.style.display = 'none';
+//                       }
+
+                    }
+    }
+
+    function UserSelected(event){
+        event.preventDefault();
+        if (event.target.checked == true) {
+            checkBoxForm = $("#checkboxes").serialize();
+//            console.log('boxes:' + checkBoxForm);
+            if (optionsBlock.style.display == "none") {
+            optionsBlock.style.display = 'block';
+            }
+            } else {  //Если пользователь убирает галку, то проверяем есть ли ckeckbox с установленной галкой
+                var boxFlag = false;
+                for (i of checkBox) {
+                    if (i.checked == true) {
+                        checkBoxForm = $("#checkboxes").serialize();
+                        boxFlag = true;
+                        break;
+                    }
+                }
+                if (boxFlag != true) {
+                optionsBlock.style.display = 'none';
+                checkBoxForm = '';
+                }
+        }
+    }
+
+
+</script>
 
 <script>
 

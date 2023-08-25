@@ -2,12 +2,13 @@ var checkBox = document.querySelectorAll("input")  //Выбираем все о�
     var optionsBlock = document.getElementById("inline_option_block")
     var paginator = document.getElementById("paginator") // Берем блок paginator
 
+
     for (i of checkBox) {  //перебираем в цикле все элементы 'checkbox'
         i.addEventListener('change', UserSelected);
         if (i.checked == true) { // Если пользователь устанавливает галку
                     optionsBlock.style.display = 'block';
                     if ( paginator != null) {
-                        console.log('paginator' + paginator);
+                        //console.log('paginator' + paginator);
                         paginator.style.display = 'none';
                        }
 
