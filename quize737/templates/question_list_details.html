@@ -30,25 +30,123 @@
             <p>{{error}}</p>
             {% endfor %}
             <input type="hidden" name="previous_url" value="{{ previous_url }}">
-                <p>{{question_form.them_name.label}}: {{question_form.them_name}}</p>
-                <p>{{question_form.question.label}}: <textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></p>
-                <p>{{question_form.option_1.label}}: <textarea style="font-size: 15px;" id="option_1" name="option_1" oninput="autoGrow()">{{question_form.option_1.value}}</textarea></p>
-                <p>{{question_form.option_2.label}}: <textarea style="font-size: 15px;" id="option_2" name="option_2" oninput="autoGrow()">{{question_form.option_2.value}}</textarea></p>
-                <p>{{question_form.option_3.label}}: <textarea style="font-size: 15px;" id="option_3" name="option_3" oninput="autoGrow()">{{question_form.option_3.value}}</textarea></p>
-                <p>{{question_form.option_4.label}}: <textarea style="font-size: 15px;" id="option_4" name="option_4" oninput="autoGrow()">{{question_form.option_4.value}}</textarea></p>
-                <p>{{question_form.option_5.label}}: <textarea style="font-size: 15px;" id="option_5" name="option_5" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></p>
-                <p>{{question_form.option_6.label}}: <textarea style="font-size: 15px;" id="option_6" name="option_6" oninput="autoGrow()">{{question_form.option_6.value}}</textarea></p>
-                <p>{{question_form.option_7.label}}: <textarea style="font-size: 15px;" id="option_7" name="option_7" oninput="autoGrow()">{{question_form.option_7.value}}</textarea></p>
-                <p>{{question_form.option_8.label}}: <textarea style="font-size: 15px;" id="option_8" name="option_8" oninput="autoGrow()">{{question_form.option_8.value}}</textarea></p>
-                <p>{{question_form.option_9.label}}: <textarea style="font-size: 15px;" id="option_9" name="option_9" oninput="autoGrow()">{{question_form.option_9.value}}</textarea></p>
-                <p>{{question_form.option_10.label}}: <textarea style="font-size: 15px;" id="option_10" name="option_10" oninput="autoGrow()">{{question_form.option_10.value}}</textarea></p>
+            <div class="block_none_light_up">
+                <div style="display: inline-block;">
+                    {{question_form.them_name.label}}: {{question_form.them_name}}
+                </div>
+                <div style="display: inline-block;">
+                    <span id="ac_type">{{question_form.ac_type.label}}: {{question_form.ac_type}}</span>
+                </div>
+            </div>
 
+            <hr/>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.question.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="question" name="question" oninput="autoGrow()">{{question_form.question.value}}</textarea></span>
+                </div>
+            </div>
+
+            <hr/>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_1.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_1" name="option_1" oninput="autoGrow()">{{question_form.option_1.value}}</textarea></span>
+                </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_2.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                   <span><textarea style="font-size: 15px;" id="option_2" name="option_2" oninput="autoGrow()">{{question_form.option_2.value}}</textarea></span>
+                </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_3.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_3" name="option_3" oninput="autoGrow()">{{question_form.option_3.value}}</textarea></span>
+                </div>
+            </div>
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_4.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_4" name="option_4" oninput="autoGrow()">{{question_form.option_4.value}}</textarea></span>
+                </div>
+            </div>
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_5.label}}:</span>
+                </div>
+                 <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_5" name="option_5" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></span>
+                 </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_6.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_6" name="option_6" oninput="autoGrow()">{{question_form.option_6.value}}</textarea></span>
+                </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_7.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_7" name="option_7" oninput="autoGrow()">{{question_form.option_7.value}}</textarea></span>
+                </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_8.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                   <span><textarea style="font-size: 15px;" id="option_8" name="option_8" oninput="autoGrow()">{{question_form.option_8.value}}</textarea></span>
+                </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_9.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_9" name="option_9" oninput="autoGrow()">{{question_form.option_9.value}}</textarea></span>
+                </div>
+            </div>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_10.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span><textarea style="font-size: 15px;" id="option_10" name="option_10" oninput="autoGrow()">{{question_form.option_10.value}}</textarea></span>
+                </div>
+            </div>
+
+            <hr/>
 
                 <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
                 <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
                 <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
                 <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
-                <p id="ac_type">{{question_form.ac_type.label}}: {{question_form.ac_type}}</p>
+
         </form>
 
         <form method="post" action="{% url 'quize737:question_del' q_id %}" id="del_question_form">
@@ -60,26 +158,18 @@
         <input type="submit" value="Сохранить" form="question_data">
         <span style="color: black;"> | </span>
         <input type="submit" value="Удалить вопрос" form="del_question_form" onclick="return confirm('Удалить Вопрос?') || event.preventDefault()">
+        <span style="color: black;"> | </span>
+        <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
 <!--        <br>-->
 <!--        <input type="submit" value="Вернуться" form="back_to_list">-->
-        <br>
-        <br>
-        <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">
+<!--        <br>-->
+<!--        <br>-->
+<!--        <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">-->
     </div>
 
 </fieldset>
 </div>
-<!--<div class="right_side">-->
-<!--        <fieldset>-->
-<!--            <legend>Редактировать</legend>-->
 
-<!--            <p><a href="{% url 'quize737:new_question' %}">Добавить вопрос</a></p>-->
-<!--            <p><a href="pass">Редактировать Темы</a></p>-->
-<!--            <p><a href="{% url 'quize737:file_upload' %}">Загрузить файл</a></p>-->
-<!--            <p><a href="pass">Скачать базу</a></p>-->
-
-<!--        </fieldset>-->
-<!--</div>-->
 
 
 <p id="demo"></p>
@@ -220,7 +310,6 @@ function hideFunc() {
     }
 
 //Динамическое изменение поля ввода текста вопроса
-//var q_text = document.getElementById("question");
 function autoGrow() {
     var q_text=document.getElementById(event.target.id)
   if (q_text.scrollHeight > q_text.clientHeight) {

@@ -21,6 +21,10 @@ class EditUserForm(forms.ModelForm):
         model = User
         fields = {'username', 'email'}
         error_messages = {'email': {'invalid': "Не правильный формат поля 'Email'"}}
+        widgets = {
+            'email': forms.Textarea(),
+            'username': forms.Textarea(),
+        }
 
 
 class UserRegisterForm(UserCreationForm):

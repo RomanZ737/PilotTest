@@ -45,22 +45,42 @@
         </select>
     </p>
 
-    <p>Группы пользователя:</p>
-    {% for group in all_groups %}
+    <hr/>
 
+    <p>Группы пользователя:</p>
+
+    <div class="fio_row">
+    {% for group in all_groups %}
         {% if group in user_obj.groups.all %}
-            <input type="checkbox" id="group" name="group" value="{{group}}" checked>{{group}}
-        {% else %}
-            <input type="checkbox" id="group" name="group" value="{{group}}">{{group}}
-        {% endif %}
-    {% endfor %}
+            <div class="fio_column_short">
+                <input type="checkbox" id="group" name="group" value="{{group}}" checked>
+                <span class="mark_up">{{group}}</span>
+            </div>
+            {% if forloop.counter|divisibleby:4 %}
+        </div>
+        <div class="fio_row">
+            {% endif %}
+            {% else %}
+            <div class="fio_column_short">
+                <input type="checkbox" id="group" name="group" value="{{group}}">
+                <span class="mark_up">{{group}}</span>
+            </div>
+            {% if forloop.counter|divisibleby:4 %}
+            </div>
+            <div class="fio_row">
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            </div>
     <br>
 
-    <p>Логин: {{form_user.username}}</p>
-      <p>Email: {{form_user.email}}</p>
+    <hr/>
+
+      <p>Логин: <span>{{form_user.username}}</span></p>
+      <p>Email: <span>{{form_user.email}}</span></p>
   </form>
     <form id="user_del_form" action="{% url 'quize737:del_user' user_obj.id %}"></form>
-    <form  id="go-back" method='get' action='{% url "quize737:go_back_button" %}'>
+    <form id="go-back" method='get' action='{% url "quize737:go_back_button" %}'>
         <input type="hidden" name="previous_url" value="{{ previous_url }}">
     </form>
     <input type="submit" form="user_edit_form" value="Сохранить">
@@ -71,4 +91,30 @@
 </div>
 </fieldset>
 
+
+<script>
+    //Скрипт меняет размер поля вопроса под фактическое количество символов
+    var login_text_Length = document.getElementById("id_username").value.length;
+    var login_rows_length = 1
+    if ( login_text_Length > 100 ) { login_rows_length = Math.ceil(login_text_Length/100);
+                                  login_text_Length = 100 };
+    var login_field = document.getElementById("id_username");
+    login_field.setAttribute("cols", login_text_Length);
+    login_field.setAttribute("rows", login_rows_length);
+
+    //----------------------------------------------------
+
+    var q_text_Length = document.getElementById("id_email").value.length;
+    var q_rows_length = 1
+    if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
+                                  q_text_Length = 100 };
+    var q_field = document.getElementById("id_email");
+    q_field.setAttribute("cols", q_text_Length);
+    q_field.setAttribute("rows", q_rows_length);
+
+
+</script>
+
     {% endblock %}
+
+

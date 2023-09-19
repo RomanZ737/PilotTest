@@ -26,8 +26,8 @@ class NewQuestionSetForm(forms.ModelForm):
                   'q_weight', 'answer', 'answers', 'ac_type']
 
         widgets = {
-            'q_weight': forms.NumberInput(attrs={'size': '3', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
-            'question': forms.Textarea(attrs={'cols': 150, 'rows': 1}),
+            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
+            'question': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_1': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_2': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_3': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
@@ -55,7 +55,7 @@ class QuestionSetForm(forms.ModelForm):
                   'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
                   'q_weight', 'answer', 'answers', 'ac_type']
         widgets = {
-            'q_weight': forms.NumberInput(attrs={'size': '3', 'step': 0.5, 'max': 2.0, 'min': 0.0})
+            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0})
         }
 
 

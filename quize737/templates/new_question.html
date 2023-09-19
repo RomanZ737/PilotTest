@@ -31,47 +31,119 @@
             <p>{{error}}</p>
             {% endfor %}
             <div class="block_none_light_up">
+                <div style="display: inline-block;">
                 {{question_form.them_name.label}}: {{question_form.them_name}}
+                </div>
+                <div style="display: inline-block;">
+                    <span id="ac_type">{{question_form.ac_type.label}}: {{question_form.ac_type}}</span>
+                </div>
+            </div>
+
+            <hr/>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.question.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.question}}</span>
+                </div>
+            </div>
+
+            <hr/>
+
+            <div class="block_none_light_up">
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_1.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_1}}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.question.label}}: {{question_form.question}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_2.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_2}}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_1.label}}: {{question_form.option_1}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_3.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_3}}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_2.label}}: {{question_form.option_2}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_4.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_4}}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_3.label}}: {{question_form.option_3}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_5.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_5}}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_4.label}}: {{question_form.option_4}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_6.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_6}}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_5.label}}: {{question_form.option_5}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_7.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_7}}</span>
+                </div>
             </div>
+
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_6.label}}: {{question_form.option_6}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_8.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_8}}</span>
+                </div>
             </div>
+
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_7.label}}: {{question_form.option_7}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_9.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_9}}</span>
+                </div>
             </div>
+
             <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_8.label}}: {{question_form.option_8}}</span>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.option_10.label}}:</span>
+                </div>
+                <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.option_10}}</span>
+                </div>
             </div>
-            <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_9.label}}: {{question_form.option_9}}</span>
-            </div>
-            <div class="block_none_light_up">
-                <span oninput="autoGrow()">{{question_form.option_10.label}}: {{question_form.option_10}}</span>
-            </div>
+
+            <hr/>
+
             <div class="block_none_light_up">
                 {{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()">
             </div>
@@ -87,9 +159,7 @@
             <div class="block_none_light_up">
                 <span id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="ex. 1,2,3,4..."></span>
             </div>
-            <div class="block_none_light_up">
-                <span id="ac_type">{{question_form.ac_type.label}}: {{question_form.ac_type}}</span>
-            </div>
+
             <br>
             <div class="block_none_light_up">
                 <input type="submit" value="Сохранить">

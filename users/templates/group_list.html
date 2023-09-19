@@ -52,13 +52,13 @@
                                 <a href="{% url 'quize737:group_users' group.id %}">Список: {{group_user_num|get_item:group.name}}</a>
                             </div>
 
-                                <span style="color: black;">|</span>
+
 
                             <div class="list-edit">
                                 <a href="{% url 'quize737:edit_group' group.id %}">Редактировать</a>
                             </div>
 
-                            <span style="color: black;">|</span>
+
 
                             <div class="list-delete">
                                 <a href="{% url 'quize737:group_del' group.id %}" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить</a>
