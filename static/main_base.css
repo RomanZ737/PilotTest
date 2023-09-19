@@ -257,7 +257,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 200px;
+    width: 177px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -839,3 +839,14 @@ div.new_group_sign {
 div.new_group_field {
     display: inline-block;
 }
+
+div.new_question-static_sign {
+    display: inline-block;
+    width: 100px;
+    vertical-align: top;
+}
+
+div.new_question-input_field {
+    display: inline-block;
+}
+
