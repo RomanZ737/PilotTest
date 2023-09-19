@@ -11,7 +11,7 @@
         <span style="color: black;"> | </span>
         <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
         <span style="color: black;"> | </span>
-        <a href="#">ДОБАВИТЬ В ГРУППУ ВЫБРАННЫХ ПИЛОТОВ</a>
+        <a href="#">ДОБАВИТЬ ВЫБРАННЫХ ПИЛОТОВ В ГРУППУ </a>
     </legend>
     <div class="block_none_light_up">
         <div class="form_errors">
@@ -21,7 +21,8 @@
             {% endfor %}
         </div>
 
-        <form id="new_users_group" method='post' action="{% url 'quize737:selected_users_test' %}">
+        <form id="new_users_group" method='post' action="{% url 'quize737:selected_users_add_to_group' %}">
+            {% csrf_token %}
             <input type="hidden" name="previous_url" value="{{ previous_url }}">
             <div class="fio_row">
                 {% for user in selected_user_list %}
@@ -35,9 +36,21 @@
                 {% endfor %}
             </div>
             <hr/>
-            <br>
 
+            <div class="fio_row">
+                {% for group in groups%}
+                    <div class="fio_column_short">
+                        <input type="checkbox" name="group_selected" value="{{group.id}}">&nbsp&nbsp
+                        <span class="theme_color">{{group.name}}</span>
+                    </div>
+                    {% if forloop.counter|divisibleby:4 %}
+                        </div>
+                        <div class="fio_row">
+                    {% endif %}
+                {% endfor %}
+            </div>
             </form>
+        <br>
         <div class="block_none_light_up" id="go_back">
         <form id="go-back_form" method='get' action='{% url "quize737:go_back_button" %}'>
             <input type="hidden" name="previous_url" value="/user_list/{{ previous_url }}">

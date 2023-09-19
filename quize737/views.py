@@ -625,7 +625,10 @@ def next_question(request):
                                       f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                       f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                       f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                                      f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
+                                      f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
+                                      f'<br>' \
+                                      f'<br>' \
+                                      f'<a href="{site_url}/download_test_result/{results_instance[0].id}">Скачать результаты теста</a>'
                             # Вынимаем список адресов КРС соответствующих данному тесту
                             email_list = (user_test_instance[0].test_name.email_to_send).split()
                             print('email_list', email_list)
@@ -720,7 +723,10 @@ def next_question(request):
                                           f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                           f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                           f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>'
+                                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
+                                          f'<br>' \
+                                          f'<br>' \
+                                          f'<a href="{site_url}/download_test_result/{results_instance[0].id}">Скачать результаты теста</a>'
                                 # Вынимаем список адресов КРС соответствующих данному тесту
                                 email_list = (user_test_instance[0].test_name.email_to_send).split()
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
@@ -1245,7 +1251,16 @@ def download_test_result(request, id):
     p.showPage()
     p.save()
     buffer.seek(0)
-    filename = result[0]['user_name'].replace(' ', '')
+    user_name = user_instance.profile.family_name + user_instance.profile.first_name[:1] + user_instance.profile.middle_name[:1]
+    print('user.name:', user_name)
+    result_for_file = ''
+    result_id_for_file = str(result[0]['id'])
+    if result[0]['conclusion']:
+        result_for_file = "PASSED"
+    else:
+        result_for_file = "FAIL"
+
+    filename = result_for_file + '_' + user_name + '_' + result_id_for_file  # Имя фала
     return FileResponse(buffer, as_attachment=True, filename=f'{filename}.pdf')
 
 
@@ -1680,6 +1695,8 @@ def user_list(request):
                     return render(request, 'user_list.html', context=context)
 
         else:
+            print('GET:', request.GET)
+
             total_user_list = User.objects.all().order_by('last_name').exclude(
                 username='roman')  # Вынимаем всех пользователей, кроме superuser
             total_user_number = User.objects.all().exclude(username='roman').count()
@@ -1687,6 +1704,7 @@ def user_list(request):
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
             users = paginator.page(page_number)
+
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
                        'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
                        'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list}
@@ -2003,7 +2021,7 @@ def user_detales(request, id):
                 if test['DELETE']:
                     UserTests.objects.filter(user=user_object,
                                              test_name=test['test_name']).delete()  # Удаляем тест у пользователя
-                    try:  # Ищем и удаляем начатфые, но не законченные тесты (сам сформированный временный тест с вопросами)
+                    try:  # Ищем и удаляем начатые, но не законченные тесты (сам сформированный временный тест с вопросами)
                         QuizeSet.objects.get(user_under_test=user_object.username,
                                              quize_name=test['test_name']).delete()
                     except Exception:
@@ -2380,6 +2398,7 @@ def go_back_button(request):
     #     return redirect('/')
 
 
+# Отправка сообщения администратору
 @login_required
 def mess_to_admin(request):
     if request.method == "POST":
@@ -2413,6 +2432,7 @@ def mess_to_admin(request):
         return render(request, 'admin_mess.html', context=context)
 
 
+#  Назначение теста произвольной группе пользователей выбранных из общего списка пользователей
 @login_required
 def selected_users_test(request):
     #  Формируем формы для назначения тестов
@@ -2500,10 +2520,31 @@ def selected_users_test(request):
         return render(request, 'selected_users_test.html', context=context)
 
 
+# Создание новой группы с пользователями выбранными из общего списка пользователей
 @login_required
 def selected_users_new_group(request):
     if request.method == 'POST':
-        pass
+        group_form = GroupForm(request.POST)
+        previous_url = request.POST.get('previous_url')  # Вынимаем ссылку на изначальную страницу
+        selected_users_ids = request.POST.getlist('user_selected')  # ID выбраных пользователей
+        total_user_list = []  # Список пользователей, которым надо назначить тест
+        # Формируем список объектов пользователей из списка id пользователей
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            total_user_list.append(user_selected)
+        if group_form.is_valid():
+            #  Создаём группу
+            group = Group.objects.create(name=group_form.cleaned_data.get('group_name'))  # Добавить группу разрешений
+            #  Добавляем группе описание
+            GroupsDescription.objects.create(group=group, discription=group_form.cleaned_data.get('discription'))
+            # Добаляем пользователей в группу
+            for user in total_user_list:
+                user.groups.add(group)
+            # Возвращаем пользователя на страницу с группами
+            return redirect('quize737:group_list')
+        else:
+            context = {'selected_user_list': total_user_list, 'previous_url': previous_url, 'form': group_form}
+            return render(request, 'selected_users_new_group.html', context=context)
 
     else:
         # Формируем ссылку для кнопки "Вернуться"
@@ -2514,18 +2555,31 @@ def selected_users_new_group(request):
         for user_id in selected_users_ids:
             user_selected = User.objects.get(id=user_id)
             selected_user_list.append(user_selected)
+
+        group_form = GroupForm()
         context = {'selected_user_list': selected_user_list,
-                   'previous_url': previous_url}
+                   'previous_url': previous_url, 'form': group_form}
 
         return render(request, 'selected_users_new_group.html', context=context)
 
 
+# Добавление в существующую(щие) группу(ы) пользователей выбранных из общего списка пользователей
 @login_required
 def selected_users_add_to_group(request):
     if request.method == 'POST':
-        pass
+        selected_user_list = []
+        selected_groups = request.POST.getlist('group_selected')
+        selected_users_ids = request.POST.getlist('user_selected')
+        for user_id in selected_users_ids:
+            user_selected = User.objects.get(id=user_id)
+            selected_user_list.append(user_selected)
+        for user in selected_user_list:
+            for group in selected_groups:
+                user.groups.add(group)
+        return redirect('quize737:group_list')
 
     else:
+        groups = Group.objects.all()
         # Формируем ссылку для кнопки "Вернуться"
         previous_url = '?' + request.META.get('QUERY_STRING')
         selected_user_list = []  # Список пользователей, которые были отмечены
@@ -2535,6 +2589,6 @@ def selected_users_add_to_group(request):
             user_selected = User.objects.get(id=user_id)
             selected_user_list.append(user_selected)
         context = {'selected_user_list': selected_user_list,
-                   'previous_url': previous_url}
+                   'previous_url': previous_url, 'groups': groups}
 
         return render(request, 'selected_users_add_to_group.html', context=context)

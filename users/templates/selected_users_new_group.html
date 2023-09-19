@@ -21,7 +21,8 @@
             {% endfor %}
         </div>
 
-        <form id="new_users_group" method='post' action="{% url 'quize737:selected_users_test' %}">
+        <form id="selected_users_group" method='post' action="{% url 'quize737:selected_users_new_group' %}">
+            {% csrf_token %}
             <input type="hidden" name="previous_url" value="{{ previous_url }}">
             <div class="fio_row">
                 {% for user in selected_user_list %}
@@ -37,18 +38,35 @@
             <hr/>
             <br>
 
-            </form>
-        <div class="block_none_light_up" id="go_back">
-        <form id="go-back_form" method='get' action='{% url "quize737:go_back_button" %}'>
-            <input type="hidden" name="previous_url" value="/user_list/{{ previous_url }}">
+            <div class="form_errors">
+            {% for error in form.errors.values %}
+            <p>{{error}}</p>
+            {% endfor %}
+            </div>
+            <div>
+                <div class="new_group_sign">Название Группы:</div>
+                <div class="new_group_field">{{form.group_name}} </div>
+            </div>
+            <br>
+            <div>
+                <div class="new_group_sign">Описание группы:</div>
+                <div class="new_group_field">{{form.discription}} </div>
+            </div>
+            <br>
+
+
         </form>
+        <div class="block_none_light_up" id="go_back">
+            <form id="go-back_form" method='get' action='{% url "quize737:go_back_button" %}'>
+                <input type="hidden" name="previous_url" value="/user_list/{{ previous_url }}">
+            </form>
         </div>
-    <div class="block_none_light_up">
-        <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
-        <input type="submit" value="Сохранить" id="save_btn" form="new_users_group">
-        <span style="color: black;" id="span_vline_1"> | </span>
-        <input type="submit" id="go-back_btn" value="Вернуться" form="go-back_form">
-    </div>
+        <div class="block_none_light_up">
+            <span id="wait" style="display: none;">Сохраняю данные, ожидайте...</span>
+            <input type="submit" value="Сохранить" id="save_btn" form="selected_users_group">
+            <span style="color: black;" id="span_vline_1"> | </span>
+            <input type="submit" id="go-back_btn" value="Вернуться" form="go-back_form">
+        </div>
     </div>
 </fieldset>
 

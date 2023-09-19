@@ -257,7 +257,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 177px;
+    width: 200px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -308,7 +308,7 @@ div.block_light_up:hover {  /* блок всей строки данных в т
 
 div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
-    margin-bottom: -1px;
+    margin-bottom: 2px;
     width: fit-content;
 }
 
@@ -354,7 +354,7 @@ div.list-other_field {    /* блок для остальных типов да�
     left: 5%;
     word-wrap: break-word;
     text-align: left;
-    width: 45%;
+    width: 370px;
     vertical-align: middle;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -381,28 +381,39 @@ div.hide_block {
 div.list-group {  /* блок группа в таблице */
     position: relative;
     display: inline-block;
-    width: 23%;
+    width: 290px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
     word-wrap: break-word;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 290px;
+    width: 460px;
     text-align: left;
     font-size: 18px;
+    border-left: 1px solid black;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.list-group_users {
     position: relative;
     display: inline-block;
-    width: 14%;
+    width: 95px;
     text-align: left;
     font-size: 18px;
     word-wrap: break-word;
+    border-left: 1px solid black;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 div.list-edit {
@@ -602,7 +613,7 @@ div.result_answers_user_answer {
 div.list-them_questions_num { /*  Количество вопросов в теме на странице спискеа тем*/
     position: relative;
     display: inline-block;
-    width: 160px;
+    width: 130px;
     vertical-align: middle;
     border-left: 1px solid black;
     padding-left: 5px;
@@ -741,7 +752,9 @@ div.inline_option {
     color: rgb(209, 209,209);
     font-size: 18px;
     width: fit-content;
-    animation: fadeInFromNone 0.5s
+    border-bottom: 1px solid rgba(184, 4, 4, 0.26);
+    animation: fadeInFromNone 0.5s;
+
 }
 
 @keyframes fadeInFromNone {
@@ -781,7 +794,7 @@ div.fio_column_short {
 
 div.fio_row {
     display: block;
-    margin: 15px;
+    margin: 20px;
 }
 
 div.form_errors {
@@ -817,12 +830,12 @@ div.form_errors {
   }
 }
 
-div.new_question-static_sign {
+div.new_group_sign {
     display: inline-block;
-    width: 100px;
+    margin-right: 10px;
     vertical-align: top;
 }
 
-div.new_question-input_field {
+div.new_group_field {
     display: inline-block;
 }

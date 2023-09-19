@@ -15,19 +15,19 @@
             {% for group in groups %}
                 {% if group.name in fixed_groups %}
                     <div>
-                        <spot class="block_light_up">
+                        <div class="block_light_up">
                             <div class="list-group">
                                 <a href="{% url 'quize737:group_details' group.id %}"><span class="theme_color">{{group}}</span></a>
                              </div>
-                            <span style="color: black;">|</span>
+
                             <div class="list-group_description">
                                 {{group.groupsdescription.discription}}
                             </div>
-                            <span style="color: black;">|</span>
+
                             <div class="list-group_users">
                                 <a href="{% url 'quize737:group_users' group.id %}">Список: {{group_user_num|get_item:group.name}}</a>
                             </div>
-                        </spot>
+                        </div>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -35,18 +35,18 @@
             {% for group in groups %}
                 {% if group.name not in fixed_groups %}
                     <div>
-                        <spot class="block_light_up">
+                        <div class="block_light_up">
                             <div class="list-group">
                                 <a href="{% url 'quize737:group_details' group.id %}"><span class="theme_color">{{group}}</span></a>
                             </div>
 
-                            <span style="color: black;">|</span>
+
 
                             <div class="list-group_description">
                                 {{group.groupsdescription.discription}}
                             </div>
 
-                            <span style="color: black;">|</span>
+
 
                             <div class="list-group_users">
                                 <a href="{% url 'quize737:group_users' group.id %}">Список: {{group_user_num|get_item:group.name}}</a>
@@ -63,7 +63,7 @@
                             <div class="list-delete">
                                 <a href="{% url 'quize737:group_del' group.id %}" onclick="return confirm('Удалить группу?') || event.preventDefault()" name="group_del">Удалить</a>
                             </div>
-                        </spot>
+                        </div>
                     </div>
                 {% endif%}
             {% endfor %}
