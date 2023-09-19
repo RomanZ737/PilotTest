@@ -381,7 +381,7 @@ div.hide_block {
 div.list-group {  /* блок группа в таблице */
     position: relative;
     display: inline-block;
-    width: 290px;
+    width: 190px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -394,7 +394,7 @@ div.list-group {  /* блок группа в таблице */
 div.list-group_description { /* блок описание группы в таблице */
     position: relative;
     display: inline-block;
-    width: 460px;
+    width: 390px;
     text-align: left;
     font-size: 18px;
     border-left: 1px solid black;
