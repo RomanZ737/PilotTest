@@ -110,7 +110,7 @@
                     <input class="submit_filter" type="submit" value="Фильтр" id="submitFilter">
                     <span style="color: black">|</span>
                     <input class="submit_filter" type="submit" value="Сбросить Фильтр" id="resetFilterButton">
-                    <div class="total_user_num">Всего: {{user_num}}</div>
+
                 </div>
             </div>
 
@@ -127,6 +127,7 @@
                 <a href="{% url 'quize737:user_list' %}"><span>Отменить</span></a>
 
             </div>
+                <div class="total_user_num">Всего: {{user_num}}</div>
         </div>
 
     </div>
@@ -172,7 +173,7 @@
     for (i of checkBox) {  //перебираем в цикле все элементы 'checkbox'
         i.addEventListener('change', UserSelected);
         if (i.checked == true) { // Если пользователь устанавливает галку
-                    optionsBlock.style.display = 'block';
+                    optionsBlock.style.display = 'inline-block';
                     checkBoxForm = $("#checkboxes").serialize();
                     console.log('boxes:' + checkBoxForm);
 //                    if ( paginator != null) {
@@ -189,7 +190,7 @@
             checkBoxForm = $("#checkboxes").serialize();
 //            console.log('boxes:' + checkBoxForm);
             if (optionsBlock.style.display == "none") {
-            optionsBlock.style.display = 'block';
+            optionsBlock.style.display = 'inline-block';
             }
             } else {  //Если пользователь убирает галку, то проверяем есть ли ckeckbox с установленной галкой
                 var boxFlag = false;
