@@ -1664,10 +1664,10 @@ def user_list(request):
                     group = filter_input[2]
                 if filter_input[3] != 'Все':
                     test = filter_input[3]
-                    total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type,
-                                                          profile__position__icontains=position,
-                                                          groups__name__icontains=group,
-                                                          usertests__test_name__name__icontains=test).exclude(
+                    total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
+                                                          profile__position__contains=position,
+                                                          groups__name__contains=group,
+                                                          usertests__test_name__name__contains=test).exclude(
                         username='roman').distinct().order_by('last_name')
                 else:
                     total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type,
