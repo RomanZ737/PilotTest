@@ -71,9 +71,11 @@
 
             <hr/>
             </div>
+
             <div style="display: inline-block; margin-bottom: 10px; width: 200px; height: 30px;">
-                <div style="display: inline-block; vertical-align: middle;">Всего вопросов: </div>
+                <div style="display: inline-block; vertical-align: middle; height: 100%;">Всего вопросов: </div>
                 <div class="q_num_mark" id="total_q_num">
+
                 </div>
             </div>
             <br>
@@ -118,19 +120,6 @@
 <script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
 <script type="text/javascript">
-//Анимация количества вопросов
-$(window).on('load', function() {
-
-    $("#total_q_num").on("DOMSubtreeModified", function(){
-        $(this).animate( {
-		    fontSize: "20px",
-	    }, 130 );
-	    $(this).animate( {
-		    fontSize: "19px",
-	    }, 130 );
-      });
-
-});
 
 //Подсчитываем общее количество вопросов
     //Считаем общее количество вопросов при открытии теста
@@ -169,11 +158,20 @@ $(window).on('load', function() {
                 totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
                 totalQNum.innerHTML = totalQNum.value;
 
+
             } else {
                 totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
                 totalQNum.innerHTML = totalQNum.value;
+
                 }
             });
+            //Анимация количества вопросов
+            $("#total_q_num").animate( {
+		        fontSize: "23px",
+	                }, 130 );
+	        $("#total_q_num").animate( {
+		           fontSize: "19px",
+	            }, 130 );
         }
 
     //Функция отслеживает изменение поля количества вопросов

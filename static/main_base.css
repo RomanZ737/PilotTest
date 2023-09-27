@@ -752,7 +752,7 @@ div.q_num_mark {
     display: inline-block;
     color: rgb(209, 209,209);
     font-size: 19px;
-    height: 20px;
+    height: 100%;
     margin-left: 8px;
     vertical-align: middle;
     /* border-bottom: 1px solid rgba(184, 4, 4, 0.26);
