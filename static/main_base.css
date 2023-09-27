@@ -748,6 +748,17 @@ div.user_test_statick_sign {
     display: inline-block;
 }
 
+div.q_num_mark {
+    display: inline-block;
+    color: rgb(209, 209,209);
+    font-size: 19px;
+    height: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+    /* border-bottom: 1px solid rgba(184, 4, 4, 0.26);
+    animation: fadeInFromNone 0.5s; */
+}
+
 div.inline_option {
     position:relative;
     color: rgb(209, 209,209);

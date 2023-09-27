@@ -1,5 +1,5 @@
 {% extends "main_base.html" %}
-
+{% load static %}
 {% block content %}
 
 {% load django_template_maths %}
@@ -27,17 +27,22 @@
         <!--Перебираем количество вопросов по темам-->
         {% for them, q_num in q_num_per_them.items %}
         <input type="hidden" id="{{them.id}}" value="{{q_num}}">
-        {% endfor %}
 
+        {% endfor %}
+        <input type="hidden" id="target_them_num" value="{{target_them_num}}">
 
         <form id="question_form" method='post'>
             {% csrf_token %}
 
             <p>Название: {{test_name_form.name}}
                 <span>Тип ВС: <span class="mark_up"><b>{{ac_type}}</b></span></span>
-                <span>{{test_name_form.training}} Тренировка <span class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
+                <span>{{test_name_form.training}} Тренировка <span id="training_comment" class="comment">(Письмо КРС не отправляется, результат не записывается)</span></span>
             </p>
             <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
+
+            <hr/>
+
+            <div id="email_select_panel">
             <p>Кому отправлять письмо с результатами: <span class="comment">(Из группы KRS)</span></p>
             <div class="fio_row">
                 {% for user_krs in krs_list%}
@@ -65,7 +70,13 @@
 
 
             <hr/>
-
+            </div>
+            <div style="display: inline-block; margin-bottom: 10px; width: 200px; height: 30px;">
+                <div style="display: inline-block; vertical-align: middle;">Всего вопросов: </div>
+                <div class="q_num_mark" id="total_q_num">
+                </div>
+            </div>
+            <br>
             <input type="hidden" id="test_id_num" value="{{test_id}}">
             {{ test_q_set.management_form }}
             {% for form in test_q_set %}
@@ -83,7 +94,7 @@
             <br>
             <br>
         </form>
-        <form id="go-back"  action="{% url 'quize737:go_back_button' %}">
+        <form id="go-back" action="{% url 'quize737:go_back_button' %}">
             <input type="hidden" name="previous_url" value="{{previous_url}}">
         </form>
         <input type="submit" value="Сохранить" form="question_form">
@@ -104,12 +115,97 @@
     </div>
 </fieldset>
 
-
-<!--https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript-->
+<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
 <script type="text/javascript">
+//Анимация количества вопросов
+$(window).on('load', function() {
 
-        // Вычисление количества вопросов
+    $("#total_q_num").on("DOMSubtreeModified", function(){
+        $(this).animate( {
+		    fontSize: "20px",
+	    }, 130 );
+	    $(this).animate( {
+		    fontSize: "19px",
+	    }, 130 );
+      });
+
+});
+
+//Подсчитываем общее количество вопросов
+    //Считаем общее количество вопросов при открытии теста
+    var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
+    let totalQNum = document.getElementById("total_q_num"); //Элемент с общим количеством вопросов
+    totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
+    //Подсчёт количества вопросов при открытии теста
+        //Выбираем все элементы input type=number, кроме 'pass score',
+        //подсчитываем количество вопросов и развешиваем listener
+    $(':input[type="number"]').not(':input[name="pass_score"]').each(function(index, element) {
+        let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+        let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
+
+        if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
+            totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
+            totalQNum.innerHTML = totalQNum.value;
+
+        } else {
+            totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
+            totalQNum.innerHTML = totalQNum.value;
+                }
+
+            element.addEventListener('input', QNumChanged); // Вешаем listener на объект input
+
+        });
+
+
+    //Базовая функция подсчёта вопросов при измении любого из полей количества вопросов
+    function mainQCount() {
+        totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
+        $(':input[type="number"]').not(':input[name="pass_score"]').each(function(index, element) {
+            let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+            let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
+
+            if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
+                totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
+                totalQNum.innerHTML = totalQNum.value;
+
+            } else {
+                totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
+                totalQNum.innerHTML = totalQNum.value;
+                }
+            });
+        }
+
+    //Функция отслеживает изменение поля количества вопросов
+    function QNumChanged() {
+        event.preventDefault();
+        mainQCount()
+        }
+
+//Если тест тренировочный, что скрываем возможность выбора, кому отправлять email
+        let trainingMark = document.getElementById("id_training")
+        let emailSelecetBlock = document.getElementById("email_select_panel")
+
+        if (trainingMark.checked == true) {
+                    emailSelecetBlock.style.display = 'none';
+                    $("#training_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
+            }   else {
+                    emailSelecetBlock.style.display = 'block';
+                    $("#training_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
+            }
+
+        trainingMark.addEventListener('change', TrainingFunc); // Вешаем listener на объект
+        function TrainingFunc(event) {
+            if (trainingMark.checked == true) {
+                    emailSelecetBlock.style.display = 'none';
+                    $("#training_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
+            }   else {
+                    emailSelecetBlock.style.display = 'block';
+                    $("#training_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
+            }
+        }
+
+// Вычисление количества вопросов в конкретной теме
 
         let Select = document.querySelectorAll("select");
         //document.getElementById("demo").innerHTML = "Value: " + Select
@@ -121,55 +217,42 @@
 
                 let select_id = i.name.match( numberPattern ) // Номер поля
 
-
-
                 let valueOfSelect = i.value //Вынимаем значение выбранного поля
                 let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
 
                 document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
                 let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
                 numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
-
-                //document.getElementById("demo_0").innerHTML = "Value_0: " + valueOfSelect
-
              };
 
         function ThemSelection(event){ //Функция отслеживаем выбранную тему и подставляет количество вопросов
             event.preventDefault()
-            //let TargetName = event.target
-
-            //document.getElementById("demo_0").innerHTML = "Value_0: " + event.target.value
-
             let select_id = event.target.name.match( numberPattern ) // Номер поля
-
-            //document.getElementById("demo_1").innerHTML = "Value_1: " + select_id
-
             let valueOfSelect = event.target.value //Вынимаем значение выбранного поля
             let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
             document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
             let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
             numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
 
+            //Пересчитываем количество вопросов
+            mainQCount()
+
             }
 
-        //Создаём новые формы
+//Создаём новые формы
+
         let qForm = document.querySelectorAll(".q_forms")
         let container = document.querySelector("#question_form")
         let addButton = document.querySelector("#add-form")
         let totalForms = document.querySelector("#id_questions-TOTAL_FORMS")
-
-
         let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
         addButton.addEventListener('click', addForm)
 
         function addForm(e){
             e.preventDefault()
-
             let newForm = qForm[0].cloneNode(true)
             let formRegex = RegExp(`questions-(\\d){1}-`,'g')
             let fieldRegex = RegExp(`max_q_(\\d){1}`,'g')
-
-
 
             formNum++
             newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formNum}-`)
@@ -177,20 +260,21 @@
             container.insertBefore(newForm, addButton)
             var sp1 = document.createElement("br")
             container.insertBefore(sp1, addButton)
-            newForm.addEventListener('change', ThemSelection); // Вешаем listener на объект select
-
-
 
             totalForms.setAttribute('value', `${formNum+1}`)
 
-            // Устанавливаем начальные значения
+            // Устанавливаем начальные значения в форме
             let q_field = document.getElementById(`id_questions-${formNum}-q_num`) // Ищем новое поле с количеством вопросов
+            q_field.addEventListener('input', QNumChanged); // Вешаем listener на объект input
             q_field.setAttribute('value', '1')
+
             let them_field = document.getElementById(`id_questions-${formNum}-theme`) // Ищем новое поле с темой
             them_field.value = '5'
+            them_field.addEventListener('change', ThemSelection); // Вешаем listener на объект select
             let numOfqAct = document.getElementById('5').value
             document.getElementById("max_q_" + formNum).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
-
+            //Пересчитываем количество вопросов
+            mainQCount()
 
         }
 

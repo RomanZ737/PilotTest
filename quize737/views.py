@@ -1095,7 +1095,7 @@ def theme_editor(request, id=None):
             # ac_types_list.append('Все')
             user_search_input = request.GET.get("them_search")
             theme_list = Thems.objects.all()
-            them_num = Thems.objects.all().count()
+            them_num = Thems.objects.all().count() - 1
             q_num_dict = {}
             no_search_result = False
             if user_search_input:
@@ -1344,13 +1344,14 @@ def test_editor(request):
         for test in tests_names:
             #  Вынимаем темы с количеством вопросов
             test_data = TestQuestionsBay.objects.filter(test_id=test)
-            test_them_num = Thems.objects.all().count()
+            test_them_num = Thems.objects.all().count() - 1
             users_number = UserTests.objects.filter(
                 test_name=test).count()  # Количество пользователей, которым назначен конкретный тест
             q_num = int()
             for q in test_data:
                 if q.theme.name == 'Все темы':
-                    q_num = (int(test_them_num) - 1) * q.q_num
+                    q_num = q_num + (int(test_them_num)) * q.q_num
+                    print('Все вопросы:', q_num)
                 else:
                     q_num += q.q_num
             total_user_test[test.name] = users_number
@@ -1383,7 +1384,8 @@ def create_new_test(request):
     ac_type = request.GET.get('ac_type')
     thems = Thems.objects.all()
     total_q_num_per_them = {}
-    totla_q_num = 0
+    #totla_q_num = 0
+    target_them_num = 0  # Количество тем для подсчёта количества вопросов, если выбраны все темы
     min_q_them = []
     all_them_instance = Thems.objects.get(id=5)  # Instance объекта 'Все темы'
     for them_name in thems:
@@ -1392,7 +1394,8 @@ def create_new_test(request):
             q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
             if q_num > 0:
                 total_q_num_per_them[them_name] = q_num
-                totla_q_num += 1
+                #totla_q_num += 1
+                target_them_num += 1
                 min_q_them.append(q_num)
     min_q_them.sort()
     total_q_num_per_them[all_them_instance] = min_q_them[0]  # Включаем 'Все темы' в список выбора тем
@@ -1446,7 +1449,7 @@ def create_new_test(request):
                 email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
             else:
                 checked_emailes = request.POST.getlist('krs_email')
-            context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+            context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                        'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
                        'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
             return render(request, 'new_test_form.html', context=context)
@@ -1456,7 +1459,7 @@ def create_new_test(request):
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)},
                                      initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
 
-        context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them,
+        context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them,
                    'ac_type': ac_type, 'krs_list': krs_list}
         return render(request, 'new_test_form.html', context=context)
 
@@ -1478,8 +1481,9 @@ def test_details(request, id):
 
     thems = Thems.objects.all()
     total_q_num_per_them = {}
-    totla_q_num = 0
+    #totla_q_num = 0
     min_q_them = []
+    target_them_num = 0 #  Количество тем для подсчёта количества вопросов, если выбраны все темы
     all_them_instance = Thems.objects.get(id=5)  # Instance объекта 'Все темы'
     for them_name in thems:
         # Считаем количество вопросов в каждой теме, кроме "Все темы"
@@ -1487,8 +1491,9 @@ def test_details(request, id):
             q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
             if q_num > 0:
                 total_q_num_per_them[them_name] = q_num
-                totla_q_num += 1
+                #totla_q_num += 1
                 min_q_them.append(q_num)
+                target_them_num += 1
     min_q_them.sort()
     total_q_num_per_them[all_them_instance] = min_q_them[0]  # Включаем 'Все темы' в список выбора тем
     thems_selection = []
@@ -1536,7 +1541,7 @@ def test_details(request, id):
                 email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
             else:
                 checked_emailes = request.POST.getlist('krs_email')
-            context = {'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+            context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                        'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
                        'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes,
                        'q_num_per_them': total_q_num_per_them}
@@ -1549,7 +1554,7 @@ def test_details(request, id):
         # Создаём набор форм
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)}, initial=test_questions,
                                      prefix='questions')
-        context = {'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
+        context = {'target_them_num': target_them_num, 'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
                    'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list,
                    'checked_emailes': checked_emailes, 'previous_url': previous_url}
         return render(request, 'test_detailes.html', context=context)
