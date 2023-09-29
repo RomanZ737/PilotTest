@@ -241,7 +241,7 @@ div.list-pass_score_num {    /* блок для остальных типов д
 div.list-them {  /* блок Тема вопроса в таблице */
     position: relative;
     display: inline-block;
-    width: 144px;
+    width: 153px;
     text-align: left;
     color: rgb(170, 39, 47);
     font-size: 18px;
@@ -253,7 +253,7 @@ div.list-them {  /* блок Тема вопроса в таблице */
 div.list-q_number {
     position: relative;
     display: inline-block;
-    width: 63px;
+    width: 75px;
     text-align: left;
     font-size: 18px;
 }
