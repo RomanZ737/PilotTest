@@ -862,3 +862,19 @@ div.new_question-input_field {
     display: inline-block;
 }
 
+div.crossed_out_inactive {
+   pointer-events: none;
+  /* for "disabled" effect */
+  opacity: 0.3;
+  /* background: #CCC; */
+  text-decoration: line-through;
+}
+
+/*
+div.crossed_out_inactive:before {
+   content: "";
+   position: absolute;
+   height: 1px;
+   width: 120%;
+   background: red;
+}  */

@@ -255,11 +255,12 @@ def start(request, id=None):
                                                         user_under_test=request.user.username)  # Объект сформированного пользователю теста
                 #  Если сформированный пользователю тест существует, продолжаем выполнение
                 q_num_left = test_in_progress.q_sequence_num
-                in_progress = True  # Флаг не завершунного теста
+                in_progress = True  # Флаг не завершённого теста
                 test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
                 user_test = UserTests.objects.filter(test_name=id)  # Объект теста назначенного пользователю
                 results_instance = QuizeResults.objects.get(user_id=request.user,
-                                                            quize_name=test_instance.name)  # Сформированный результат выполнения теста
+                                                            quize_name=test_instance.name,
+                                                            in_progress=True)  # Сформированный результат выполнения теста
                 user_tests = UserTests.objects.filter(
                     user=request.user)  # Весь список тестов пользователя для отображения в боковом меню
                 test_question_sets = TestQuestionsBay.objects.filter(
@@ -1413,53 +1414,83 @@ def create_new_test(request):
                                      initial=[{'theme': '5', 'q_num': '4'}],
                                      prefix="questions")
         test_name_form = NewTestFormName(request.POST, prefix="test_name")
+        #  Проверяем если установлен параметр тренировочного теста
+        if test_name_form.data['test_name-training'] == 'on':
 
-        if test_q_set.is_valid() and test_name_form.is_valid() and 'krs_email' in request.POST:
-            # Создаём объект теста
-            training = False
-            try:
-                if test_name_form.data['test_name-training'] == 'on':
-                    training = True
-            except MultiValueDictKeyError:
-                pass
-            emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
-            new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
-                                                      pass_score=test_name_form.data['test_name-pass_score'],
-                                                      training=training,
-                                                      ac_type=ac_type,
-                                                      email_to_send=', '.join(emails))
-            # Создаём объекты вопросов теста
-            for question in test_q_set.cleaned_data:
-                if not question['DELETE']:
-                    them_instance = Thems.objects.get(id=question['theme'])
-                    TestQuestionsBay.objects.create(theme=them_instance,
-                                                    test_id=new_test,
-                                                    q_num=question['q_num'])
-            return redirect('quize737:test_editor')
-        else:
-            form_errors = []  # Ошибки при валидации формы
-            for error in test_q_set.errors:
-                if len(error) > 0:
-                    for value in error.values():
-                        form_errors.append(value)
-            errors_non_form = test_q_set.non_form_errors
-            email_error = ''  # Ошибка с заполнением email адресов
-            checked_emailes = ''  # Список email адресов для отсылки уведомлений
-            if 'krs_email' not in request.POST:
-                email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+            if test_q_set.is_valid() and test_name_form.is_valid():
+                # Создаём объект теста
+                new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                          pass_score=test_name_form.data['test_name-pass_score'],
+                                                          training=True,
+                                                          ac_type=ac_type,
+                                                          )
+                # Создаём объекты вопросов теста
+                for question in test_q_set.cleaned_data:
+                    if not question['DELETE']:
+                        them_instance = Thems.objects.get(id=question['theme'])
+                        TestQuestionsBay.objects.create(theme=them_instance,
+                                                        test_id=new_test,
+                                                        q_num=question['q_num'])
+                return redirect('quize737:test_editor')
             else:
-                checked_emailes = request.POST.getlist('krs_email')
-            context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
-                       'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
-            return render(request, 'new_test_form.html', context=context)
+                form_errors = []  # Ошибки при валидации формы
+                for error in test_q_set.errors:
+                    if len(error) > 0:
+                        for value in error.values():
+                            form_errors.append(value)
+                errors_non_form = test_q_set.non_form_errors
+                email_error = ''  # Ошибка с заполнением email адресов
+                checked_emailes = ''  # Список email адресов для отсылки уведомлений
+                if 'krs_email' not in request.POST:
+                    email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+                else:
+                    checked_emailes = request.POST.getlist('krs_email')
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                           'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
+                           'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
+                return render(request, 'new_test_form.html', context=context)
+        else:  # Если тест НЕ тренировочный
+            if test_q_set.is_valid() and test_name_form.is_valid() and 'krs_email' in request.POST:
+                # Создаём объект теста
+                emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
+                new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                          pass_score=test_name_form.data['test_name-pass_score'],
+                                                          training=False,
+                                                          ac_type=ac_type,
+                                                          email_to_send=', '.join(emails))
+                # Создаём объекты вопросов теста
+                for question in test_q_set.cleaned_data:
+                    if not question['DELETE']:
+                        them_instance = Thems.objects.get(id=question['theme'])
+                        TestQuestionsBay.objects.create(theme=them_instance,
+                                                        test_id=new_test,
+                                                        q_num=question['q_num'])
+                return redirect('quize737:test_editor')
+            else:
+                form_errors = []  # Ошибки при валидации формы
+                for error in test_q_set.errors:
+                    if len(error) > 0:
+                        for value in error.values():
+                            form_errors.append(value)
+                errors_non_form = test_q_set.non_form_errors
+                email_error = ''  # Ошибка с заполнением email адресов
+                checked_emailes = ''  # Список email адресов для отсылки уведомлений
+                if 'krs_email' not in request.POST:
+                    email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+                else:
+                    checked_emailes = request.POST.getlist('krs_email')
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                           'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
+                           'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
+                return render(request, 'new_test_form.html', context=context)
     else:
         # https://translated.turbopages.org/proxy_u/en-ru.ru.9354fe54-64555aae-631f0b43-74722d776562/https/docs.djangoproject.com/en/dev/topics/forms/formsets/#formsets
         test_name_form = NewTestFormName(prefix="test_name")
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)},
                                      initial=[{'theme': '5', 'q_num': '4', }], prefix='questions')
 
-        context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them,
+        context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
+                   'test_q_set': test_q_set, 'q_num_per_them': total_q_num_per_them,
                    'ac_type': ac_type, 'krs_list': krs_list}
         return render(request, 'new_test_form.html', context=context)
 
@@ -1509,44 +1540,78 @@ def test_details(request, id):
         test_name_form = NewTestFormName(request.POST)
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)}, prefix="questions")
-        # TestQuestionsBay.objects.filter(test_id=id).delete()
-        if test_q_set.is_valid() and 'krs_email' in request.POST:
-            TestQuestionsBay.objects.filter(test_id=id).delete()
-            emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
-            a.email_to_send = ', '.join(emails)
-            training = False
-            a.name = test_name_form.data.get('name')
-            a.pass_score = test_name_form.data.get('pass_score')
-            if test_name_form.data.get('training') == 'on':
+        # Если выбран параметр тренировочного теста
+        if test_name_form.data.get('training') == 'on':
+            if test_q_set.is_valid():
+                TestQuestionsBay.objects.filter(test_id=id).delete()
+                # emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
+                # a.email_to_send = ', '.join(emails)
                 training = True
-            a.training = training
-            a.save()
-            for question in test_q_set.cleaned_data:
-                if not question['DELETE']:
-                    them_instance = Thems.objects.get(id=question['theme'])
-                    TestQuestionsBay.objects.create(theme=them_instance,
-                                                    test_id=a,
-                                                    q_num=question['q_num'], )
-            return redirect('quize737:test_editor')
-        else:
-            form_errors = []  # Ошибки при валидации формы
-            for error in test_q_set.errors:
-                if len(error) > 0:
-                    for value in error.values():
-                        form_errors.append(value)
-            errors_non_form = test_q_set.non_form_errors
-            email_error = ''  # Ошибка с заполнением email адресов
-            checked_emailes = ''  # Список email адресов для отсылки уведомлений
-            if 'krs_email' not in request.POST:
-                email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+                a.name = test_name_form.data.get('name')
+                a.pass_score = test_name_form.data.get('pass_score')
+                a.training = training
+                a.save()
+                for question in test_q_set.cleaned_data:
+                    if not question['DELETE']:
+                        them_instance = Thems.objects.get(id=question['theme'])
+                        TestQuestionsBay.objects.create(theme=them_instance,
+                                                        test_id=a,
+                                                        q_num=question['q_num'], )
+                return redirect('quize737:test_editor')
             else:
-                checked_emailes = request.POST.getlist('krs_email')
-            context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
-                       'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
-                       'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes,
-                       'q_num_per_them': total_q_num_per_them}
-            return render(request, 'test_detailes.html', context=context)
-
+                form_errors = []  # Ошибки при валидации формы
+                for error in test_q_set.errors:
+                    if len(error) > 0:
+                        for value in error.values():
+                            form_errors.append(value)
+                errors_non_form = test_q_set.non_form_errors
+                # email_error = ''  # Ошибка с заполнением email адресов
+                # checked_emailes = ''  # Список email адресов для отсылки уведомлений
+                # if 'krs_email' not in request.POST:
+                #     email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+                # else:
+                #     checked_emailes = request.POST.getlist('krs_email')
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                           'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
+                           'krs_list': krs_list,
+                           'q_num_per_them': total_q_num_per_them}
+                return render(request, 'test_detailes.html', context=context)
+        else:
+            if test_q_set.is_valid() and 'krs_email' in request.POST:
+                TestQuestionsBay.objects.filter(test_id=id).delete()
+                emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
+                a.email_to_send = ', '.join(emails)
+                training = False
+                a.name = test_name_form.data.get('name')
+                a.pass_score = test_name_form.data.get('pass_score')
+                a.training = training
+                a.save()
+                for question in test_q_set.cleaned_data:
+                    if not question['DELETE']:
+                        them_instance = Thems.objects.get(id=question['theme'])
+                        TestQuestionsBay.objects.create(theme=them_instance,
+                                                        test_id=a,
+                                                        q_num=question['q_num'], )
+                return redirect('quize737:test_editor')
+            else:
+                form_errors = []  # Ошибки при валидации формы
+                for error in test_q_set.errors:
+                    if len(error) > 0:
+                        for value in error.values():
+                            form_errors.append(value)
+                errors_non_form = test_q_set.non_form_errors
+                email_error = ''  # Ошибка с заполнением email адресов
+                checked_emailes = ''  # Список email адресов для отсылки уведомлений
+                if 'krs_email' not in request.POST:
+                    email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+                else:
+                    checked_emailes = request.POST.getlist('krs_email')
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
+                           'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                           'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
+                           'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes,
+                           'q_num_per_them': total_q_num_per_them}
+                return render(request, 'test_detailes.html', context=context)
     else:
         previous_url = request.META.get('HTTP_REFERER')
         test_name_form = NewTestFormName(test_instance[0])  # Форма с названием теста
