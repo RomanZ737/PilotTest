@@ -293,8 +293,9 @@ def start(request, id=None):
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
         contence_of_mess = f'File:\n' \
-                           f'{filename}\n\n' \
-                           f'<b>Номер строки:</b> {line_number}'
+                           f'{filename}\n' \
+                           f'<b>Номер строки:</b> {line_number}\n\n' \
+                           f'Вероятно пользователь обновил страницу с результатами теста'
         to = common.admin_email
         subject = f'<b>!Ошибка!</b> Pilot Test'
         message = f'<p style="font-size: 20px;">Пользователь:</p>' \
@@ -317,7 +318,9 @@ def start(request, id=None):
 # Генерация последующих вопросов
 def next_question(request):
     try:
+        print('request', request.GET)
         if request.method == 'POST':
+            print('POST', request.POST)
             #  Если пользователь продолжает попытку
             if 'continue_test' in request.POST.keys():
                 user_quize_set_id = int(request.POST.get(
@@ -831,14 +834,17 @@ def next_question(request):
                                 QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
                                 QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).delete()
                                 return render(request, 'results.html', context=context)
+        else:
+            return HttpResponseRedirect('/')
     except Exception as general_error:
         # Формируем письмо администратору
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
-        contence_of_mess = f'File:\n' \
-                           f'{filename}\n\n' \
-                           f'<b>Номер строки:</b> {line_number}'
+        contence_of_mess = f'<b>File</b>:\n' \
+                           f'{filename}\n' \
+                           f'<b>Номер строки:</b> {line_number}\n\n' \
+                           f'Вероятно пользователь обновил страницу с результатами теста'
         to = common.admin_email
         subject = f'!Ошибка! Pilot Test'
         message = f'<p style="font-size: 20px;">Пользователь:</p>' \
