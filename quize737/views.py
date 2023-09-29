@@ -1415,8 +1415,8 @@ def create_new_test(request):
                                      prefix="questions")
         test_name_form = NewTestFormName(request.POST, prefix="test_name")
         #  Проверяем если установлен параметр тренировочного теста
-        if test_name_form.data['test_name-training'] == 'on':
-
+        #if test_name_form.data['test_name-training'] == 'on':
+        if 'test_name-training' in test_name_form.data.keys():
             if test_q_set.is_valid() and test_name_form.is_valid():
                 # Создаём объект теста
                 new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],

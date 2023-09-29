@@ -183,7 +183,13 @@ var numberPattern = /\d+/g;  //Регулярное выражение, что �
     //Выбираем все checkbox который относятся к "Удалить тему"
     $(':input[type="checkbox"][name^=questions-][name$=-DELETE]').each(function(index, element) {
         element.addEventListener('input', markToDelete); // Вешаем listener на объект input
-
+        //Если какая-то тема была отмечена к удалению при загрузке страницы (возврат из-за ошибки ввода пользователя)
+        let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+        if (element.checked == true) {
+                $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
+            } else {
+                $("#for_crossout_" + idNum).removeClass();
+            }
         });
 
     function markToDelete(event) {
