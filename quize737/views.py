@@ -258,7 +258,7 @@ def start(request, id=None):
                     q_num_left = test_in_progress.q_sequence_num
                     in_progress = True  # Флаг не завершённого теста
                     test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
-                    user_test = UserTests.objects.filter(test_name=id)  # Объект теста назначенного пользователю
+                    user_test = UserTests.objects.filter(test_name=id, user=request.user)  # Объект теста назначенного пользователю
                     results_instance = QuizeResults.objects.get(user_id=request.user,
                                                                 quize_name=test_instance.name,
                                                                 in_progress=True)  # Сформированный результат выполнения теста
