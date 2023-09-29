@@ -1,58 +1,88 @@
 /* rgb(128,128,128);  Цвет NWS Light Gray */
 /* rgb(62, 62, 62);   Цвет NWS Dark Gray */
 
+#wrapper {
+    max-width: 99%;
+    margin: auto;
+}
 
 body {
   background-color: rgb(128,128,128);  /* Цвет NWS Light Gray */
 }
 
 header {
-    position: relative;
+    margin-bottom: 15px;
+    /*position: relative;
     height: 25%;
+    */
 }
 
 .user_name {
+    display: inline-block;
     position: absolute;
-    display: inline;
     top: 10%;
     right: 2%;
 
 }
 
 nav{
+    margin-top: 5px;
+    text-align: right;
+    /*
     position: absolute;
     right: 2%;
     top: 50%;
     font-size: 17px;
+    */
+
 }
 
 main {
+    /*
   position: relative;
   height: 10%;
   font-size: 18px;
+  */
 }
 
 aside {
+    float: left;
+    width: 170px;
+    /*
     position: absolute;
     left: 1%;
     top: 5%;
     font-size: 17px;
-
+    */
 }
 
 section {
+    margin-left: 185px;
+    margin-top: 10px;
+    /*
     position: absolute;
     left: 20%;
     top: 5%;
     width: 78%;
+    */
 
 }
 
 footer {
+    text-align: right;
+    margin-top: 10px;
+    /*
     position: absolute;
     right: 2%;
     bottom: -30%;
     font-size: 17px;
+        */
+}
+
+#footer {
+    max-width: 99%;
+    margin: auto;
+
 }
 
 button {

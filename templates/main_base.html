@@ -11,60 +11,109 @@
     </head>
 
     <body>
+        <div id="wrapper">
+            <header>
+                    <div style="display: inline-block;">
+                        <a href="/">
+                            <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto">
+                        </a>
+                        <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
+                    </div>
 
-        <header>
-            <a href="/">
-			    <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto">
-            </a>
-            <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
+                <nav>
+                    <div class="top-menu">
+                    {% if user.is_authenticated %}
+                        <span>|</span>
+                        <span><a href="{% url 'quize737:start' %}">Главная</a></span>
+                        <span>|</span>
+                        <span><a href="{% url 'password_change' %}">Профиль</a></span>
+                        <span>|</span>
+                            {% if request.user|has_group:'krs' or user.is_superuser %}
+                                <span><a href="{% url 'quize737:tests_results_list' %}">Отчёты</a></span>
+                                <span>|</span>
+                            {% endif %}
+                            {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
+                                <span><a href="{% url 'quize737:question_list' %}">База вопросов</a></span>
+                                <span>|</span>
+                            {% endif %}
+                            {% if request.user|has_group:'krs' or user.is_superuser %}
 
-            <nav>
+                                <span><a href="{% url 'quize737:test_editor' %}">Тесты</a></span>
+                                <span>|</span>
+                                <span><a href="{% url 'quize737:user_list' %}">Пилоты</a></span>
+                                <span>|</span>
+                            {% endif %}
 
-                {% if user.is_authenticated %}
+                        <span><a href="{% url 'logout' %}?next=/login">Выход</a></span>
+                        <span>|</span>
+                    {% endif %}
+                    </div>
+                </nav>
+            </header>
+            <main>
+
+                <section>
+                    {% block content %}
+                    {% endblock %}
+
+                </section>
+
+            </main>
+        </div>
+        <footer>
+            <div id="footer">
+            {% if user.is_authenticated %}
+                {% if user.is_superuser %}
                     <span>|</span>
-                    <a href="{% url 'quize737:start' %}">Главная</a>
+                    <a href="{% url 'quize737:pilotload' %}">Load Pilots</a>
                     <span>|</span>
-                    <a href="{% url 'password_change' %}">Профиль</a>
-                    <span>|</span>
-                        {% if request.user|has_group:'krs' or user.is_superuser %}
-                            <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
-                            <span>|</span>
-                        {% endif %}
-                        {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
-                            <a href="{% url 'quize737:question_list' %}">База вопросов</a>
-                            <span>|</span>
-                        {% endif %}
-                        {% if request.user|has_group:'krs' or user.is_superuser %}
-
-                            <a href="{% url 'quize737:test_editor' %}">Тесты</a>
-                            <span>|</span>
-                            <a href="{% url 'quize737:user_list' %}">Пилоты</a>
-                            <span>|</span>
-                        {% endif %}
-
-            	    <a href="{% url 'logout' %}?next=/login">Выход</a>
-                    <span>|</span>
+                    <a href="{% url 'DBLoad:alter_questions' %}">DB Alter</a>
                 {% endif %}
-            </nav>
-        </header>
-        <main>
-            <section>
-                {% block content %}
-                {% endblock %}
 
-            </section>
+                        <span>|</span>
+                        <a href="#" hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">Написать Администратору</a>
+                        <span>|</span>
 
-        </main>
-<!--        <footer>-->
-<!--            {% if user.is_authenticated %}-->
-<!--                {% if user.is_superuser %}-->
-<!--                    <span>|</span>-->
-<!--                    <a href="{% url 'quize737:pilotload' %}">Load Pilots</a>-->
-<!--                {% endif %}-->
-<!--                    <span>|</span>-->
-<!--                    <a href="">Написать Администратору</a>-->
-<!--                    <span>|</span>-->
-<!--            {% endif %}-->
-<!--        </footer>-->
+<!--                    <button hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">-->
+<!--                        Mess to Admin-->
+<!--                    </button>-->
+
+
+
+            {% endif %}
+        </div>
+    </footer>
+        <div id="modal" class="modal fade">
+            <div id="dialog" class="modal-dialog" hx-target="this"></div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
+        <script>
+           const modal = new bootstrap.Modal(document.getElementById("modal"))
+
+            htmx.on("htmx:afterSwap", (e) => {
+            // Response targeting #dialog => show the modal
+
+            if (e.detail.target.id == "dialog") {
+               modal.show()
+            }
+            })
+
+            htmx.on("htmx:beforeSwap", (e) => {
+            // Empty response targeting #dialog => hide the modal
+            if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+            modal.hide()
+            e.detail.shouldSwap = false
+            alert('Сообщение отправлено!')
+            }
+            })
+            htmx.on("hidden.bs.modal", () => {
+            document.getElementById("dialog").innerHTML = ""
+            })
+
+        </script>
+
     </body>
 </html>
+

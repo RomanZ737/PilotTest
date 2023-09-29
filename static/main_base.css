@@ -1,58 +1,85 @@
 /* rgb(128,128,128);  Цвет NWS Light Gray */
 /* rgb(62, 62, 62);   Цвет NWS Dark Gray */
 
+#wrapper {
+    max-width: 99%;
+    margin: auto;
+}
 
 body {
   background-color: rgb(128,128,128);  /* Цвет NWS Light Gray */
 }
 
 header {
-    position: relative;
+    margin-bottom: 15px;
+    /*position: relative;
     height: 25%;
+    */
 }
 
 .user_name {
+    display: inline-block;
     position: absolute;
-    display: inline;
     top: 10%;
     right: 2%;
 
 }
 
-nav{
+nav {
+    margin-top: 5px;
+    text-align: right;
+    /*
     position: absolute;
     right: 2%;
     top: 50%;
     font-size: 17px;
+    */
 }
 
 main {
+    /*
   position: relative;
   height: 10%;
   font-size: 18px;
+  */
 }
 
 aside {
+    /*
     position: absolute;
     left: 1%;
     top: 5%;
     font-size: 17px;
+    */
 
 }
 
 section {
+    /*
     position: absolute;
     left: 1%;
     top: -30%;
     width: 98%;
+    */
 
 }
 
 footer {
+    text-align: right;
+    margin-top: 10px;
+
+    /*
     position: absolute;
     right: 2%;
     bottom: -5%;
     font-size: 17px;
+    */
+}
+
+#footer {
+    max-width: 99%;
+    margin: auto;
+
 }
 
 hr {
@@ -882,4 +909,36 @@ div.crossed_out_inactive:before {
 div.max_q_num_in_theme {
     display: inline-block;
     width: 90px;
+}
+
+div.modal-dialog {
+    position: absolute;
+    display: block;
+    left: 33%;
+    width: 520px;
+    top: 22%;
+    }
+
+
+#admin_mess_form {
+    background-color: rgb(62, 62, 62);
+}
+
+
+div.modal_form-static_sign {
+    position:relative;
+    display: block;
+    margin-top: 30px;
+}
+
+div.modal_form-dynamic_sign {
+    position:relative;
+    display: block;
+}
+
+div.modal_form_button_block {
+    position:relative;
+    display: block;
+    /* right: 10% */
+    margin-top: 30px;
 }

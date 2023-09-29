@@ -1,70 +1,84 @@
 {% load static %}
 {% load tags %}
-<html>
+<html lang="ru">
         <link href="https://fonts.cdnfonts.com/css/helveticaneuecyr-2" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'base_start.css' %}" type="text/css">
-        <head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>NWS Pilot Test</title>
         <link rel="icon" href="{% static 'nws_icon.png' %}">
     </head>
 
     <body>
-    <header>
-        <a href="/">
-            <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto">
-        </a>
-        <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
+        <div id="wrapper">
+            <header>
 
-        <nav>
-            {% if user.is_authenticated %}
-                <span>|</span>
-                <a href="{% url 'quize737:start' %}">Главная</a>
-                <span>|</span>
-                <a href="{% url 'password_change' %}">Профиль</a>
-                <span>|</span>
+                <div style="display: inline-block; height: 40px;">
+                <a href="/">
+                    <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="auto" height="100%">
+                </a>
+                </div>
+                <div style="display: block; float: right; margin-top: 5px;">
+<!--                    class="user_name"-->
+                <span> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
 
-                {% if request.user|has_group:'krs' or user.is_superuser %}
-                    <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
-                    <span>|</span>
-                {% endif %}
+                    </div>
+                <nav>
+                    <div class="top-menu">
+                        {% if user.is_authenticated %}
+                            <span>|</span>
+                            <a href="{% url 'quize737:start' %}">Главная</a>
+                            <span>|</span>
+                            <a href="{% url 'password_change' %}">Профиль</a>
+                            <span>|</span>
 
-                {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
-                    <a href="{% url 'quize737:question_list' %}">База вопросов</a>
-                    <span>|</span>
-                {% endif %}
+                            {% if request.user|has_group:'krs' or user.is_superuser %}
+                                <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
+                                <span>|</span>
+                            {% endif %}
 
-                {% if request.user|has_group:'krs' or user.is_superuser %}
-                    <a href="{% url 'quize737:test_editor' %}">Тесты</a>
-                    <span>|</span>
-                    <a href="{% url 'quize737:user_list' %}">Пилоты</a>
-                    <span>|</span>
-                {% endif %}
+                            {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
+                                <a href="{% url 'quize737:question_list' %}">База вопросов</a>
+                                <span>|</span>
+                            {% endif %}
 
-                <a href="{% url 'logout' %}?next=/login">Выход</a>
-                <span>|</span>
-            {% endif %}
+                            {% if request.user|has_group:'krs' or user.is_superuser %}
+                                <a href="{% url 'quize737:test_editor' %}">Тесты</a>
+                                <span>|</span>
+                                <a href="{% url 'quize737:user_list' %}">Пилоты</a>
+                                <span>|</span>
+                            {% endif %}
 
-        </nav>
-    </header>
+                            <a href="{% url 'logout' %}?next=/login">Выход</a>
+                            <span>|</span>
+                        {% endif %}
+                    </div>
+                </nav>
 
-    <main>
-            <aside>
-                {% if user_tests|length > 0 %}
-                    {% for test in user_tests %}
-                    <p><a href="{% url 'quize737:start' test.test_name.id %}">{{test.test_name}}</a></p>
-                    {% endfor %}
-                {% else %}
-                <p>Тесты отсутствуют</p>
-                {% endif %}
-            </aside>
-            <section>
-                {% block content %}
-                {% endblock %}
-            </section>
-    </main>
 
+            </header>
+
+            <main>
+                    <aside>
+                        <div>
+                            {% if user_tests|length > 0 %}
+                                {% for test in user_tests %}
+                                <p><a href="{% url 'quize737:start' test.test_name.id %}">{{test.test_name|truncatechars:20}}</a></p>
+                                {% endfor %}
+                            {% else %}
+                            <p>Тесты отсутствуют</p>
+                            {% endif %}
+                        </div>
+                    </aside>
+                    <section>
+                        {% block content %}
+                        {% endblock %}
+                    </section>
+            </main>
+        </div>
     <footer>
-
+        <div id="footer">
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
                     <span>|</span>
@@ -72,11 +86,11 @@
                     <span>|</span>
                     <a href="{% url 'DBLoad:alter_questions' %}">DB Alter</a>
                 {% endif %}
-                    <div>
+
                         <span>|</span>
                         <a href="#" hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">Написать Администратору</a>
                         <span>|</span>
-                    </div>
+
 <!--                    <button hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">-->
 <!--                        Mess to Admin-->
 <!--                    </button>-->
@@ -84,7 +98,8 @@
 
 
             {% endif %}
-        </footer>
+        </div>
+    </footer>
         <div id="modal" class="modal fade">
             <div id="dialog" class="modal-dialog" hx-target="this"></div>
         </div>
