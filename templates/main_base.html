@@ -13,11 +13,13 @@
     <body>
         <div id="wrapper">
             <header>
-                    <div style="display: inline-block;">
+                    <div style="display: inline-block; height: 40px;">
                         <a href="/">
-                            <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="25%" height="auto">
+                            <img src="{% static 'nws_logo.png' %}" alt="NWS Logo" style="vertical-align:center" width="auto" height="100%">
                         </a>
-                        <span class="user_name"> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
+                    </div>
+                    <div style="display: block; float: right; margin-top: 5px;">
+                        <span> {{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</span>
                     </div>
 
                 <nav>
