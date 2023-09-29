@@ -51,49 +51,65 @@
 
             </div>
             <br>
+
+
+
             {% if user_test.num_try > 0 %}
+
+            <hr/>
+
             <div class="block_none_light_up">
                 <span class="main_sign">Вопросы теста:</span>
             </div>
-                {% for them in question_set%}
-                    {% if not forloop.counter|divisibleby:2 %}
-                        <div class="block_none_light_up">
-                            <div class="list-them">
-                                <span class="theme_color">{{them.theme}}:</span>
-                            </div>
-                            <div class="list-q_number">
-                                <span class="mark_up">{{them.q_num}}</span> вопроса(ов)
-                            </div>
-                            {% if forloop.last %}
-                                </div>
-                            {% endif %}
-                    {% else %}
+                <div class="block_none_light_up">
+                {% for them in question_set %}
+                    <div class="them_q_num_line">
                         <div class="list-them">
-                                <span class="theme_color">{{them.theme}}:</span>
-                            </div>
-                            <div class="list-q_number">
-                                <span class="mark_up">{{them.q_num}}</span> вопроса(ов)
-                            </div>
+                            <span class="theme_color">{{them.theme|truncatechars:15}}:</span>
+                        </div>
+                        <div class="list-q_number">
+                            <span class="mark_up">{{them.q_num}}</span> вопр.
+                        </div>
+                    </div>
+                    {% if forloop.counter|divisibleby:3 %}
+                        </div>
+                        <div class="block_none_light_up">
                     {% endif %}
                 {% endfor %}
+                </div>
             <div>
                 {% if in_progress %}
-                    <p>У вас есть не завершённая попытка тестирования</p>
-                    <p>Вопросов осталось <span class="mark_up">{{q_num_left}}</span></p>
+                <hr/>
+                <div class="block_none_light_up">
+                    <span>У вас есть не завершённая попытка тестирования</span>
+                </div>
+                <div class="block_none_light_up">
+                    <span>Вопросов осталось: <span class="mark_up"> {{q_num_left}}</span></span>
+                </div>
+                <div class="block_none_light_up">
                     <input type="submit" form="in progress" value="Продолжить попытку">
+                </div>
                 {% else %}
+                <div class="block_none_light_up">
                     <input type="submit" form="data" value="Начать Тестирование">
+                </div>
                 {% endif %}
             </div>
             {% else %}
                 {% if in_progress %}
-                    <div>
-                        <p>У вас есть не завершённая попытка тестирования</p>
-                        <p>Вопросов осталось <span class="mark_up">{{q_num_left}}</span></p>
+                    <hr/>
+                    <div class="block_none_light_up">
+                        <span>У вас есть не завершённая попытка тестирования</span>
+                    </div>
+                    <div class="block_none_light_up">
+                        <span>Вопросов осталось: <span class="mark_up"> {{q_num_left}}</span></span>
+                    </div>
+                     <div class="block_none_light_up">
                         <input type="submit" form="in progress" value="Продолжить попытку">
                     </div>
                 {% else %}
-                    <div>
+                <hr/>
+                     <div class="block_none_light_up">
                         <span>Попытки израсходованы, обратитесь к руководству отряда</span>
                     </div>
                 {% endif %}

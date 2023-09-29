@@ -72,9 +72,11 @@
                     <span>|</span>
                     <a href="{% url 'DBLoad:alter_questions' %}">DB Alter</a>
                 {% endif %}
-                    <span>|</span>
-                    <a href="#" hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">Написать Администратору</a>
-                    <span>|</span>
+                    <div>
+                        <span>|</span>
+                        <a href="#" hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">Написать Администратору</a>
+                        <span>|</span>
+                    </div>
 <!--                    <button hx-get="{% url 'quize737:mess_to_admin' %}" hx-target="#dialog">-->
 <!--                        Mess to Admin-->
 <!--                    </button>-->
