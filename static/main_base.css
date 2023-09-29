@@ -878,3 +878,8 @@ div.crossed_out_inactive:before {
    width: 120%;
    background: red;
 }  */
+
+div.max_q_num_in_theme {
+    display: inline-block;
+    width: 90px;
+}

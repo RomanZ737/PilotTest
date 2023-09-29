@@ -86,7 +86,10 @@
                 <div id="for_crossout_{{ forloop.counter|sub:'1' }}" style="display: inline-block;">
                     <span class="test_theme_list">Тема: {{ form.theme }} </span>
                     <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
-                    <span>Max. </span><span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
+                    <div class="max_q_num_in_theme">
+                        <span>Max. </span>
+                        <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
+                    </div>
                 </div>
                 <span class="test_theme_del" style="display: inline-block;">{{ form.DELETE }} Удалить тему</span>
             </div>

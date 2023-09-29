@@ -97,7 +97,7 @@ class TestsForUser(forms.ModelForm):
         fields = {'test_name', 'num_try', 'date_before'}
         widgets = {
             'date_before': forms.SelectDateWidget(months=MONTH_CHOICES),
-            'num_try': forms.NumberInput(attrs={'step': 1, 'min': 1, 'size': '3'})
+            'num_try': forms.NumberInput(attrs={'step': 1, 'min': 1, 'size': '5'})
         }
         error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"},
                           'test_name': {'required': "Поле 'Название теста' не может быть пустым"}}
