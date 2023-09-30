@@ -107,7 +107,7 @@
                 {% endif %}
 
             {% endfor %}
-            <div class="list-other_field_non_inline">
+            <div id="button_block" class="list-other_field_non_inline">
                 <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
             </div>
             <br>
@@ -169,6 +169,8 @@
 <script>
     let ans_block = document.getElementById("answers");
     let button = document.getElementById("hide_show_butt");
+    let button_block = document.getElementById("button_block");
+
     function show_answers(event) {
         if (ans_block.style.display === 'none' ) {
                 ans_block.style.display = 'block';

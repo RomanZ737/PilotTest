@@ -70,29 +70,33 @@
             <span style="color: rgb(209, 209,209);">{{results}}</span>
         </div>
         {% else %}
+        <div style="display: flex;">
+        <div class="v_block_for_vl">
             {% for theme in themes %}
-                {% if theme.name != 'Все темы'%}
-            <div class="block_light_up">
-                <div class="list-them">
-                    <a href="{{theme.id}}">
-                        <span class="theme_color">
-                            {{theme.name}}
-                        </span>
-                    </a>
-                </div>
-
-                <div class="list-them_questions_num">
-                    <a href="/question_list/?filter={{theme.name}}&filter=Все">Вопросов: {{num_dict|get_item:theme.name}}</a>
-                </div>
-
-
-                <div class="list-delete">
-                    <a href="{% url 'quize737:theme_del' theme.id %}" onclick="return confirm('Внимание! При удалении темы будут удалены все связанные с ней вопросы. Продолжить?') || event.preventDefault()" name="theme_del">Удалить</a>
-                </div>
-
-            </div>
-                {% endif %}
+                    <div class="data_block_non_inline_light">
+                        <div class="list-them">
+                            <a href="{{theme.id}}">
+                                <span class="theme_color">
+                                    {{theme.name|truncatechars:20}}
+                                </span>
+                            </a>
+                        </div>
+                        <div class="list-them_questions_num">
+                            <a href="/question_list/?filter={{theme.name}}&filter=Все">Вопросов: {{num_dict|get_item:theme.name}}</a>
+                        </div>
+                        <div class="list-delete">
+                            <a href="{% url 'quize737:theme_del' theme.id %}" onclick="return confirm('Внимание! При удалении темы будут удалены все связанные с ней вопросы. Продолжить?') || event.preventDefault()" name="theme_del">Удалить</a>
+                        </div>
+                    </div>
+                    {% if forloop.counter == 10 %}
+                        </div>
+                        <div style="display: inline; padding-left: 15px;"></div>
+                        <div class="vline"></div>
+                        <div class="v_block_for_vl">
+                    {% endif %}
             {% endfor %}
+        </div>
+        </div>
         <br>
             {% include "paginator.html" with page=themes %}
         {% endif %}

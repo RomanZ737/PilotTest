@@ -352,6 +352,22 @@ div.block_none_light_up {  /* блок всей строки данных в т�
     /* width: 98%; */
 }
 
+div.vline {
+    display: inline-block;
+    border-left: 1px solid #ccc;
+    padding-right: 15px;
+}
+
+div.data_block_non_inline_light {
+    position: relative;
+    /* display: inline-block; */
+    /* margin-left: 40px; */
+}
+
+div.data_block_non_inline_light:hover  {
+    background-color: #4f93ce;
+}
+
 div.search-form {  /* блок формы поиска */
     display: inline-block;
     position: relative;
@@ -500,6 +516,12 @@ span.block_none_light_up {  /* блок всей строки данных в т
     left: 3%;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+
+div.v_block_for_vl {
+    position: relative;
+    display: inline-block;
 }
 
 div.filter_sign_position {
@@ -910,6 +932,9 @@ div.max_q_num_in_theme {
     display: inline-block;
     width: 90px;
 }
+
+
+
 
 div.modal-dialog {
     position: absolute;

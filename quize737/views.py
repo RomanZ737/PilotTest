@@ -1152,7 +1152,8 @@ def theme_editor(request, id=None):
             # ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
             # ac_types_list.append('Все')
             user_search_input = request.GET.get("them_search")
-            theme_list = Thems.objects.all()
+            theme_list = Thems.objects.exclude(name='Все темы')
+            #theme_list = Thems.objects.all()
             them_num = Thems.objects.all().count() - 1
             q_num_dict = {}
             no_search_result = False
