@@ -183,7 +183,7 @@ div.list-other_field {    /* блок для остальных типов да�
     left: 5%;
     word-wrap: break-word;
     text-align: left;
-    width: 40%;
+    width: 410px;
     vertical-align: middle;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -257,4 +257,15 @@ div.report_issue {
     display: block;
     right: 2%;
     margin: 10px;
+}
+
+
+div.block_light_up {  /* блок всей строки данных в таблице */
+    padding: 0px;
+    margin-bottom: 2px;
+    width: fit-content;
+}
+
+div.block_light_up:hover {  /* блок всей строки данных в таблице */
+    background-color: #4f93ce;
 }

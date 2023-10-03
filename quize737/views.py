@@ -88,7 +88,8 @@ def start(request, id=None):
                 user_results_instance = QuizeResults.objects.get(user_id=request.user,
                                                                  quize_name=test_in_progress.quize_name,
                                                                  in_progress=True)  # Результаты теста пользователя
-                user_test = UserTests.objects.get(test_name=id, user=user_instance)  # Объект теста конкретного пользователя
+                user_test = UserTests.objects.get(test_name=id,
+                                                  user=user_instance)  # Объект теста конкретного пользователя
                 question_set_id = id  # ID теста (сам тест), назначенного пользователю
                 test_instance = TestConstructor.objects.filter(id=question_set_id)
 
@@ -131,7 +132,8 @@ def start(request, id=None):
                 return render(request, q_page_layout, context=context)
 
             except ObjectDoesNotExist:
-                user_test = UserTests.objects.get(test_name=id, user=user_instance)  # Объект теста конкретного пользователя
+                user_test = UserTests.objects.get(test_name=id,
+                                                  user=user_instance)  # Объект теста конкретного пользователя
                 #  Уменьшаем количество попыток у пользователя
                 num_try = user_test.num_try  # Текущее количество попыток
                 num_try -= 1
@@ -253,12 +255,13 @@ def start(request, id=None):
                 #  Проверяем, есть ли у пользователя не завершённые тесты
                 try:
                     test_in_progress = QuizeSet.objects.get(test_id=id,
-                                                            user_under_test=request.user.username)  # Объект сформированного пользователю теста
+                                                            user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
                     #  Если сформированный пользователю тест существует, продолжаем выполнение
                     q_num_left = test_in_progress.q_sequence_num
                     in_progress = True  # Флаг не завершённого теста
                     test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
-                    user_test = UserTests.objects.filter(test_name=id, user=request.user)  # Объект теста назначенного пользователю
+                    user_test = UserTests.objects.filter(test_name=id,
+                                                         user=request.user)  # Объект теста назначенного пользователю
                     results_instance = QuizeResults.objects.get(user_id=request.user,
                                                                 quize_name=test_instance.name,
                                                                 in_progress=True)  # Сформированный результат выполнения теста
@@ -267,7 +270,8 @@ def start(request, id=None):
                     test_question_sets = TestQuestionsBay.objects.filter(
                         test_id=id)  # Вопросы теста, назначенного пользователю
 
-                    context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
+                    context = {'question_set': test_question_sets, 'test_name': test_instance,
+                               'user_test': user_test[0],
                                'user_tests': user_tests, 'in_progress': in_progress, 'tmp_test_id': test_in_progress.id,
                                'result_id': results_instance.id, 'question_id': id, 'q_num_left': q_num_left}
                     return render(request, 'start_test_ditales.html', context=context)
@@ -279,7 +283,8 @@ def start(request, id=None):
                         user=request.user)  # Весь список тестов пользователя для отображения
                     test_instance = TestConstructor.objects.get(id=id)
                     test_question_sets = TestQuestionsBay.objects.filter(test_id=id)
-                    context = {'question_set': test_question_sets, 'test_name': test_instance, 'user_test': user_test[0],
+                    context = {'question_set': test_question_sets, 'test_name': test_instance,
+                               'user_test': user_test[0],
                                'user_tests': user_tests, 'in_progress': in_progress}
                     return render(request, 'start_test_ditales.html', context=context)
             #  Если пользователь открывает страницу со списком тестов
@@ -380,7 +385,8 @@ def next_question(request):
                         'tmp_test_id'))  # ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
                     # Количество оставшихся у пользователя вопросов
                     q_amount = QuizeSet.objects.filter(id=user_quize_set_id).values('q_sequence_num')
-                    q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('questions_ids')
+                    q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values(
+                        'questions_ids')
                     q_num_list = list((q_num_list[0]['questions_ids']).split(' '))
                     # Номер позиции вопроса в списке
                     question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
@@ -398,7 +404,8 @@ def next_question(request):
                     # 'result_id' - ID сформированных результатов теста
                     # 'option_dict' - Варианты ответов на вопрос
                     context = {'question': question[0]['question'], 'question_id': question[0]['id'],
-                               'tmp_test_id': request.POST.get('tmp_test_id'), 'result_id': request.POST.get('result_id'),
+                               'tmp_test_id': request.POST.get('tmp_test_id'),
+                               'result_id': request.POST.get('result_id'),
                                'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num'],
                                'q_instance': question_instance}
                     # Проверяем содержит ли вопрос мультивыбор
@@ -448,7 +455,8 @@ def next_question(request):
                             # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
                             print('answered_q_instance.q_weight', answered_q_instance.q_weight)
                             if answered_q_instance.q_weight != 0:
-                                updated_score_number = user_result_data[0]['score_number'] + answered_q_instance.q_weight
+                                updated_score_number = user_result_data[0][
+                                                           'score_number'] + answered_q_instance.q_weight
                             else:
                                 updated_score_number = user_result_data[0]['score_number'] + 1
 
@@ -512,7 +520,8 @@ def next_question(request):
                     # q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
 
                     # Номера вопросов сгенерированные пользователю
-                    q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('questions_ids')
+                    q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values(
+                        'questions_ids')
 
                     # Проверяем остались ли ещё вопросы в тесте пользователя
                     if int(q_amount[0]['q_sequence_num']) > 0:
@@ -561,100 +570,123 @@ def next_question(request):
                         return render(request, q_page_layout, context=context)
 
                     else:
-                        # Ставим флаг завершённости теста
-                        QuizeResults.objects.filter(id=request.POST.get('result_id')).update(in_progress=False)
+                        context = {}
+                        conclusion = ''
+                        #  Вынимаем объект результатов теста
+                        results_instance = QuizeResults.objects.get(id=int(request.POST.get('result_id')))
+
+                        #  Вынисмаем объект сформированно "на сеанс" теста (когда пользователь нажимает кнопку "начать тестирования")
+                        quiz_set_instance = QuizeSet.objects.get(id=int(request.POST.get('tmp_test_id')))
+
+                        #  Вынимаем объект теста, назначенного конкретному пользователю
+                        user_test_instance = UserTests.objects.get(user=request.user,
+                                                                   test_name=quiz_set_instance.test_id)
+
                         # Вынимаем количество правильных ответов, число вопросов и количество баллов
                         result_data = QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).values(
                             'correct_q_num', 'score_number', 'total_num_q', 'pass_score')
 
                         # Вынимаем количество максимально возможных баллов
-                        max_score_num = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values(
-                            'max_score_amount')
+                        max_score_num = float(quiz_set_instance.max_score_amount)
+                        # Вынимаем количество набранных баллов
+                        score_number = float(results_instance.score_number)
+                        # Вынимает минимальный процент необходимый для прохождения теста
+                        min_pass_score = int(results_instance.pass_score)
+                        #  Вынимаем флаг теста (теринровка или нет)
+                        test_flag = user_test_instance.test_name.training
+                        #  Вынимаем Название теста пользователя
+                        user_test_name = quiz_set_instance.quize_name
 
                         # Вычисляем процент прохождения теста и округляем результат до десятой
-                        total_result = ('%.0f' % (
-                                (result_data[0]['score_number'] * 100) / max_score_num[0]['max_score_amount']))
+                        total_result = int(('%.0f' % ((score_number * 100) / max_score_num)))
+
+                        # Ставим флаг завершённости теста
+                        results_instance.in_progress = False
+                        #  Записываем в отчёт о тесте: результат сдачи,
+                        results_instance.total_result = total_result
+                        #  Сохраняем данные
+                        results_instance.save()
+
+                        #  Формируем данные для отображения
+                        user_name = results_instance.user_name  # Имя пользователя для отображения
+                        total_num_q = results_instance.total_num_q  # Общее количество ответов
+                        correct_q_num = results_instance.correct_q_num  # Количество правильных ответов
+                        quize_name = results_instance.quize_name
+                        ac_type = results_instance.user_id.profile.get_ac_type_display
+                        timestamp = results_instance.timestamp
+
+
+                        #  Формируем результаты ответов на тест
+                        answer_results = []
+                        answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
+                        #  Формируем список ответов в результатах теста
+                        for question in answers:
+                            question_block = {}
+                            question_block['question'] = question.question.question
+                            question_block['conclusion'] = question.conclusion
+                            #  Если вопрос имеет один ответ
+                            if not question.question.q_kind:
+                                options = []
+                                for i in range(1, 11):
+                                    if question.question.answer == i:
+                                        options.append(
+                                            {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                                    else:
+                                        if getattr(question.question, f'option_{i}'):
+                                            options.append(
+                                                {f'option': getattr(question.question, f'option_{i}'),
+                                                 'valid': False})
+                                user_answer = question.user_answer
+                                question_block['answers'] = options
+                                question_block['user_answer'] = [
+                                    getattr(question.question, f'option_{user_answer}')]
+
+                            #  Если на вопрос несколько ответов
+                            else:
+                                options = []
+                                #  Список с правильными ответами
+                                correct_answers_list = list(map(int, question.question.answers.split(',')))
+                                print('correct_answers_list', correct_answers_list)
+                                for i in range(1, 11):
+                                    if i in correct_answers_list:
+                                        options.append(
+                                            {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
+                                    else:
+                                        if getattr(question.question, f'option_{i}'):
+                                            options.append(
+                                                {f'option': getattr(question.question, f'option_{i}'),
+                                                 'valid': False})
+
+                                question_block['answers'] = options
+                                user_answers = []
+                                for number in question.user_answer:
+                                    if number.isdigit():
+                                        user_answers.append(number)
+                                answer = []
+                                for user_answer in user_answers:
+                                    print('user_answer', user_answer)
+                                    answer.append(getattr(question.question, f'option_{user_answer}'))
+                                question_block['user_answer'] = answer
+
+                            answer_results.append(question_block)
 
                         # Если пользователь сдал тест
-                        if int(total_result) >= int(result_data[0]['pass_score']):
-                            #  Вынимаем объект набора вопросов (QuizeSet) для исфользования в фильтре удаления теста польхователя, если он сдал тест
-                            set_instance = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id')))
-                            results_instance = QuizeResults.objects.filter(id=int(request.POST.get('result_id')))
-                            results_instance.update(total_result=total_result, conclusion=True)
-                            # Вынимаем id теста для удаления теста у пользователя
-                            user_test_id = set_instance[0].test_id  # ID теста пользователя
-                            user_test_name = set_instance[0].quize_name  # Название теста пользователя
-                            #  Удаляем тест у пользователя
-
-                            user_test_instance = UserTests.objects.filter(user=request.user, test_name=user_test_id)
-
-                            answer_results = []
-                            answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
-                            #  Формируем список ответов в результатах теста
-                            for question in answers:
-                                question_block = {}
-                                question_block['question'] = question.question.question
-                                question_block['conclusion'] = question.conclusion
-                                #  Если вопрос имеет один ответ
-                                if not question.question.q_kind:
-                                    options = []
-                                    for i in range(1, 11):
-                                        if question.question.answer == i:
-                                            options.append(
-                                                {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
-                                        else:
-                                            if getattr(question.question, f'option_{i}'):
-                                                options.append(
-                                                    {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
-                                    user_answer = question.user_answer
-                                    question_block['answers'] = options
-                                    question_block['user_answer'] = [getattr(question.question, f'option_{user_answer}')]
-
-                                #  Если на вопрос несколько ответов
-                                else:
-                                    options = []
-                                    #  Список с правильными ответами
-                                    correct_answers_list = list(map(int, question.question.answers.split(',')))
-                                    print('correct_answers_list', correct_answers_list)
-                                    for i in range(1, 11):
-                                        if i in correct_answers_list:
-                                            options.append(
-                                                {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
-                                        else:
-                                            if getattr(question.question, f'option_{i}'):
-                                                options.append(
-                                                    {f'option': getattr(question.question, f'option_{i}'), 'valid': False})
-
-                                    question_block['answers'] = options
-                                    user_answers = []
-                                    for number in question.user_answer:
-                                        if number.isdigit():
-                                            user_answers.append(number)
-                                    answer = []
-                                    for user_answer in user_answers:
-                                        print('user_answer', user_answer)
-                                        answer.append(getattr(question.question, f'option_{user_answer}'))
-                                    question_block['user_answer'] = answer
-
-                                answer_results.append(question_block)
-
-                            context = {'user_name': results_instance[0].user_name,
-                                       'total_num_q': result_data[0]['total_num_q'],
-                                       'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                                       'conclusion': True, 'answers': answer_results}
-                            # Удаляем тест пользователя из базы тестов пользователя
-
-                            QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
+                        if total_result >= min_pass_score:
+                            conclusion = True
+                            #  Записываем в отчёт о тесте заключение
+                            results_instance.conclusion = conclusion
+                            #  Сохраняем данные
+                            results_instance.save()
 
                             # Отправляем письмо КРС если тест не тренировочный
-                            if user_test_instance[0].test_name.training == False:
+                            if not test_flag:
                                 site_url = config('SITE_URL', default='')
                                 subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. Сдал Тест'
                                 message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
                                           f'<p style="color: rgb(148, 192, 74); font-size: 20px;"><b>СДАЛ ТЕСТ</b></p>' \
                                           f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                           f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
-                                          f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
+                                          f'<p style="font-size: 15px;">Проходной балл: <b>{min_pass_score}%</b></p>' \
                                           f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
                                           f'<br>' \
                                           f'<br>' \
@@ -664,176 +696,70 @@ def next_question(request):
                                 print('email_list', email_list)
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
                                 common.send_email(request, email_msg)
-                            else:
-                                # Если тест тренировочный, удаляем результаты теста
+
+                            else:  # Если тест тренировочный, удаляем результаты теста
                                 results_instance.delete()
 
-                            #  Удаляем тест у пользователя
-                            user_test_instance[0].delete()
-
-                            return render(request, 'results.html', context=context)
+                            #  Удаляем тест у пользователя т.к. он его сдал успешно
+                            user_test_instance.delete()
+                            # Удаляем сгенерированный тест (был сформирован когда пользователь нажал кнопку "Начать
+                            # тестирование") т.к. это временный объект, в любом случае удаляется после полного
+                            # завершения теста
+                            quiz_set_instance.delete()
 
                         # Если пользователь тест НЕ сдал
                         else:
-                            results_instance = QuizeResults.objects.filter(id=int(request.POST.get('result_id')))
-                            set_instance = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id')))
-                            user_test_id = set_instance[0].test_id
-                            user_test_name = set_instance[0].quize_name  # Название теста пользователя
-                            user_test_instance = UserTests.objects.filter(user=request.user, test_name=user_test_id)
-                            # Уменьшаем количество попыток
-                            num_try = user_test_instance[0].num_try
-                            # num_try -= 1
-                            # user_test_instance.update(num_try=num_try)
-
-                            # Если у пользователя не осталось попыток, отправляем письмо КРС
-                            if int(num_try) == 0:
-                                QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).update(
-                                    total_result=total_result, conclusion=False)
-
-                                answer_results = []
-                                answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
-
-                                #  Формируем список ответов в результатах теста
-                                for question in answers:
-                                    question_block = {}
-                                    question_block['question'] = question.question.question
-                                    question_block['conclusion'] = question.conclusion
-                                    #  Если вопрос имеет один ответ
-                                    if not question.question.q_kind:
-                                        options = []
-                                        for i in range(1, 11):
-                                            if question.question.answer == i:
-                                                options.append(
-                                                    {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
-                                            else:
-                                                if getattr(question.question, f'option_{i}'):
-                                                    options.append(
-                                                        {f'option': getattr(question.question, f'option_{i}'),
-                                                         'valid': False})
-                                        user_answer = question.user_answer
-                                        question_block['answers'] = options
-                                        question_block['user_answer'] = [
-                                            getattr(question.question, f'option_{user_answer}')]
-
-                                    #  Если на вопрос несколько ответов
-                                    else:
-                                        options = []
-                                        #  Список с правильными ответами
-                                        correct_answers_list = list(map(int, question.question.answers.split(',')))
-                                        print('correct_answers_list', correct_answers_list)
-                                        for i in range(1, 11):
-                                            if i in correct_answers_list:
-                                                options.append(
-                                                    {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
-                                            else:
-                                                if getattr(question.question, f'option_{i}'):
-                                                    options.append(
-                                                        {f'option': getattr(question.question, f'option_{i}'),
-                                                         'valid': False})
-
-                                        question_block['answers'] = options
-                                        user_answers = []
-                                        for number in question.user_answer:
-                                            if number.isdigit():
-                                                user_answers.append(number)
-                                        answer = []
-                                        for user_answer in user_answers:
-                                            print('user_answer', user_answer)
-                                            answer.append(getattr(question.question, f'option_{user_answer}'))
-                                        question_block['user_answer'] = answer
-
-                                    answer_results.append(question_block)
-
+                            #  Записываем в отчёт о тесте заключение
+                            conclusion = False
+                            results_instance.conclusion = conclusion
+                            #  Сохраняем данные
+                            results_instance.save()
+                            # Вынимаем количество оставшихся попыток
+                            num_try = user_test_instance.num_try
+                            # Если у пользователя не осталось попыток, отправляем письмо КРС, если тест НЕ тренировочный
+                            if int(num_try) <= 0:
                                 # Отправляем письмо КРС если тест не тренировочный
-                                if user_test_instance[0].test_name.training == False:
+                                if not test_flag:
                                     site_url = config('SITE_URL', default='')
                                     subject = f'Пилот {request.user.profile.family_name} {(request.user.profile.first_name)[0]}. {(request.user.profile.middle_name)[0]}. НЕ сдал тест'
                                     message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
                                               f'<p style="color: rgb(142, 23, 11); font-size: 20px;"><b>НЕ СДАЛ ТЕСТ</b></p>' \
                                               f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                               f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
-                                              f'<p style="font-size: 15px;">Проходной балл: <b>{result_data[0]["pass_score"]}%</b></p>' \
-                                              f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
+                                              f'<p style="font-size: 15px;">Проходной балл: <b>{min_pass_score}%</b></p>' \
+                                              f'<a href="{site_url}/tests_results_list/{results_instance.id}">Посмотреть подробности</a>' \
                                               f'<br>' \
                                               f'<br>' \
-                                              f'<a href="{site_url}/download_test_result/{results_instance[0].id}">Скачать результаты теста</a>'
+                                              f'<a href="{site_url}/download_test_result/{results_instance.id}">Скачать результаты теста</a>'
                                     # Вынимаем список адресов КРС соответствующих данному тесту
-                                    email_list = (user_test_instance[0].test_name.email_to_send).split()
+                                    email_list = (user_test_instance.test_name.email_to_send).split()
                                     email_msg = {'subject': subject, 'message': message, 'to': email_list}
                                     common.send_email(request, email_msg)
-                                else:
-                                    # Удаляем результаты теста, если тест тренировояный
+
+                                else:  # Удаляем результаты теста, если тест тренировочный
                                     results_instance.delete()
-                                context = {'user_name': results_instance[0].user_name,
-                                           'total_num_q': result_data[0]['total_num_q'],
-                                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                                           'conclusion': False, 'answers': answer_results}
-                                QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
-                                return render(request, 'results.html', context=context)
-                            else:
 
-                                answer_results = []
-                                answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
+                                # Удаляем сгенерированный тест (был сформирован когда пользователь нажал кнопку "Начать
+                                # тестирование") т.к. это временный объект, в любом случае удаляется после полного
+                                # завершения теста
+                                quiz_set_instance.delete()
 
-                                #  Формируем список ответов в результатах теста
-                                for question in answers:
-                                    question_block = {}
-                                    question_block['question'] = question.question.question
-                                    question_block['conclusion'] = question.conclusion
-                                    #  Если вопрос имеет один ответ
-                                    if not question.question.q_kind:
-                                        options = []
-                                        for i in range(1, 11):
-                                            if question.question.answer == i:
-                                                options.append(
-                                                    {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
-                                            else:
-                                                if getattr(question.question, f'option_{i}'):
-                                                    options.append(
-                                                        {f'option': getattr(question.question, f'option_{i}'),
-                                                         'valid': False})
-                                        user_answer = question.user_answer
-                                        question_block['answers'] = options
-                                        question_block['user_answer'] = [
-                                            getattr(question.question, f'option_{user_answer}')]
+                            else:  #  Если у пользователя остались попытки
+                                # Удаляем результаты теста
+                                results_instance.delete()
 
-                                    #  Если на вопрос несколько ответов
-                                    else:
-                                        options = []
-                                        #  Список с правильными ответами
-                                        correct_answers_list = list(map(int, question.question.answers.split(',')))
-                                        print('correct_answers_list', correct_answers_list)
-                                        for i in range(1, 11):
-                                            if i in correct_answers_list:
-                                                options.append(
-                                                    {f'option': getattr(question.question, f'option_{i}'), 'valid': True})
-                                            else:
-                                                if getattr(question.question, f'option_{i}'):
-                                                    options.append(
-                                                        {f'option': getattr(question.question, f'option_{i}'),
-                                                         'valid': False})
+                                # Удаляем сгенерированный тест (был сформирован когда пользователь нажал кнопку "Начать
+                                # тестирование") т.к. это временный объект, в любом случае удаляется после полного
+                                # завершения теста
+                                quiz_set_instance.delete()
 
-                                        question_block['answers'] = options
-                                        user_answers = []
-                                        for number in question.user_answer:
-                                            if number.isdigit():
-                                                user_answers.append(number)
-                                        answer = []
-                                        for user_answer in user_answers:
-                                            print('user_answer', user_answer)
-                                            answer.append(getattr(question.question, f'option_{user_answer}'))
-                                        question_block['user_answer'] = answer
+                        context = {'user_name': user_name, 'ac_type': ac_type, 'timestamp': timestamp,
+                                   'total_num_q': total_num_q, 'quize_name': quize_name,
+                                   'correct_q_num': correct_q_num, 'total_result': total_result,
+                                   'conclusion': conclusion, 'answers': answer_results, 'min_pass_score': min_pass_score}
 
-                                    answer_results.append(question_block)
+                        return render(request, 'results.html', context=context)
 
-                                context = {'user_name': results_instance[0].user_name,
-                                           'total_num_q': result_data[0]['total_num_q'],
-                                           'correct_q_num': result_data[0]['correct_q_num'], 'total_result': total_result,
-                                           'conclusion': False, 'answers': answer_results}
-
-                                QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).delete()
-                                QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).delete()
-                                return render(request, 'results.html', context=context)
         else:
             return HttpResponseRedirect('/')
     except Exception as general_error:
@@ -861,7 +787,6 @@ def next_question(request):
         common.send_email(request, email_msg)
         # Отправляем пользователя на заглавную страницу
         return HttpResponseRedirect('/')
-
 
 
 @login_required
@@ -1153,7 +1078,7 @@ def theme_editor(request, id=None):
             # ac_types_list.append('Все')
             user_search_input = request.GET.get("them_search")
             theme_list = Thems.objects.exclude(name='Все темы')
-            #theme_list = Thems.objects.all()
+            # theme_list = Thems.objects.all()
             them_num = Thems.objects.all().count() - 1
             q_num_dict = {}
             no_search_result = False
@@ -1310,7 +1235,8 @@ def download_test_result(request, id):
     p.showPage()
     p.save()
     buffer.seek(0)
-    user_name = user_instance.profile.family_name + user_instance.profile.first_name[:1] + user_instance.profile.middle_name[:1]
+    user_name = user_instance.profile.family_name + user_instance.profile.first_name[
+                                                    :1] + user_instance.profile.middle_name[:1]
     print('user.name:', user_name)
     result_for_file = ''
     result_id_for_file = str(result[0]['id'])
@@ -1443,7 +1369,7 @@ def create_new_test(request):
     ac_type = request.GET.get('ac_type')
     thems = Thems.objects.all()
     total_q_num_per_them = {}
-    #totla_q_num = 0
+    # totla_q_num = 0
     target_them_num = 0  # Количество тем для подсчёта количества вопросов, если выбраны все темы
     min_q_them = []
     all_them_instance = Thems.objects.get(id=5)  # Instance объекта 'Все темы'
@@ -1453,7 +1379,7 @@ def create_new_test(request):
             q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
             if q_num > 0:
                 total_q_num_per_them[them_name] = q_num
-                #totla_q_num += 1
+                # totla_q_num += 1
                 target_them_num += 1
                 min_q_them.append(q_num)
     min_q_them.sort()
@@ -1473,7 +1399,7 @@ def create_new_test(request):
                                      prefix="questions")
         test_name_form = NewTestFormName(request.POST, prefix="test_name")
         #  Проверяем если установлен параметр тренировочного теста
-        #if test_name_form.data['test_name-training'] == 'on':
+        # if test_name_form.data['test_name-training'] == 'on':
         if 'test_name-training' in test_name_form.data.keys():
             if test_q_set.is_valid() and test_name_form.is_valid():
                 # Создаём объект теста
@@ -1503,7 +1429,8 @@ def create_new_test(request):
                     email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
                 else:
                     checked_emailes = request.POST.getlist('krs_email')
-                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
+                           'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                            'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
                            'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
                 return render(request, 'new_test_form.html', context=context)
@@ -1537,7 +1464,8 @@ def create_new_test(request):
                     email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
                 else:
                     checked_emailes = request.POST.getlist('krs_email')
-                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
+                           'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                            'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
                            'krs_list': krs_list, 'email_error': email_error, 'checked_emailes': checked_emailes}
                 return render(request, 'new_test_form.html', context=context)
@@ -1570,9 +1498,9 @@ def test_details(request, id):
 
     thems = Thems.objects.all()
     total_q_num_per_them = {}
-    #totla_q_num = 0
+    # totla_q_num = 0
     min_q_them = []
-    target_them_num = 0 #  Количество тем для подсчёта количества вопросов, если выбраны все темы
+    target_them_num = 0  # Количество тем для подсчёта количества вопросов, если выбраны все темы
     all_them_instance = Thems.objects.get(id=5)  # Instance объекта 'Все темы'
     for them_name in thems:
         # Считаем количество вопросов в каждой теме, кроме "Все темы"
@@ -1580,7 +1508,7 @@ def test_details(request, id):
             q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
             if q_num > 0:
                 total_q_num_per_them[them_name] = q_num
-                #totla_q_num += 1
+                # totla_q_num += 1
                 min_q_them.append(q_num)
                 target_them_num += 1
     min_q_them.sort()
@@ -1629,7 +1557,8 @@ def test_details(request, id):
                 #     email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
                 # else:
                 #     checked_emailes = request.POST.getlist('krs_email')
-                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form, 'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
+                context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
+                           'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                            'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
                            'krs_list': krs_list,
                            'q_num_per_them': total_q_num_per_them}
@@ -1677,7 +1606,8 @@ def test_details(request, id):
         # Создаём набор форм
         test_q_set = QuestionFormSet(form_kwargs={'thems_selection': tuple(thems_selection)}, initial=test_questions,
                                      prefix='questions')
-        context = {'target_them_num': target_them_num, 'test_q_set': test_q_set, 'test_name_form': test_name_form, 'test_id': test_instance[0]['id'],
+        context = {'target_them_num': target_them_num, 'test_q_set': test_q_set, 'test_name_form': test_name_form,
+                   'test_id': test_instance[0]['id'],
                    'q_num_per_them': total_q_num_per_them, 'ac_type': test_instance[0]['ac_type'], 'krs_list': krs_list,
                    'checked_emailes': checked_emailes, 'previous_url': previous_url}
         return render(request, 'test_detailes.html', context=context)

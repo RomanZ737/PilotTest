@@ -24,7 +24,7 @@
 
             <div class="list-user_test_list">
                 {% if user_test_dict|get_item:user.username %}
-                <span>{{user_test_dict|get_item:user.username|join:";  "}}</span>
+                <span>{{user_test_dict|get_item:user.username|join:";  "|truncatechars:16}}</span>
                 {% else %}
                 <span>Нет Тестов</span>
                 {% endif %}

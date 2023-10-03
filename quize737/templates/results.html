@@ -1,31 +1,76 @@
 {% extends "base_test.html" %}
 
 {% block content %}
+<fieldset>
+    <legend>Результат теста</legend>
+        <div class="block_none_light_up">
+            <h1>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</h1>
+        </div>
+            <br>
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Дата:</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{timestamp|date:"d.m.Y H:i:s"}} UTC</span>
+            </div>
+        </div>
 
-    <div class="result_list">
-        <fieldset>
-                <legend>Результат теста</legend>
-                    <h1>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</h1>
-                    <br>
-                    <div class="list-other_field">
-                        <span class="static_sign">Общее количество вопросов:</span>
-                    </div>
-                    <div class="list-other_field">
-                        <span class="mark_up">{{total_num_q}}</span>
-                    </div>
-                    <div class="list-other_field">
-                        <span class="static_sign">Количество правильных ответов:</span>
-                    </div>
-                    <div class="list-other_field">
-                        <span class="mark_up">{{correct_q_num}}</span>
-                    </div>
-                    <div class="list-other_field">
-                        <span class="static_sign">Результать теста с учётом "веса" вопросов</span>
-                    </div>
-                    <div class="list-other_field">
-                        <span class="mark_up">{{total_result}}%</span>
-                    </div>
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Тип ВС:</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{ac_type}}</span>
+            </div>
+        </div>
 
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Название теста:</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{quize_name}}</span>
+            </div>
+        </div>
+
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Общее количество вопросов:</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{total_num_q}}</span>
+            </div>
+        </div>
+
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Количество правильных ответов:</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{correct_q_num}}</span>
+            </div>
+        </div>
+
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Минимально-необходимое количество баллов:</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{min_pass_score}}%</span>
+            </div>
+        </div>
+
+        <div class="block_light_up">
+            <div class="list-other_field">
+                <span>Результать теста с учётом "веса" вопросов</span>
+            </div>
+            <div class="list-other_field">
+                <span class="mark_up">{{total_result}}%</span>
+            </div>
+        </div>
+
+        <div class="block_none_light_up">
                         {% if conclusion%}
                             <div class="list-other_field">
                                 <span class="positive">ТЕСТ СДАН</span>
@@ -35,8 +80,9 @@
                                 <span class="negative">ТЕСТ НЕ СДАН</span>
                             </div>
                         {% endif %}
-
-            <div class="list-other_field_non_inline">
+            </div>
+            <br>
+            <div class="block_none_light_up">
                 <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
             </div>
             <br>
@@ -79,11 +125,11 @@
             </div>
 
                     <br>
+            <div class="block_none_light_up">
                     <form method='get' action='{% url "start" %}'>
-                        <br>
-                        <br>
                     <input type="submit" value="На главную">
                     </form>
+            </div>
         </fieldset>
     </div>
 
