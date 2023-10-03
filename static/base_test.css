@@ -189,10 +189,31 @@ div.list-other_field {    /* блок для остальных типов да�
     margin-top: 5px;
 }
 
-span.static_sign {
-    font-size: 24px;
+div.results_static_sign {
+    font-size: 22px;
+    position: relative;
+    display: inline-block;
+    left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    width: 495px;
+    vertical-align: middle;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
+div.results_dynamic_sign{
+    font-size: 22px;
+    /*position: relative; */
+    display: inline-block;
+    /*left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    vertical-align: middle;
+    margin-bottom: 5px;
+    margin-top: 5px; */
+    color: rgb(209, 209,209);
+}
 
 div.result_answers_question {
     position: relative;

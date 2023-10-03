@@ -4,70 +4,46 @@
 <fieldset>
     <legend>Результат теста</legend>
         <div class="block_none_light_up">
-            <h1>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</h1>
+            <span style="font-size: 25px;"><b>{{user.profile.family_name}} {{user.profile.first_name}} {{user.profile.middle_name}}</b></span>
         </div>
-            <br>
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Дата:</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{timestamp|date:"d.m.Y H:i:s"}} UTC</span>
-            </div>
+            <div class="results_static_sign">Дата:</div>
+            <div class="results_dynamic_sign">{{timestamp|date:"d.m.Y H:i:s"}} UTC</div>
         </div>
 
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Тип ВС:</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{ac_type}}</span>
-            </div>
+            <div class="results_static_sign">Тип ВС:</div>
+            <div class="results_dynamic_sign">{{ac_type}}</div>
         </div>
 
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Название теста:</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{quize_name}}</span>
-            </div>
+            <div class="results_static_sign">Название теста:</div>
+            <div class="results_dynamic_sign">{{quize_name}}</div>
         </div>
 
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Общее количество вопросов:</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{total_num_q}}</span>
-            </div>
+            <div class="results_static_sign">Общее количество вопросов:</div>
+            <div class="results_dynamic_sign">{{total_num_q}}</div>
         </div>
 
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Количество правильных ответов:</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{correct_q_num}}</span>
-            </div>
+            <div class="results_static_sign">Количество правильных ответов:</div>
+            <div class="results_dynamic_sign">{{correct_q_num}}</div>
         </div>
 
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Минимально-необходимое количество баллов:</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{min_pass_score}}%</span>
-            </div>
+            <div class="results_static_sign">Минимально-необходимое количество баллов:</div>
+            <div class="results_dynamic_sign">{{min_pass_score}}%</div>
         </div>
 
         <div class="block_light_up">
-            <div class="list-other_field">
-                <span>Результать теста с учётом "веса" вопросов</span>
-            </div>
-            <div class="list-other_field">
-                <span class="mark_up">{{total_result}}%</span>
-            </div>
+            {% if total_result >= min_pass_score%}
+                <div class="results_static_sign">Результать теста с учётом "веса" вопросов</div>
+                <div class="results_dynamic_sign" style="color: rgb(148, 192, 74);">{{total_result}}%</div>
+            {% else %}
+                <div class="results_static_sign">Результать теста с учётом "веса" вопросов</div>
+                <div class="results_dynamic_sign" style="color: rgb(142, 23, 11);">{{total_result}}%</div>
+            {% endif %}
         </div>
 
         <div class="block_none_light_up">
@@ -81,11 +57,11 @@
                             </div>
                         {% endif %}
             </div>
-            <br>
+
             <div class="block_none_light_up">
                 <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
             </div>
-            <br>
+
             <div id="answers" style="display: none;" >
 
 
@@ -117,21 +93,19 @@
                         {% endfor %}
 
                         </fieldset>
-                    <br>
-                    <br>
+
                     {% endfor %}
 
 
             </div>
 
-                    <br>
             <div class="block_none_light_up">
                     <form method='get' action='{% url "start" %}'>
                     <input type="submit" value="На главную">
                     </form>
             </div>
         </fieldset>
-    </div>
+
 
 
 <script>

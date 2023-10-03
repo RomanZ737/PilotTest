@@ -582,10 +582,6 @@ def next_question(request):
                         user_test_instance = UserTests.objects.get(user=request.user,
                                                                    test_name=quiz_set_instance.test_id)
 
-                        # Вынимаем количество правильных ответов, число вопросов и количество баллов
-                        result_data = QuizeResults.objects.filter(id=int(request.POST.get('result_id'))).values(
-                            'correct_q_num', 'score_number', 'total_num_q', 'pass_score')
-
                         # Вынимаем количество максимально возможных баллов
                         max_score_num = float(quiz_set_instance.max_score_amount)
                         # Вынимаем количество набранных баллов
@@ -687,12 +683,12 @@ def next_question(request):
                                           f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                           f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                           f'<p style="font-size: 15px;">Проходной балл: <b>{min_pass_score}%</b></p>' \
-                                          f'<a href="{site_url}/tests_results_list/{results_instance[0].id}">Посмотреть подробности</a>' \
+                                          f'<a href="{site_url}/tests_results_list/{results_instance.id}">Посмотреть подробности</a>' \
                                           f'<br>' \
                                           f'<br>' \
-                                          f'<a href="{site_url}/download_test_result/{results_instance[0].id}">Скачать результаты теста</a>'
+                                          f'<a href="{site_url}/download_test_result/{results_instance.id}">Скачать результаты теста</a>'
                                 # Вынимаем список адресов КРС соответствующих данному тесту
-                                email_list = (user_test_instance[0].test_name.email_to_send).split()
+                                email_list = user_test_instance.test_name.email_to_send.split()
                                 print('email_list', email_list)
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
                                 common.send_email(request, email_msg)
