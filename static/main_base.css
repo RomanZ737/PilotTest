@@ -858,6 +858,13 @@ div.fio_row {
     margin: 20px;
 }
 
+.errorlist {
+    color: rgb(142, 15, 23);
+    font-size: 22px;
+    width: fit-content;
+    animation: ErrorAppear 0.5s
+}
+
 div.form_errors {
     color: rgb(142, 15, 23);
     font-size: 22px;
@@ -967,3 +974,5 @@ div.modal_form_button_block {
     /* right: 10% */
     margin-top: 30px;
 }
+
+

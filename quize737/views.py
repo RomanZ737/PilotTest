@@ -611,7 +611,6 @@ def next_question(request):
                         ac_type = results_instance.user_id.profile.get_ac_type_display
                         timestamp = results_instance.timestamp
 
-
                         #  Формируем результаты ответов на тест
                         answer_results = []
                         answers = AnswersResults.objects.filter(user=results_inst.user_id, results=results_inst)
@@ -740,7 +739,7 @@ def next_question(request):
                                 # завершения теста
                                 quiz_set_instance.delete()
 
-                            else:  #  Если у пользователя остались попытки
+                            else:  # Если у пользователя остались попытки
                                 # Удаляем результаты теста
                                 results_instance.delete()
 
@@ -752,7 +751,8 @@ def next_question(request):
                         context = {'user_name': user_name, 'ac_type': ac_type, 'timestamp': timestamp,
                                    'total_num_q': total_num_q, 'quize_name': quize_name,
                                    'correct_q_num': correct_q_num, 'total_result': total_result,
-                                   'conclusion': conclusion, 'answers': answer_results, 'min_pass_score': min_pass_score}
+                                   'conclusion': conclusion, 'answers': answer_results,
+                                   'min_pass_score': min_pass_score}
 
                         return render(request, 'results.html', context=context)
 
@@ -1421,10 +1421,10 @@ def create_new_test(request):
                 errors_non_form = test_q_set.non_form_errors
                 email_error = ''  # Ошибка с заполнением email адресов
                 checked_emailes = ''  # Список email адресов для отсылки уведомлений
-                if 'krs_email' not in request.POST:
-                    email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
-                else:
-                    checked_emailes = request.POST.getlist('krs_email')
+                # if 'krs_email' not in request.POST:
+                #     email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
+                # else:
+                #     checked_emailes = request.POST.getlist('krs_email')
                 context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
                            'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                            'form_errors': form_errors, 'q_num_per_them': total_q_num_per_them, 'ac_type': ac_type,
