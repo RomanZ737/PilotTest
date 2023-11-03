@@ -8,6 +8,6 @@ import telebot  # библиотека работы с телеграм
 crewbot_token = config("TEST_CREW_BOT_TOKEN", default='')
 develop_chat_id = config("DEVELOP_CHAT_ID", default='')
 
-dp = Dispatcher(storage=fsm_storage)
+#dp = Dispatcher(storage=fsm_storage)
 #bot = Bot(crewbot_token, parse_mode='html')
 bot = telebot.TeleBot(crewbot_token, parse_mode='html')
