@@ -9,13 +9,14 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+from loggers.my_loggers import TelegramMsgLog
 from pathlib import Path
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
-#from quize737.common import DKIMBackend
+# from quize737.common import DKIMBackend
 
 import common
 import os
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,32 +31,57 @@ SECRET_KEY = secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "handlers": {
-#         "file": {
-#             "level": "INFO",
-#             "class": "logging.FileHandler",
-#             "filename": "C:/Users/User/PycharmProjects/PilotTest/log/debug.log",
-#         },
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["file"],
-#             "level": "INFO",
-#             "propagate": True,
-#         },
-#     },
-# }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "common": {
+            "format": '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+            "datefmt": "%d:%m:%Y %H:%M:%S"
+        }
 
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
 
+        "file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": "C:/Users/User/PycharmProjects/PilotTest/log/pilottest.log",
+            'formatter': 'common'},
 
+        "bot": {
+            "level": "WARNING",
+            "class": "loggers.my_loggers.TelegramMsgLog"
+        }
+    },
+
+    "loggers": {
+        "root": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True
+        },
+        "USER ACTION": {
+            "handlers": ["file", "bot"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+
+        "django.server": {
+            "handlers": ["bot"],
+            "level": "ERROR",
+            "propagate": True
+        },
+    },
+}
 
 EMAIL_HOST = config('EMAIL_HOST', default='')
 EMAIL_PORT = config('EMAIL_PORT', default='')
 EMAIL_USE_TLS = True
-#EMAIL_USE_SSL = True
+# EMAIL_USE_SSL = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('SENDER_MAIL', default='')
@@ -194,13 +220,12 @@ MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = 'start'
 LOGIN_URL = 'login'
 
-
 CRON_CLASSES = [
     "quize737.cron.MyCronJob",
 ]
 
 REST_FRAMEWORK = {
-  'DEFAULT_PERMISSION_CLASSES': [
-      'rest_framework.permissions.AllowAny',
-  ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }

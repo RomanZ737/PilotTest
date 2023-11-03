@@ -13,8 +13,8 @@ import sys
 from django.core.wsgi import get_wsgi_application
 
 #TODO: для рабочего сайта поменять путь wsgi
-sys.path.append('/etc/default/web_app/PilotTest')
-sys.path.append('/etc/default/web_app/PilotTest/PilotTest')
+sys.path.append('/etc/default/test/PilotTest')
+sys.path.append('/etc/default/test/PilotTest/PilotTest')
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'PilotTest.settings')
 

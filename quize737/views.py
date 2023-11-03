@@ -6,7 +6,7 @@ import io
 import csv
 import re
 import sys
-
+import logging
 import common
 
 from django.utils.datastructures import MultiValueDictKeyError
@@ -42,6 +42,8 @@ from users.models import Profile, UserTests, GroupsDescription, TestExpired
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 
+logger_user_action = logging.getLogger('USER ACTION')
+loger_other = logging.getLogger('other')
 
 # Декоратор проверки группы пользователя для доступа
 def group_required(group, login_url=None, raise_exception=False):
@@ -990,6 +992,10 @@ def new_question(request):
     if request.method == 'POST':
         question_form = NewQuestionSetForm(request.POST)  # Для форм основанных на модели объекта
         if question_form.is_valid():
+            logger_user_action.warning(f'<b>Добавлен вопрос: </b>{request.POST.get("question")}\n\n'
+                                       f'<b>User:</b> {request.user.profile.family_name}'
+                                       f' {request.user.profile.first_name[0]}.'
+                                       f'{request.user.profile.middle_name[0]}.')
             question_form.save()
             return redirect('quize737:question_list')
         else:
@@ -1045,6 +1051,11 @@ def question_list_details(request, id):
 @login_required
 @group_required(('KRS', 'Редактор'))
 def question_del(request, id):
+    question_instance = QuestionSet.objects.get(id=id)
+    logger_user_action.warning(f'<b>Удалён вопрос: </b>{question_instance.question}\n\n'
+                               f'<b>User:</b> {request.user.profile.family_name}'
+                               f' {request.user.profile.first_name[0]}.'
+                               f'{request.user.profile.middle_name[0]}.')
     QuestionSet.objects.get(id=id).delete()
     return redirect('quize737:question_list')
 
@@ -1113,6 +1124,10 @@ def new_theme(request):
     form = NewThemeForm()
     if request.method == 'POST':
         form = NewThemeForm(request.POST)
+        logger_user_action.warning(f'<b>Создана тема: </b>{request.POST.get("name")}\n\n'
+                                   f'<b>User:</b> {request.user.profile.family_name}'
+                                   f' {request.user.profile.first_name[0]}.'
+                                   f'{request.user.profile.middle_name[0]}.')
         if form.is_valid():  # TODO: добавить в валидацию проверку на уже существующую тему
             form.save()
             return redirect('quize737:theme_editor')
@@ -1128,7 +1143,11 @@ def new_theme(request):
 @login_required
 @group_required(('KRS', 'Редактор'))
 def theme_del(request, id):
-    print('id:', id)
+    them_instance = Thems.objects.get(id=id)
+    logger_user_action.warning(f'<b>Удалена Тема:</b> {them_instance.name}\n\n'
+                               f'<b>User:</b> {request.user.profile.family_name}'
+                               f' {request.user.profile.first_name[0]}.'
+                               f'{request.user.profile.middle_name[0]}.')
     Thems.objects.get(id=id).delete()
     return redirect('quize737:theme_editor')
 
@@ -1404,6 +1423,11 @@ def create_new_test(request):
                                                           training=True,
                                                           ac_type=ac_type,
                                                           )
+                logger_user_action.warning(f'<b>Создан Тест: </b>{test_name_form.data["test_name-name"]}\n\n'
+                                           f'<b>User:</b> {request.user.profile.family_name}'
+                                           f' {request.user.profile.first_name[0]}.'
+                                           f'{request.user.profile.middle_name[0]}.')
+
                 # Создаём объекты вопросов теста
                 for question in test_q_set.cleaned_data:
                     if not question['DELETE']:
@@ -1539,6 +1563,12 @@ def test_details(request, id):
                         TestQuestionsBay.objects.create(theme=them_instance,
                                                         test_id=a,
                                                         q_num=question['q_num'], )
+
+                logger_user_action.warning(f'<b>Отредактирован Тест: </b>{a.name}\n\n'
+                                           f'<b>User:</b> {request.user.profile.family_name}'
+                                           f' {request.user.profile.first_name[0]}.'
+                                           f'{request.user.profile.middle_name[0]}.')
+
                 return redirect('quize737:test_editor')
             else:
                 form_errors = []  # Ошибки при валидации формы
@@ -1575,6 +1605,12 @@ def test_details(request, id):
                         TestQuestionsBay.objects.create(theme=them_instance,
                                                         test_id=a,
                                                         q_num=question['q_num'], )
+
+                logger_user_action.warning(f'<b>Отредактирован Тест: </b>{a.name}\n\n'
+                                           f'<b>User:</b> {request.user.profile.family_name}'
+                                           f' {request.user.profile.first_name[0]}.'
+                                           f'{request.user.profile.middle_name[0]}.')
+
                 return redirect('quize737:test_editor')
             else:
                 form_errors = []  # Ошибки при валидации формы
@@ -1613,6 +1649,11 @@ def test_details(request, id):
 @login_required
 @group_required('KRS')
 def del_test(request, id):
+    a = TestConstructor.objects.get(id=id)
+    logger_user_action.warning(f'<b>Удалён Тест: </b>{a.name}\n\n'
+                               f'<b>User:</b> {request.user.profile.family_name}'
+                               f' {request.user.profile.first_name[0]}.'
+                               f'{request.user.profile.middle_name[0]}.')
     TestConstructor.objects.get(id=id).delete()
     return redirect('quize737:test_editor')
 
@@ -1913,7 +1954,10 @@ def new_group(request):
             GroupsDescription.objects.create(group=group,
                                              discription=group_form.cleaned_data.get('discription')
                                              )
-
+            logger_user_action.warning(f'<b>Создана Группа: </b>{group.name}\n\n'
+                                       f'<b>User:</b> {request.user.profile.family_name}'
+                                       f' {request.user.profile.first_name[0]}.'
+                                       f'{request.user.profile.middle_name[0]}.')
             return redirect('quize737:group_list')
         else:
             context = {'form': group_form}
@@ -1938,6 +1982,11 @@ def edit_group(request, id):
             discript_obj.discription = group_form.cleaned_data['discription']
             discript_obj.save()
 
+            logger_user_action.warning(f'<b>Отредактирована Группа: </b>{group_obj.name}\n\n'
+                                       f'<b>User:</b> {request.user.profile.family_name}'
+                                       f' {request.user.profile.first_name[0]}.'
+                                       f'{request.user.profile.middle_name[0]}.')
+
             return redirect('quize737:group_list')
         else:
             context = {'group_form': group_form}
@@ -1953,6 +2002,12 @@ def edit_group(request, id):
 @login_required
 @group_required('KRS')
 def group_del(request, id):
+    group_obj = Group.objects.get(id=id)
+    logger_user_action.warning(f'<b>Удалена Группа: </b>{group_obj.name}\n\n'
+                               f'<b>User:</b> {request.user.profile.family_name}'
+                               f' {request.user.profile.first_name[0]}.'
+                               f'{request.user.profile.middle_name[0]}.')
+
     Group.objects.get(id=id).delete()
     return redirect('quize737:group_list')
 
@@ -1981,6 +2036,17 @@ def edit_user(request, id):
         if old_position != new_position:
             user_obj.profile.position = new_position
             user_obj.profile.save()
+
+            logger_user_action.warning(f'<b>Изменена Квалификация сотрудника </b>{user_obj.profile.family_name}'
+                                       f'{user_obj.profile.first_name[0]}.'
+                                       f'{user_obj.profile.middle_name[0]}.\n\n'
+                                       f'<b>Новая квалификация</b>: {new_position}'
+                                       f'Старая квалификация: {old_position}'
+
+                                       f'<b>User:</b> {request.user.profile.family_name}'
+                                       f' {request.user.profile.first_name[0]}.'
+                                       f'{request.user.profile.middle_name[0]}.')
+
             position_name_group = new_position + ' ' + user_obj.profile.ac_type
 
         all_groups_set = set()  # Множество для хранения стринговых названий групп
@@ -2004,9 +2070,11 @@ def edit_user(request, id):
         for del_group in to_del_groups:  # Удаляем пользователя из групп
             group_obj = Group.objects.get(name=del_group)
             user_obj.groups.remove(group_obj)
+
         for add_group in changed_groups:  # Добавляем пользователя в группы
             group_obj = Group.objects.get(name=add_group)
             user_obj.groups.add(group_obj)
+
 
         #  Проверям ТИП ВС
         for j in Profile.ACType.choices:  # Выясняем соответсвие названию выбора и самому выбору
@@ -2016,6 +2084,7 @@ def edit_user(request, id):
         if old_ac_type != new_ac_type:
             user_obj.profile.ac_type = new_ac_type
             user_obj.profile.save()
+
 
         # TODO: долелать автоматическое изменение группы, в случаем изменения типа ВС
 
@@ -2075,6 +2144,14 @@ def user_detales(request, id):
                 if test['DELETE']:
                     UserTests.objects.filter(user=user_object,
                                              test_name=test['test_name']).delete()  # Удаляем тест у пользователя
+                    logger_user_action.warning(f'У Пользователя: '
+                                               f'<b>{user_object.profile.family_name}</b>'
+                                               f'{user_object.profile.first_name[0]}.'
+                                               f'{user_object.profile.middle_name[0]}.\n'
+                                               f'Удалён Тест: <b>{test["test_name"]}</b>\n\n'
+                                               f'<b>User: </b>{request.user.profile.family_name}'
+                                               f' {request.user.profile.first_name[0]}.'
+                                               f'{request.user.profile.middle_name[0]}.')
                     try:  # Ищем и удаляем начатые, но не законченные тесты (сам сформированный временный тест с вопросами)
                         QuizeSet.objects.get(user_under_test=user_object.username,
                                              quize_name=test['test_name']).delete()
@@ -2131,6 +2208,17 @@ def user_detales(request, id):
                                                      num_try_initial=test['num_try'],
                                                      num_try=test['num_try'],
                                                      date_before=test['date_before'])
+
+                            logger_user_action.warning(f'Пользователю: '
+                                                       f'<b>{user_object.profile.family_name}</b>'
+                                                       f'{user_object.profile.first_name[0]}.'
+                                                       f'{user_object.profile.middle_name[0]}.\n'
+                                                       f'Назначен Тест: <b>{test["test_name"]}</b>\n'
+                                                       f'Количество попыток: <b>{test["num_try"]}</b>\n'
+                                                       f'Выполнить до: <b>{test["date_before"]}</b>\n\n'
+                                                       f'<b>User: </b>{request.user.profile.family_name}'
+                                                       f' {request.user.profile.first_name[0]}.'
+                                                       f'{request.user.profile.middle_name[0]}.')
 
                             #  Отправляем письмо пользователю о назначенном тесте
                             subject = f"Вам назначен Тест: '{test['test_name']}'"
@@ -2207,6 +2295,16 @@ def new_user(request):
                 ac_type=form_profile.cleaned_data['ac_type']
                 # - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
             )
+
+            logger_user_action.warning(f'Создан Пользователь: '
+                                       f'<b>{form_profile.cleaned_data["family_name"]} '
+                                       f'{form_profile.cleaned_data["first_name"][0]}.'
+                                       f'{form_profile.cleaned_data["middle_name"][0]}.</b>\n'
+                                       f'Квалификация: <b>{form_profile.cleaned_data["position"]}</b>\n'
+                                       f'Тип ВС: <b>{form_profile.cleaned_data["ac_type"]}</b>\n\n'
+                                       f'<b>User: </b>{request.user.profile.family_name}'
+                                       f' {request.user.profile.first_name[0]}.'
+                                       f'{request.user.profile.middle_name[0]}.')
             return redirect('quize737:user_list')
 
         else:
@@ -2221,6 +2319,16 @@ def new_user(request):
 @login_required
 @group_required('KRS')
 def del_user(request, id):
+    user_object = User.objects.get(id=id)
+    logger_user_action.warning(f'Удалён Пользователь: '
+                               f'<b>{user_object.profile.family_name} '
+                               f'{user_object.profile.first_name[0]}.'
+                               f'{user_object.profile.middle_name[0]}.</b>\n'
+                               f'Квалификация: <b>{user_object.profile.position}</b>\n'
+                               f'Тип ВС: <b>{user_object.profile.ac_type}</b>\n\n'
+                               f'<b>User: </b>{request.user.profile.family_name}'
+                               f' {request.user.profile.first_name[0]}.'
+                               f'{request.user.profile.middle_name[0]}.')
     User.objects.get(id=id).delete()
     previous_url = request.META.get('HTTP_REFERER')
     return HttpResponseRedirect(previous_url)
@@ -2527,7 +2635,16 @@ def selected_users_test(request):
                                                      num_try_initial=test['num_try'],
                                                      num_try=test['num_try'],
                                                      date_before=test['date_before'])
-
+                            logger_user_action.warning(f'Пользователю: '
+                                                       f'<b>{user.profile.family_name}</b>'
+                                                       f'{user.profile.first_name[0]}.'
+                                                       f'{user.profile.middle_name[0]}.\n'
+                                                       f'Назначен Тест: <b>{test["test_name"]}</b>\n'
+                                                       f'Количество попыток: <b>{test["num_try"]}</b>\n'
+                                                       f'Выполнить до: <b>{test["date_before"]}</b>\n\n'
+                                                       f'<b>User: </b>{request.user.profile.family_name}'
+                                                       f' {request.user.profile.first_name[0]}.'
+                                                       f'{request.user.profile.middle_name[0]}.')
                             #  Отправляем письмо пользователю о назначенном тесте
                             subject = f"Вам назначен Тест: '{test['test_name']}'"
                             message = f"<p style='font-size: 25px;'><b>Уважаемый, {user.profile.first_name} {user.profile.middle_name}.</b></p><br>" \
@@ -2588,6 +2705,10 @@ def selected_users_new_group(request):
         if group_form.is_valid():
             #  Создаём группу
             group = Group.objects.create(name=group_form.cleaned_data.get('group_name'))  # Добавить группу разрешений
+            logger_user_action.warning(f'<b>Создана Группа: </b>{group.name}\n\n'
+                                       f'<b>User:</b> {request.user.profile.family_name}'
+                                       f' {request.user.profile.first_name[0]}.'
+                                       f'{request.user.profile.middle_name[0]}.')
             #  Добавляем группе описание
             GroupsDescription.objects.create(group=group, discription=group_form.cleaned_data.get('discription'))
             # Добаляем пользователей в группу
