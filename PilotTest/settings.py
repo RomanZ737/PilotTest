@@ -49,7 +49,7 @@ LOGGING = {
         "file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
-            "filename": "C:/Users/User/PycharmProjects/PilotTest/log/pilottest.log",
+            "filename": "/log/pilottest.log",
             'formatter': 'common'},
 
         "bot": {
