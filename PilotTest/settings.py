@@ -49,7 +49,7 @@ LOGGING = {
         "file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
-            "filename": "/log/pilottest.log",
+            "filename": os.path.join(BASE_DIR / "log/pilottest.log"),
             'formatter': 'common'},
 
         "bot": {
