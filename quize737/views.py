@@ -1463,6 +1463,10 @@ def create_new_test(request):
                                                           training=False,
                                                           ac_type=ac_type,
                                                           email_to_send=', '.join(emails))
+                logger_user_action.warning(f'<b>Создан Тест: </b>{test_name_form.data["test_name-name"]}\n\n'
+                                           f'<b>User:</b> {request.user.profile.family_name}'
+                                           f' {request.user.profile.first_name[0]}.'
+                                           f'{request.user.profile.middle_name[0]}.')
                 # Создаём объекты вопросов теста
                 for question in test_q_set.cleaned_data:
                     if not question['DELETE']:
