@@ -306,7 +306,7 @@ def start(request, id=None):
                            f'<b>Номер строки:</b> {line_number}\n\n' \
                            f'Вероятно пользователь обновил страницу с результатами теста'
         to = common.admin_email
-        subject = f'<b>!Серверная ошибка!</b> Pilot Test'
+        subject = f'!Серверная ошибка! Pilot Test'
         message = f'<p style="font-size: 20px;">Пользователь:</p>' \
                   f'<span style="font-size: 18px;"><b>{request.user.profile.position} </b></span>' \
                   f'<span style="font-size: 18px;"><b>{request.user.profile.ac_type}</b></span>' \
@@ -729,6 +729,7 @@ def next_question(request):
                                               f'<p style="font-size: 15px;">Проходной балл: <b>{min_pass_score}%</b></p>' \
                                               f'<a href="{site_url}/tests_results_list/{results_instance.id}">' \
                                               f'<span style="font-size: 14px;">Посмотреть подробности</span></a>' \
+                                              f'<br>' \
                                               f'<br>' \
                                               f'<a href="{site_url}/user_list/{request.user.id}">' \
                                               f'<span style="font-size: 14px;">Добавить попытки прохождения</span></a>' \
