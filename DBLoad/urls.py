@@ -6,5 +6,5 @@ from . import views
 app_name = 'DBLoad'
 
 urlpatterns = [
-    path('alter_questions/', views.alter_questions, name='alter_questions'),
+    path('alter_results/', views.alter_results, name='alter_results'),
     ]

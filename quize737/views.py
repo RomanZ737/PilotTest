@@ -229,7 +229,9 @@ def start(request, id=None):
                     questions_ids=', '.join(particular_user_questions),
                     correct_q_num=0,
                     score_number=0,
-                    pass_score=test_instance[0].pass_score
+                    pass_score=test_instance[0].pass_score,
+                    total_num_try=user_test.num_try_initial,
+                    try_spent=user_test.num_try_initial - user_test.num_try
                 )
 
                 #  Создаём словарь с вариантами ответов на вопрос
@@ -676,6 +678,7 @@ def next_question(request):
                             conclusion = True
                             #  Записываем в отчёт о тесте заключение
                             results_instance.conclusion = conclusion
+                            results_instance.date_end = datetime.datetime.utcnow()
                             #  Сохраняем данные
                             results_instance.save()
 
@@ -713,6 +716,7 @@ def next_question(request):
                             #  Записываем в отчёт о тесте заключение
                             conclusion = False
                             results_instance.conclusion = conclusion
+                            results_instance.date_end = datetime.datetime.utcnow()
                             #  Сохраняем данные
                             results_instance.save()
                             # Вынимаем количество оставшихся попыток
@@ -815,14 +819,14 @@ def tests_results_list(request):
     if user_search_input or filter_input:
         if user_search_input:
             total_results_list = QuizeResults.objects.filter(Q(user_name__icontains=f'{user_search_input}'),
-                                                             in_progress=False)
+                                                             in_progress=False).order_by('-date_end')
             if not total_results_list:
                 no_search_result = True
                 results = f'Пилоты по запросу "{user_search_input}" не найдены'
                 context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                            'position_list': position_list, 'group_list': group_list,
                            'results_list_options': results_list_options, 'user_search_input': user_search_input}
-                return render(request, 'tests_results_list.html', context=context)
+                return render(request, 'tests_results_list.html', context=context).order_by('-date_end')
             else:
                 paginator = Paginator(total_results_list, 10)
                 page_number = request.GET.get('page', 1)
@@ -847,12 +851,12 @@ def tests_results_list(request):
                     result = False
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
-                                                              conclusion__exact=result, in_progress=False).distinct()
+                                                              conclusion__exact=result, in_progress=False).distinct().order_by('-date_end')
             else:
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
                                                               conclusion__icontains=result,
-                                                              in_progress=False).distinct()
+                                                              in_progress=False).distinct().order_by('-date_end')
             if not total_user_list:
                 no_search_result = True
                 results = f'Результаты тестов не найдены'
@@ -872,7 +876,7 @@ def tests_results_list(request):
 
 
     else:
-        results_list = QuizeResults.objects.filter(in_progress=False)
+        results_list = QuizeResults.objects.filter(in_progress=False).order_by('-date_end')
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)

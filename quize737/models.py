@@ -93,20 +93,23 @@ class QuizeResults(models.Model):
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     total_num_q = models.IntegerField(verbose_name='Количество вопросов', help_text='Общее количество вопросов в тесте')
-    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=now)
+    timestamp = models.DateTimeField(verbose_name='Время и дата начала теста', default=now)
+    date_end = models.DateTimeField(verbose_name='Время и дата окончания теста', null=True)
+    total_num_try = models.IntegerField(verbose_name='Изначальное Количество попыток', null=True)
+    try_spent = models.IntegerField(verbose_name='Количество потраченных попыток', null=True)
     questions_ids = models.TextField(verbose_name='Номера вопросов', null=True)
     correct_q_num = models.IntegerField(verbose_name='Количество правильных ответов')
     score_number = models.FloatField(verbose_name='Количество баллов')
     total_result = models.IntegerField(verbose_name='Общая оценка', null=True)
-    pass_score = models.IntegerField(default=0, verbose_name='Количество правильных ответов',
+    pass_score = models.IntegerField(default=0, verbose_name='Минимальный процент прохождения',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
     conclusion = models.BooleanField(verbose_name='Итоговый результат', null=True,
                                      help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
     in_progress = models.BooleanField(verbose_name='Тест не завершён', default=True,
-                                     help_text='Если тест не завершён, то результат не показывается в общем списке')
+                                      help_text='Если тест не завершён, то результат не показывается в общем списке')
 
     class Meta:
-        ordering = ['-timestamp']
+        ordering = ['-date_end']
 
     def __str__(self):
         return f'{self.user_name} {self.timestamp.strftime("%d.%m.%Y %H:%M:%S")}'

@@ -11,12 +11,31 @@
             {% for i in result %}
             <div class="block_light_up">
                 <div class="list-other_field">
-                    <span>Дата:</span>
+                    <span>Дата начала:</span>
                 </div>
                 <div class="list-other_field">
                     <span class="mark_up">{{i.timestamp|date:"d.m.Y H:i:s"}} UTC</span>
                 </div>
             </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Дата окончания:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.date_end|date:"d.m.Y H:i:s"}} UTC</span>
+                </div>
+            </div>
+
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Попыток выполнено:</span>
+                </div>
+                <div class="list-other_field">
+                    <span class="mark_up">{{i.try_spent}} из {{i.total_num_try}}</span>
+                </div>
+            </div>
+
             <div class="block_light_up">
                 <div class="list-other_field">
                     <span>ФИО:</span>
