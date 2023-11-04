@@ -138,6 +138,8 @@ def start(request, id=None):
                                                   user=user_instance)  # Объект теста конкретного пользователя
                 #  Уменьшаем количество попыток у пользователя
                 num_try = user_test.num_try  # Текущее количество попыток
+                if num_try <= 0:
+                    return HttpResponseRedirect('/')
                 num_try -= 1
                 user_test.num_try = num_try
                 # user_test.update(num_try=num_try)
@@ -304,7 +306,7 @@ def start(request, id=None):
                            f'<b>Номер строки:</b> {line_number}\n\n' \
                            f'Вероятно пользователь обновил страницу с результатами теста'
         to = common.admin_email
-        subject = f'<b>!Ошибка!</b> Pilot Test'
+        subject = f'<b>!Серверная ошибка!</b> Pilot Test'
         message = f'<p style="font-size: 20px;">Пользователь:</p>' \
                   f'<span style="font-size: 18px;"><b>{request.user.profile.position} </b></span>' \
                   f'<span style="font-size: 18px;"><b>{request.user.profile.ac_type}</b></span>' \
@@ -325,7 +327,7 @@ def start(request, id=None):
 # Генерация последующих вопросов
 def next_question(request):
     try:
-        print('request', request.GET)
+        #print('request', request.GET)
         if request.method == 'POST':
             print('POST', request.POST)
             #  Если пользователь продолжает попытку
@@ -340,6 +342,7 @@ def next_question(request):
                 # Номер позиции вопроса в списке
                 question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
 
+                #TODO: Дописать обработку варианта, если такого вопроса в базе не нашлось
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
                 question = QuestionSet.objects.filter(id=question_pisition).values()
 
@@ -516,7 +519,7 @@ def next_question(request):
                                                           user_answer=user_aswer,
                                                           conclusion=False
                                                           )
-                            print('Не правильный ответ')
+                            #print('Не правильный ответ')
 
                     # # Количество оставшихся у пользователя вопросов
                     # q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
@@ -724,10 +727,15 @@ def next_question(request):
                                               f'<p style="font-size: 15px;">Название теста: <b>{user_test_name}</b></p>' \
                                               f'<p style="font-size: 15px;">Набрано баллов: <b>{total_result}%</b></p>' \
                                               f'<p style="font-size: 15px;">Проходной балл: <b>{min_pass_score}%</b></p>' \
-                                              f'<a href="{site_url}/tests_results_list/{results_instance.id}">Посмотреть подробности</a>' \
+                                              f'<a href="{site_url}/tests_results_list/{results_instance.id}">' \
+                                              f'<span style="font-size: 14px;">Посмотреть подробности</span></a>' \
+                                              f'<br>' \
+                                              f'<a href="{site_url}/user_list/{request.user.id}">' \
+                                              f'<span style="font-size: 14px;">Добавить попытки прохождения</span></a>' \
                                               f'<br>' \
                                               f'<br>' \
-                                              f'<a href="{site_url}/download_test_result/{results_instance.id}">Скачать результаты теста</a>'
+                                              f'<a href="{site_url}/download_test_result/{results_instance.id}">' \
+                                              f'<span style="font-size: 14px;">Скачать результаты теста</span></a>'
                                     # Вынимаем список адресов КРС соответствующих данному тесту
                                     email_list = (user_test_instance.test_name.email_to_send).split()
                                     email_msg = {'subject': subject, 'message': message, 'to': email_list}
@@ -770,7 +778,7 @@ def next_question(request):
                            f'<b>Номер строки:</b> {line_number}\n\n' \
                            f'Вероятно пользователь обновил страницу с результатами теста'
         to = common.admin_email
-        subject = f'!Ошибка! Pilot Test'
+        subject = f'!Серверная ошибка! Pilot Test'
         message = f'<p style="font-size: 20px;">Пользователь:</p>' \
                   f'<span style="font-size: 18px;"><b>{request.user.profile.position} </b></span>' \
                   f'<span style="font-size: 18px;"><b>{request.user.profile.ac_type}</b></span>' \
