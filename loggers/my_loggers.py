@@ -23,7 +23,8 @@ class TelegramMsgLog(StreamHandler):
 
     def emit(self, record: LogRecord):
         try:
-            message = f'{(record.levelname.upper())}:\n\n{record.message}'
+            text = str(record.message).replace("<br>", "")
+            message = f'{(record.levelname.upper())}:\n\n{text}'
                   # f'FileName: {record.pathname}\nFunc.: {record.funcName}\n' \
                   # f'StringNo: {record.lineno}\nName: {record.name}'
         except AttributeError:

@@ -45,6 +45,7 @@ from reportlab.pdfgen import canvas
 logger_user_action = logging.getLogger('USER ACTION')
 loger_other = logging.getLogger('other')
 
+
 # Декоратор проверки группы пользователя для доступа
 def group_required(group, login_url=None, raise_exception=False):
     """
@@ -327,7 +328,7 @@ def start(request, id=None):
 # Генерация последующих вопросов
 def next_question(request):
     try:
-        #print('request', request.GET)
+        # print('request', request.GET)
         if request.method == 'POST':
             print('POST', request.POST)
             #  Если пользователь продолжает попытку
@@ -342,7 +343,7 @@ def next_question(request):
                 # Номер позиции вопроса в списке
                 question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
 
-                #TODO: Дописать обработку варианта, если такого вопроса в базе не нашлось
+                # TODO: Дописать обработку варианта, если такого вопроса в базе не нашлось
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
                 question = QuestionSet.objects.filter(id=question_pisition).values()
 
@@ -519,7 +520,7 @@ def next_question(request):
                                                           user_answer=user_aswer,
                                                           conclusion=False
                                                           )
-                            #print('Не правильный ответ')
+                            # print('Не правильный ответ')
 
                     # # Количество оставшихся у пользователя вопросов
                     # q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
@@ -2088,7 +2089,6 @@ def edit_user(request, id):
             group_obj = Group.objects.get(name=add_group)
             user_obj.groups.add(group_obj)
 
-
         #  Проверям ТИП ВС
         for j in Profile.ACType.choices:  # Выясняем соответсвие названию выбора и самому выбору
             if j[1] == new_ac_type:
@@ -2097,7 +2097,6 @@ def edit_user(request, id):
         if old_ac_type != new_ac_type:
             user_obj.profile.ac_type = new_ac_type
             user_obj.profile.save()
-
 
         # TODO: долелать автоматическое изменение группы, в случаем изменения типа ВС
 
@@ -2180,6 +2179,51 @@ def user_detales(request, id):
                     try:
                         if UserTests.objects.get(user=user_object, test_name=test['test_name']):
                             instance = UserTests.objects.get(user=user_object, test_name=test['test_name'])
+                            # Если изменено количество попыток или срок сдачи теста информируем пользователя
+                            if int(instance.num_try) != int(test['num_try']) or instance.date_before != test[
+                                'date_before']:
+                                def test_param_check() -> str:
+                                    text = ''
+                                    if int(instance.num_try) != int(test['num_try']) and instance.date_before != test[
+                                        'date_before']:
+                                        text = f'Кол-во попыток было: {instance.num_try}\n<br>' \
+                                               f'Кол-во попыток установлено: {test["num_try"]}\n<br>' \
+                                               f'Выполнить до было: {instance.date_before.strftime("%d.%m.%Y")}\n<br>' \
+                                               f'Выполнить до установлено: {test["date_before"].strftime("%d.%m.%Y")}<br>'
+                                    elif int(instance.num_try) != int(test['num_try']) or instance.date_before != test[
+                                        'date_before']:
+                                        if int(instance.num_try) != int(test['num_try']):
+                                            text = f'Кол-во попыток было: {instance.num_try}<br>\n' \
+                                                   f'Кол-во попыток установлено: {test["num_try"]}<br>\n'
+                                        else:
+                                            text = f'Выполнить до было: {instance.date_before.strftime("%d.%m.%Y")}<br>\n' \
+                                                   f'Выполнить до установлено: {test["date_before"].strftime("%d.%m.%Y")}<br>'
+                                    return text
+
+                                logger_user_action.warning(f'Изменены параметры теста пользователя: '
+                                                           f'<b>{user_object.profile.family_name} </b>'
+                                                           f'{user_object.profile.first_name[0]}.'
+                                                           f'{user_object.profile.middle_name[0]}.\n'
+                                                           f'Тест: <b>{test["test_name"]}</b>\n'
+                                                           f'{test_param_check()}\n\n'
+                                                           f'<b>User: </b>{request.user.profile.family_name}'
+                                                           f' {request.user.profile.first_name[0]}.'
+                                                           f'{request.user.profile.middle_name[0]}.')
+
+                                #  Отправляем письмо пользователю о назначенном тесте
+                                subject = f"Изменены параметры Теста: '{test['test_name']}'"
+                                message = f"<p style='font-size: 25px;'><b>Уважаемый, {user_object.profile.first_name} {user_object.profile.middle_name}.</b></p><br>" \
+                                          f"<p style='font-size: 20px;'>В тест: <b>'{test['test_name']}'</b> внесены следующие изменения:</p>" \
+                                          f"<p style='font-size: 20px;'>{test_param_check()}</p>" \
+                                          f"<p style='font-size: 20px;'>На портале <a href='{config('SITE_URL', default='')}'>Pilot Test</a></p>" \
+                                          f"<br>" \
+                                          f"<br>" \
+                                          f"<p style='font-size: 20px;'>По умолчанию логин для входа: Ваш email до знака @, пароль такой же</p>" \
+                                          f"<p style='font-size: 20px;'>Рекомендуем сменить пароль после первого входа</p>"
+
+                                email_msg = {'subject': subject, 'message': message, 'to': user_object.email}
+                                send_email(request, email_msg)
+
                             instance.num_try = test['num_try']
                             instance.date_before = test['date_before']
                             instance.save()
