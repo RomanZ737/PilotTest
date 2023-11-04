@@ -135,8 +135,10 @@ def start(request, id=None):
                 return render(request, q_page_layout, context=context)
 
             except ObjectDoesNotExist:
+
                 user_test = UserTests.objects.get(test_name=id,
                                                   user=user_instance)  # Объект теста конкретного пользователя
+
                 #  Уменьшаем количество попыток у пользователя
                 num_try = user_test.num_try  # Текущее количество попыток
                 if num_try <= 0:
@@ -218,7 +220,6 @@ def start(request, id=None):
 
                 # Обновляем количество оставшихся вопросов - закоментил т.е. уменьшать количество вопросов надо после ответа пользователя
                 # QuizeSet.objects.filter(id=user_quize_set.id).update(q_sequence_num=sequence_number)
-
                 # Создаём запись с результатами теста
                 user_name_for_h = f'{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}'
                 result_obj = QuizeResults.objects.create(
@@ -2230,6 +2231,7 @@ def user_detales(request, id):
 
                             instance.num_try = test['num_try']
                             instance.date_before = test['date_before']
+                            instance.num_try_initial = test['num_try']
                             instance.save()
                             now = datetime.datetime.now().date()
                             five_day_before = datetime.datetime.now().date() + datetime.timedelta(
