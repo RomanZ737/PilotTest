@@ -1200,7 +1200,7 @@ def download_test_result(request, id):
     p.setFont('FreeSans', 15)
     p.drawString(x, y, f'Дата:')
     p.setFont('FreeSansBold', 15)
-    p.drawString(185, y, f'{result[0]["timestamp"].strftime("%d.%m.%Y %H:%M:%S")} UTC')
+    p.drawString(185, y, f'{result[0]["date_end"].strftime("%d.%m.%Y %H:%M:%S")} UTC')
     y -= 25
     p.setFont('FreeSans', 15)
     p.drawString(x, y, f'ФИО:')
