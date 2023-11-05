@@ -38,13 +38,22 @@ LOGGING = {
         "common": {
             "format": '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
             "datefmt": "%d:%m:%Y %H:%M:%S"
-        }
+        },
+        "answers": {
+            "format": '%(asctime)s %(name)-12s %(message)s',
+            "datefmt": "%d:%m:%Y %H:%M:%S"
+        },
 
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "file_answers": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR / "log/answers.log"),
+            'formatter': 'answers'},
 
         "file": {
             "level": "WARNING",
@@ -62,14 +71,18 @@ LOGGING = {
         "root": {
             "handlers": ["file", "console"],
             "level": "WARNING",
-            "propagate": True
+            "propagate": False
         },
-        "USER ACTION": {
+        "USER ACTION": {  # Критические действия пользователей (удаление тестов, вопросов...)
             "handlers": ["file", "bot"],
             "level": "WARNING",
             "propagate": True,
         },
-
+        "PILOT ANSWER": {  # Ответы тестируемых
+            "handlers": ["file_answers"],
+            "level": "INFO",
+            "propagate": True,
+        },
         "django.server": {
             "handlers": ["bot"],
             "level": "ERROR",

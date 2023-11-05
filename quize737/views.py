@@ -43,7 +43,7 @@ from django.http import FileResponse
 from reportlab.pdfgen import canvas
 
 logger_user_action = logging.getLogger('USER ACTION')
-loger_other = logging.getLogger('other')
+loger_pilot_answer = logging.getLogger('PILOT ANSWER')
 
 
 # Декоратор проверки группы пользователя для доступа
@@ -331,9 +331,9 @@ def start(request, id=None):
 # Генерация последующих вопросов
 def next_question(request):
     try:
-        # print('request', request.GET)
+
         if request.method == 'POST':
-            print('POST', request.POST)
+
             #  Если пользователь продолжает попытку
             if 'continue_test' in request.POST.keys():
                 user_quize_set_id = int(request.POST.get(
@@ -386,8 +386,7 @@ def next_question(request):
                 try:
                     answer_result = AnswersResults.objects.get(results=results_inst, question=answered_q_instance)
                     # previous_url = request.META.get('HTTP_REFERER')
-                    # print('previous_url', previous_url)
-                    # print('REFERER', request.META)
+
                     # return HttpResponseRedirect(previous_url)
 
                     user_quize_set_id = int(request.POST.get(
@@ -443,6 +442,14 @@ def next_question(request):
                             user_answers_set.add(int(answer.replace('option_', '')))
                         # Вынимаем правильные ответы из вопроса и преобразуем во множество чисел
                         correct_answers_set = set(map(int, (answered_q_instance.answers).split(',')))
+
+                        # Формируем список ответов для лога
+                        def get_answers(answers_):
+                            text = ''
+                            for a in answers_:
+                                text = text + getattr(answered_q_instance, f'option_{a}') + "\n"
+                            return text
+
                         # Если ответ пользователя правильный
                         if user_answers_set == correct_answers_set:
                             #  Создаём объект ответа на вопрос конкретного теста
@@ -452,7 +459,14 @@ def next_question(request):
                                                           user_answer=user_answers_set,
                                                           conclusion=True
                                                           )
-
+                            loger_pilot_answer.info(f"{request.user.username} "
+                                                    f">>PASS<<{request.user.profile.family_name}\n"
+                                                    f" {request.user.profile.first_name[0]}."
+                                                    f"{request.user.profile.middle_name[0]}.\n"
+                                                    f"Question(ID:{answered_q_instance.id}):\n"
+                                                    f"{answered_q_instance.question}\n"
+                                                    f"Pilot Answers:\n{get_answers(user_answers_set)}\n"
+                                                    f"Correct Answers:\n{get_answers(correct_answers_set)}")
                             # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                             user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                                 'correct_q_num', 'score_number')
@@ -462,7 +476,7 @@ def next_question(request):
                                 correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
                             # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
-                            print('answered_q_instance.q_weight', answered_q_instance.q_weight)
+
                             if answered_q_instance.q_weight != 0:
                                 updated_score_number = user_result_data[0][
                                                            'score_number'] + answered_q_instance.q_weight
@@ -481,10 +495,20 @@ def next_question(request):
                                                           user_answer=user_answers_set,
                                                           conclusion=False
                                                           )
+
+                            loger_pilot_answer.info(f"{request.user.username}\n"
+                                                    f">>FAIL<< {request.user.profile.family_name}"
+                                                    f" {request.user.profile.first_name[0]}."
+                                                    f"{request.user.profile.middle_name[0]}.\n"
+                                                    f"Question(ID:{answered_q_instance.id}):\n"
+                                                    f"{answered_q_instance.question}\n"
+                                                    f"Pilot Answers:\n{get_answers(user_answers_set)}\n"
+                                                    f"Correct Answers:\n{get_answers(correct_answers_set)}")
                     else:
                         #  Если вопрос с одним вариантом ответа
                         user_aswer = request.POST.get('user_answer').replace('option_', '')
-                        print('request.POST', request.POST)
+                        full_user_answer = getattr(answered_q_instance, request.POST.get('user_answer'))
+                        full_correct_answer = getattr(answered_q_instance, f'option_{answered_q_instance.answer}')
                         # Если пользователь правильно ответил на вопрос:
                         if int(answered_q_instance.answer) == int(user_aswer):
                             #  Создаём объект ответа на вопрос конкретного теста
@@ -494,6 +518,14 @@ def next_question(request):
                                                           user_answer=user_aswer,
                                                           conclusion=True
                                                           )
+                            loger_pilot_answer.info(f"{request.user.username}\n"
+                                                    f">>PASS<< {request.user.profile.family_name}"
+                                                    f" {request.user.profile.first_name[0]}."
+                                                    f"{request.user.profile.middle_name[0]}.\n"
+                                                    f"Question(ID:{answered_q_instance.id}):\n"
+                                                    f"{answered_q_instance.question}\n"
+                                                    f"Pilot Answer:\n{full_user_answer}\n"
+                                                    f"Correct Answer:\n{full_correct_answer}")
                             # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                             user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                                 'correct_q_num', 'score_number')
@@ -503,14 +535,14 @@ def next_question(request):
                                 correct_q_num=(user_result_data[0]['correct_q_num'] + 1))
 
                             # Увеличиваем колличество баллов пользователя, с учётов веса вопроса, если вес есть
-                            print('answered_q_instance.q_weight', answered_q_instance.q_weight)
+
                             if float(answered_q_instance.q_weight) != 0:
                                 updated_score_number = user_result_data[0]['score_number'] + float(
                                     answered_q_instance.q_weight)
 
                             else:
                                 updated_score_number = user_result_data[0]['score_number'] + 1
-                            print('updated_score_number', updated_score_number)
+
 
                             # Обновляем количетво баллов
                             QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
@@ -523,8 +555,15 @@ def next_question(request):
                                                           user_answer=user_aswer,
                                                           conclusion=False
                                                           )
-                            # print('Не правильный ответ')
 
+                            loger_pilot_answer.info(f"{request.user.username}\n"
+                                                    f">>FAIL<< {request.user.profile.family_name}"
+                                                    f" {request.user.profile.first_name[0]}."
+                                                    f"{request.user.profile.middle_name[0]}.\n"
+                                                    f"Question(ID:{answered_q_instance.id}):\n"
+                                                    f"{answered_q_instance.question}\n"
+                                                    f"Pilot Answer:\n{full_user_answer}\n"
+                                                    f"Correct Answer:\n{full_correct_answer}")
                     # # Количество оставшихся у пользователя вопросов
                     # q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
 
@@ -650,7 +689,7 @@ def next_question(request):
                                 options = []
                                 #  Список с правильными ответами
                                 correct_answers_list = list(map(int, question.question.answers.split(',')))
-                                print('correct_answers_list', correct_answers_list)
+
                                 for i in range(1, 11):
                                     if i in correct_answers_list:
                                         options.append(
@@ -668,7 +707,7 @@ def next_question(request):
                                         user_answers.append(number)
                                 answer = []
                                 for user_answer in user_answers:
-                                    print('user_answer', user_answer)
+
                                     answer.append(getattr(question.question, f'option_{user_answer}'))
                                 question_block['user_answer'] = answer
 
@@ -698,7 +737,7 @@ def next_question(request):
                                           f'<a href="{site_url}/download_test_result/{results_instance.id}">Скачать результаты теста</a>'
                                 # Вынимаем список адресов КРС соответствующих данному тесту
                                 email_list = user_test_instance.test_name.email_to_send.split()
-                                print('email_list', email_list)
+
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
                                 common.send_email(request, email_msg)
 
@@ -915,7 +954,7 @@ def test_result_details(request, id):
             options = []
             #  Список с правильными ответами
             correct_answers_list = list(map(int, question.question.answers.split(',')))
-            print('correct_answers_list', correct_answers_list)
+
             for i in range(1, 11):
                 if i in correct_answers_list:
                     options.append({f'option': getattr(question.question, f'option_{i}'), 'valid': True})
@@ -930,7 +969,7 @@ def test_result_details(request, id):
                     user_answers.append(number)
             answer = []
             for user_answer in user_answers:
-                print('user_answer', user_answer)
+
                 answer.append(getattr(question.question, f'option_{user_answer}'))
             question_block['user_answer'] = answer
 
@@ -1267,7 +1306,7 @@ def download_test_result(request, id):
     buffer.seek(0)
     user_name = user_instance.profile.family_name + user_instance.profile.first_name[
                                                     :1] + user_instance.profile.middle_name[:1]
-    print('user.name:', user_name)
+
     result_for_file = ''
     result_id_for_file = str(result[0]['id'])
     if result[0]['conclusion']:
@@ -1366,7 +1405,7 @@ def test_editor(request):
             for q in test_data:
                 if q.theme.name == 'Все темы':
                     q_num = q_num + (int(test_them_num)) * q.q_num
-                    print('Все вопросы:', q_num)
+
                 else:
                     q_num += q.q_num
             total_user_test[test.name] = users_number
@@ -1809,7 +1848,7 @@ def user_list(request):
                     return render(request, 'user_list.html', context=context)
 
         else:
-            print('GET:', request.GET)
+
 
             total_user_list = User.objects.all().order_by('last_name').exclude(
                 username='roman')  # Вынимаем всех пользователей, кроме superuser
@@ -1850,7 +1889,7 @@ def group_users(request, id):
     total_user_number = User.objects.filter(groups=id).count()  # Получаем число пользователей группы
     group_instance = Group.objects.get(id=id)
     filter_input = ['Все', 'Все', group_instance.name, 'Все']
-    print('filter', filter_input)
+
     if not total_user_list:
         no_search_result = True
         group_name = Group.objects.get(id=id)  # .values('name')
@@ -1912,7 +1951,7 @@ def group_details(request, id):
                 if not test['DELETE']:
                     #  Вынимаем всех пользователей группы
                     total_user_list = User.objects.filter(groups=id)
-                    # print('total_user_list', total_user_list)
+
                     #  Перебираем всех пользователей группы
                     for user in total_user_list:
                         # Проверяем есть ли у пользователя этот тест
@@ -1956,7 +1995,7 @@ def group_details(request, id):
             return render(request, 'group_details.html', context=context)
     else:
         tests_for_group_form = UserTestForm()
-        # print('tests_for_group_form', tests_for_group_form)
+
         context = {'group': group, 'group_tests': tests_for_group_form, 'group_id': id}
         return render(request, 'group_details.html', context=context)
 
@@ -2304,7 +2343,7 @@ def user_detales(request, id):
 
             # # Возвращаем пользователя на исходную страницу
             # previous_url = request.POST.get('previous_url', '/')
-            # print('previous_url:', request.POST)
+
             # return HttpResponseRedirect(previous_url)
             return render(request, 'user_ditales.html', context=context)
 
@@ -2324,7 +2363,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-        print('previous_url_initial:', previous_url)
+        # print('previous_url_initial:', previous_url)
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)
@@ -2427,7 +2466,7 @@ def file_upload(request):
                 filename = force_str(f).strip().replace(' ', '_')
                 filename = force_str(filename).strip().replace('(', '')
                 filename = force_str(filename).strip().replace(')', '')
-                print('filename', filename)
+                # print('filename', filename)
                 try:
                     with open(f"{dir_path}/media/documents/{filename}", newline='',
                               encoding='utf-8') as csvfile:
@@ -2441,7 +2480,7 @@ def file_upload(request):
                                           'q_weight', 'answer', 'answers', 'ac_type']
                             reader = csv.DictReader(csvfile, dialect='excel', fieldnames=fieldnames, delimiter=';')
                         except BaseException as error:
-                            print('ERROR', error)
+
                             wrong_data = ['Вероятно ошибка кодлировки файла, файл должен быть в колировке UTF-8']
                             error_read = error
                             context = {"upload_form": upload_form, 'reading_errors': error_read,
@@ -2506,8 +2545,8 @@ def file_upload(request):
 
                                             if question[1]:
                                                 questions_created += 1
-                                        else:
-                                            print('Вопрос существует')
+                                        # else:
+                                        #     print('Вопрос существует')
                                         # Подсчитываем созданные вопросы
 
 
@@ -2522,17 +2561,17 @@ def file_upload(request):
                                         if data is not None:
                                             if data:
                                                 if re.search('[a-zA-Z]', str(data)):
-                                                    print('this data!:::', data)
+
                                                     alpha = True
                                                     break
                                                 elif re.search('[0-9]', str(data)):
-                                                    # print('this data!:::', data)
+
                                                     alpha = True
                                                     break
 
                                     if alpha == True:
                                         wrong_data.append(f'Не заполненные поля в строке {reader.line_num}')
-                                        # print("HEREEEEEE_2")
+
                                         continue
 
                         except csv.Error as e:
@@ -2617,7 +2656,7 @@ def go_back_button(request):
     # index = (request.get_host()).find(':')
     # request_host = request_host[:index]
     # if previous_url and urlparse(previous_url).hostname == request_host:
-    # print('previous_url:::::', previous_url)
+
     return HttpResponseRedirect(previous_url)
     # else:
     #     return redirect('/')
@@ -2646,7 +2685,7 @@ def mess_to_admin(request):
             common.send_email(request, email_msg)
             return HttpResponse(status=204)
         else:
-            print('Noooooot OK')
+
             form = AdminMessForm()
             context = {'form': form}
             return render(request, 'admin_mess.html', context=context)
@@ -2671,7 +2710,7 @@ def selected_users_test(request):
         for user_id in selected_users_ids:
             user_selected = User.objects.get(id=user_id)
             total_user_list.append(user_selected)
-        # print('selected_users_ids', selected_users_ids)
+
         tests_for_group_form = UserTestForm(request.POST,
                                             request.FILES)  # Вынимаем данные из запроса и заполняем ими форму
         if tests_for_group_form.is_valid():
