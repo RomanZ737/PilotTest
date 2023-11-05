@@ -64,7 +64,15 @@ LOGGING = {
         "bot": {
             "level": "WARNING",
             "class": "loggers.my_loggers.TelegramMsgLog"
-        }
+        },
+        "log_rotate_answers": {
+            'level': 'INFO',
+            'class': "logging.handlers.RotatingFileHandler",
+            'formatter': 'answers',
+            "filename": os.path.join(BASE_DIR / "log/answers.log"),
+            "maxBytes": 10000,
+            "backupCount": 10,
+        },
     },
 
     "loggers": {
@@ -79,7 +87,7 @@ LOGGING = {
             "propagate": True,
         },
         "PILOT ANSWER": {  # Ответы тестируемых
-            "handlers": ["file_answers"],
+            "handlers": ["file_answers", "log_rotate_answers"],
             "level": "INFO",
             "propagate": True,
         },
