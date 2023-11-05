@@ -13,7 +13,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.http import HttpResponseRedirect
 from urllib.parse import urlparse
 from django.utils.encoding import force_str
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from common import send_email
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 from django.contrib.auth.models import User, Group
@@ -134,7 +134,19 @@ def start(request, id=None):
 
                 return render(request, q_page_layout, context=context)
 
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, MultipleObjectsReturned) as err:
+                # Если в результате сбоя несколько результатов с ответами
+                if type(err).__name__ == "MultipleObjectsReturned":
+                    test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
+                    QuizeResults.objects.filter(user_id=request.user,
+                                                quize_name=test_instance.name,
+                                                in_progress=True).delete()
+                    QuizeSet.objects.filter(test_id=id,
+                                            user_under_test=request.user.username).delete()
+                    user_test = UserTests.objects.get(test_name=id,
+                                                      user=request.user)  # Объект теста назначенного пользователю
+                    user_test.num_try = int(user_test.num_try) + 1
+                    user_test.save()
 
                 user_test = UserTests.objects.get(test_name=id,
                                                   user=user_instance)  # Объект теста конкретного пользователя
@@ -270,9 +282,11 @@ def start(request, id=None):
                     test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
                     user_test = UserTests.objects.filter(test_name=id,
                                                          user=request.user)  # Объект теста назначенного пользователю
+
                     results_instance = QuizeResults.objects.get(user_id=request.user,
                                                                 quize_name=test_instance.name,
                                                                 in_progress=True)  # Сформированный результат выполнения теста
+
                     user_tests = UserTests.objects.filter(
                         user=request.user)  # Весь список тестов пользователя для отображения в боковом меню
                     test_question_sets = TestQuestionsBay.objects.filter(
@@ -284,7 +298,19 @@ def start(request, id=None):
                                'result_id': results_instance.id, 'question_id': id, 'q_num_left': q_num_left}
                     return render(request, 'start_test_ditales.html', context=context)
 
-                except ObjectDoesNotExist:
+                except (ObjectDoesNotExist, MultipleObjectsReturned) as err:
+                    if err == MultipleObjectsReturned:
+                        test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
+                        QuizeResults.objects.filter(user_id=request.user,
+                                                    quize_name=test_instance.name,
+                                                    in_progress=True).delete()
+                        QuizeSet.objects.get(test_id=id,
+                                             user_under_test=request.user.username).delete()
+                        user_test = UserTests.objects.filter(test_name=id,
+                                                             user=request.user)  # Объект теста назначенного пользователю
+                        user_test.num_try = int(user_test.num_try) + 1
+                        user_test.save()
+
                     in_progress = False
                     user_test = UserTests.objects.filter(test_name=id)  # Выбраный пользователем тест
                     user_tests = UserTests.objects.filter(
@@ -295,6 +321,9 @@ def start(request, id=None):
                                'user_test': user_test[0],
                                'user_tests': user_tests, 'in_progress': in_progress}
                     return render(request, 'start_test_ditales.html', context=context)
+
+
+
             #  Если пользователь открывает страницу со списком тестов
             else:
                 user_tests = UserTests.objects.filter(user=request.user)
@@ -336,6 +365,7 @@ def next_question(request):
 
             #  Если пользователь продолжает попытку
             if 'continue_test' in request.POST.keys():
+
                 user_quize_set_id = int(request.POST.get(
                     'tmp_test_id'))  # ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
                 # Количество оставшихся у пользователя вопросов
@@ -378,6 +408,7 @@ def next_question(request):
                 return render(request, q_page_layout, context=context)
             # Если пользователь нажал кнопку ответить или обновил страницу
             else:
+
                 #  Вынимает объект результатов пользователя
                 results_inst = QuizeResults.objects.get(id=request.POST.get('result_id'))
                 #  Вынимаем объект отвеченного вопроса
@@ -385,12 +416,9 @@ def next_question(request):
                 # Проверяем нажал пользователь кнопку обновить или кнопку "Ответить"
                 try:
                     answer_result = AnswersResults.objects.get(results=results_inst, question=answered_q_instance)
-                    # previous_url = request.META.get('HTTP_REFERER')
 
-                    # return HttpResponseRedirect(previous_url)
-
-                    user_quize_set_id = int(request.POST.get(
-                        'tmp_test_id'))  # ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
+                    # ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
+                    user_quize_set_id = int(request.POST.get('tmp_test_id'))
                     # Количество оставшихся у пользователя вопросов
                     q_amount = QuizeSet.objects.filter(id=user_quize_set_id).values('q_sequence_num')
                     q_num_list = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values(
@@ -577,18 +605,21 @@ def next_question(request):
 
                         # Номер позиции вопроса в списке
                         # question_sequence = int(q_amount[0]['q_sequence_num']) - 1
-                        question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
+                        question_id = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
 
                         # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                        question = QuestionSet.objects.filter(id=question_pisition).values()
+                        #question = QuestionSet.objects.filter(id=question_id).values()
 
                         # Объект "следующего" вопроса
-                        question_instance = QuestionSet.objects.get(id=question_pisition)
+                        question_instance = QuestionSet.objects.get(id=question_id)
 
                         #  Создаём словарь с вариантами ответов на вопрос
                         option_dict = {}
+                        # for option_num in range(1, 11):
+                        #     option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+
                         for option_num in range(1, 11):
-                            option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+                            option_dict[f'option_{option_num}'] = getattr(question_instance, f'option_{option_num}')
 
                         # Содержание context:
                         # 'question' - Сам вопрос
@@ -596,7 +627,13 @@ def next_question(request):
                         # 'result_id' - ID сформированных результатов теста
                         # 'option_dict' - Варианты ответов на вопрос
 
-                        context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                        # context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                        #            'tmp_test_id': request.POST.get('tmp_test_id'),
+                        #            'result_id': request.POST.get('result_id'),
+                        #            'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num'],
+                        #            'q_instance': question_instance}
+
+                        context = {'question': question_instance.question, 'question_id': question_instance.id,
                                    'tmp_test_id': request.POST.get('tmp_test_id'),
                                    'result_id': request.POST.get('result_id'),
                                    'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num'],
@@ -610,7 +647,7 @@ def next_question(request):
                             q_sequence_num=question_sequence)
 
                         # Проверяем содержит ли вопрос мультивыбор
-                        if question[0]['q_kind'] == False:
+                        if not question_instance.q_kind:
                             q_page_layout = 'start_test_radio.html'
                         else:
                             q_page_layout = 'start_test_check.html'

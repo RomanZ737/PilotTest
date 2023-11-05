@@ -70,7 +70,7 @@ LOGGING = {
             'class': "logging.handlers.RotatingFileHandler",
             'formatter': 'answers',
             "filename": os.path.join(BASE_DIR / "log/answers.log"),
-            "maxBytes": 10000,
+            "maxBytes": 10000000,  # 10MB
             "backupCount": 10,
         },
     },
