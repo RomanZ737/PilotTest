@@ -105,15 +105,20 @@ def start(request, id=None):
                 question_pisition = q_num_list[int(q_amount) - 1]
 
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                question = QuestionSet.objects.filter(id=question_pisition).values()
+                #question = QuestionSet.objects.filter(id=question_pisition).values()
 
                 # Объект "следующего" вопроса
-                question_instance = QuestionSet.objects.get(id=question_pisition)
+                try:
+                    question_instance = QuestionSet.objects.get(id=question_pisition)
+                except ObjectDoesNotExist:
+                    # Если вопрос в базе не найден, генерируем случайный для конкретного типа или для всех типов
+                    question_instance = QuestionSet.objects.filter(Q(ac_type=request.user.profile.ac_type)
+                                                                   | Q(ac_type='ANY')).order_by('?').first()
 
                 #  Создаём словарь с вариантами ответов на вопрос
                 option_dict = {}
                 for option_num in range(1, 11):
-                    option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+                    option_dict[f'option_{option_num}'] = getattr(question_instance, f'option_{option_num}')
 
                 # Содержание context:
                 # 'question' - Сам вопрос
@@ -121,13 +126,13 @@ def start(request, id=None):
                 # 'result_id' - ID сформированных результатов теста
                 # 'option_dict' - Варианты ответов на вопрос
 
-                context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                context = {'question': question_instance.question, 'question_id': question_instance.id,
                            'tmp_test_id': test_in_progress.id, 'result_id': user_results_instance.id,
                            'option_dict': option_dict, 'q_num_left': q_amount,
                            'q_instance': question_instance}
 
                 # Проверяем содержит ли вопрос мультивыбор
-                if question[0]['q_kind'] == False:
+                if not question_instance.q_kind:
                     q_page_layout = 'start_test_radio.html'
                 else:
                     q_page_layout = 'start_test_check.html'
@@ -224,9 +229,14 @@ def start(request, id=None):
                     sequence_number]  # Номер вопроса в списке вопросов пользователя
 
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                question = QuestionSet.objects.filter(id=question_pisition).values()
+                #question = QuestionSet.objects.filter(id=question_pisition).values()
                 # Вынимаем объект вопроса
-                question_instance = QuestionSet.objects.get(id=question_pisition)
+                try:
+                    question_instance = QuestionSet.objects.get(id=question_pisition)
+                except ObjectDoesNotExist:
+                    # Если вопрос в базе не найден, генерируем случайный для конкретного типа или для всех типов
+                    question_instance = QuestionSet.objects.filter(Q(ac_type=request.user.profile.ac_type)
+                                                                   | Q(ac_type='ANY')).order_by('?').first()
 
                 # Формируем данные для отправки на страницу тестирования
 
@@ -250,7 +260,7 @@ def start(request, id=None):
                 #  Создаём словарь с вариантами ответов на вопрос
                 option_dict = {}
                 for option_num in range(1, 11):
-                    option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+                    option_dict[f'option_{option_num}'] = getattr(question_instance, f'option_{option_num}')
 
                 # Содержание context:
                 # 'question' - Сам вопрос
@@ -258,11 +268,11 @@ def start(request, id=None):
                 # 'result_id' - ID сформированных результатов теста
                 # 'option_dict' - Варианты ответов на вопрос
 
-                context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                context = {'question': question_instance.question, 'question_id': question_instance.id,
                            'tmp_test_id': user_quize_set.id, 'result_id': result_obj.id, 'option_dict': option_dict,
                            'q_num_left': total_q_number, 'q_instance': question_instance}
                 # Проверяем содержит ли вопрос мультивыбор
-                if not question[0]['q_kind']:
+                if not question_instance.q_kind:
                     q_page_layout = 'start_test_radio.html'
                 else:
                     q_page_layout = 'start_test_check.html'
@@ -427,25 +437,30 @@ def next_question(request):
                     # Номер позиции вопроса в списке
                     question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
                     # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                    question = QuestionSet.objects.filter(id=question_pisition).values()
+                    #question = QuestionSet.objects.filter(id=question_pisition).values()
                     # Объект "следующего" вопроса
-                    question_instance = QuestionSet.objects.get(id=question_pisition)
+                    try:
+                        question_instance = QuestionSet.objects.get(id=question_pisition)
+                    except ObjectDoesNotExist:
+                        # Если вопрос в базе не найден, генерируем случайный для конкретного типа или для всех типов
+                        question_instance = QuestionSet.objects.filter(Q(ac_type=request.user.profile.ac_type)
+                                                                       | Q(ac_type='ANY')).order_by('?').first()
                     #  Создаём словарь с вариантами ответов на вопрос
                     option_dict = {}
                     for option_num in range(1, 11):
-                        option_dict[f'option_{option_num}'] = question[0][f'option_{option_num}']
+                        option_dict[f'option_{option_num}'] = getattr(question_instance, f'option_{option_num}')
                     # Содержание context:
                     # 'question' - Сам вопрос
                     # 'tmp_test_id' - ID сформированного теста пользователю
                     # 'result_id' - ID сформированных результатов теста
                     # 'option_dict' - Варианты ответов на вопрос
-                    context = {'question': question[0]['question'], 'question_id': question[0]['id'],
+                    context = {'question': question_instance.question, 'question_id': question_instance.id,
                                'tmp_test_id': request.POST.get('tmp_test_id'),
                                'result_id': request.POST.get('result_id'),
                                'option_dict': option_dict, 'q_num_left': q_amount[0]['q_sequence_num'],
                                'q_instance': question_instance}
                     # Проверяем содержит ли вопрос мультивыбор
-                    if question[0]['q_kind'] == False:
+                    if not question_instance.q_kind:
                         q_page_layout = 'start_test_radio.html'
                     else:
                         q_page_layout = 'start_test_check.html'
@@ -611,7 +626,12 @@ def next_question(request):
                         #question = QuestionSet.objects.filter(id=question_id).values()
 
                         # Объект "следующего" вопроса
-                        question_instance = QuestionSet.objects.get(id=question_id)
+                        try:
+                            question_instance = QuestionSet.objects.get(id=question_id)
+                        except ObjectDoesNotExist:
+                            # Если вопрос в базе не найден, генерируем случайный для конкретного типа или для всех типов
+                            question_instance = QuestionSet.objects.filter(Q(ac_type=request.user.profile.ac_type)
+                                                                           | Q(ac_type='ANY')).order_by('?').first()
 
                         #  Создаём словарь с вариантами ответов на вопрос
                         option_dict = {}
