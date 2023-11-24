@@ -1,7 +1,7 @@
 from .models import QuestionSet, TestConstructor, TestQuestionsBay, Thems
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, Textarea, NumberInput
+from django.forms import ModelForm, Textarea, NumberInput, ChoiceField
 
 
 # Валидатор для формы QuestionSetForm - проверят уникальность вопроса
@@ -101,7 +101,9 @@ class MyNewTestFormQuestions(NewTestFormQuestions):
     def __init__(self, *args, thems_selection, **kwargs):
         self.thems_selection = thems_selection
         super(MyNewTestFormQuestions, self).__init__(*args, **kwargs)
+        self.fields['theme'].widget = forms.Select(attrs={'class': 'select_them'})
         self.fields['theme'].choices = self.thems_selection
+
 
 
 #  Форма для загрузки файла

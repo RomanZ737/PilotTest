@@ -713,6 +713,9 @@ div.test_theme_list {
     display: inline-block;
 }
 
+select.select_them {
+    width: 217px;
+}
 
 
 div.test_q_num {
