@@ -1514,7 +1514,7 @@ def create_new_test(request):
     # Создаём список тем для конктретного типа ВС
     for them in total_q_num_per_them.keys():
         thems_selection.append((them.id, them.name))
-    QuestionFormSet = formset_factory(MyNewTestFormQuestions, min_num=1, max_num=20, extra=0, absolute_max=20,
+    QuestionFormSet = formset_factory(MyNewTestFormQuestions, min_num=1, extra=0,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
@@ -1653,7 +1653,7 @@ def test_details(request, id):
     for them in total_q_num_per_them.keys():
         thems_selection.append((them.id, them.name))
     #  Формируем форму
-    QuestionFormSet = formset_factory(MyNewTestFormQuestions, min_num=1, max_num=10, extra=0, absolute_max=20,
+    QuestionFormSet = formset_factory(MyNewTestFormQuestions, min_num=1, extra=0,
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':

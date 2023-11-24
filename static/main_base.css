@@ -708,13 +708,20 @@ div.test_them_list {
 
 }
 
-span.test_theme_list {
-    padding-right: 20px;
+div.test_theme_list {
+    width: 280px;
+    display: inline-block;
 }
 
-span.test_q_num {
-    padding-right: 5px;
+
+
+div.test_q_num {
+    width: 232px;
+    display: inline-block;
 }
+
+
+
 
 div.test_training {
     position: relative;
@@ -728,7 +735,7 @@ div.test_training {
 }
 
 span.test_theme_del {
-    padding-left: 40px;
+    padding-left: 7px;
 }
 
 span.vertical_line {

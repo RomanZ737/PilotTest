@@ -34,7 +34,14 @@
                     </div>
 
                     <div class="test_total_q_num">
-                        <span>Вопросов: <span class="mark_up">{{total_q_num|get_item:test.name}}</span></span>
+                        <span>Вопросов:
+                            {% if total_q_num|get_item:test.name > 100 and total_q_num|get_item:test.name < 150 %}
+                                <span style="color: rgb(204, 198, 22);">{{total_q_num|get_item:test.name}}</span></span>
+                            {% elif total_q_num|get_item:test.name > 150 %}
+                                <span style="color: rgb(142, 23, 11);">{{total_q_num|get_item:test.name}}</span></span>
+                            {% else %}
+                                <span class="mark_up">{{total_q_num|get_item:test.name}}</span></span>
+                            {% endif %}
                     </div>
 
                     <div class="test_total_users">

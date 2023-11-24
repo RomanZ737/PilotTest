@@ -82,8 +82,8 @@
 
             <div class="q_forms">
                 <div id="for_crossout_{{ forloop.counter|sub:'1' }}" style="display: inline-block;">
-                    <span class="test_theme_list">Тема: {{form.theme}}</span>
-                    <span class="test_q_num">Количество вопросов: {{ form.q_num }}</span>
+                    <div class="test_theme_list">Тема: {{form.theme}}</div>
+                    <div class="test_q_num">Количество вопросов: {{ form.q_num }}</div>
                     <div class="max_q_num_in_theme">
                     <span>Max. </span>
                     <span id="max_q_{{ forloop.counter|sub:'1' }}" class="mark_up"></span>
@@ -114,232 +114,293 @@
 
 <script>
 var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
-
+//формируем массив с id тем (при добавлении проверять выбрана ли тема)
+let themList = {{q_num_per_them|dict_keys}}
+let previous = {}
 //Подсчитываем общее количество вопросов
-    //Считаем общее количество вопросов при открытии теста
-    let totalQNum = document.getElementById("total_q_num"); //Элемент с общим количеством вопросов
-    totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
-    //Подсчёт количества вопросов при открытии теста
-        //Выбираем все элементы input type=number, кроме 'pass score',
-        //подсчитываем количество вопросов и развешиваем listener
-    $(':input[type="number"]').not(':input[name="test_name-pass_score"]').each(function(index, element) {
+//Считаем общее количество вопросов при открытии теста
+let totalQNum = document.getElementById("total_q_num"); //Элемент с общим количеством вопросов
+totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
+//Подсчёт количества вопросов при открытии теста
+//Выбираем все элементы input type=number, кроме 'pass score',
+//подсчитываем количество вопросов и развешиваем listener
+$(':input[type="number"]').not(':input[name="test_name-pass_score"]').each(function(index, element) {
 
-        //console.log(element);
+  let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+  let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
 
-        let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+  if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
+    totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
+    totalQNum.innerHTML = totalQNum.value;
+
+  } else {
+    totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
+    totalQNum.innerHTML = totalQNum.value;
+  }
+
+  // Меняем цвет в зависимости от количества вопросов
+  if ( totalQNum.value > 100 && totalQNum.value < 150 ) {  //Если количество вопросов больше 100 но меньше 150
+    $("#total_q_num").attr("style", "color: rgb(204, 198, 22);");
+  } else if ( totalQNum.value > 150 ) {
+    $("#total_q_num").attr("style", "color: rgb(142, 23, 11);");
+  };
+
+
+  element.addEventListener('input', QNumChanged); // Вешаем listener на объект input
+
+});
+
+//Функция добавляет значение выбора в select при смене темы вопросов
+function ThemSelectorsAdd(event){
+  console.log(event.target.id)
+  $('select').not(event.target.id).each(function(index, element) {
+    $(this).append("<option value="+ previous['value'] + ">" + previous['text'] + "</option>");
+  });
+
+}
+//Функция удаления тем в селекторах
+function ThemSelectorsDel(select_id, valueOfSelect){
+  //Убираем выбранный элемент в select из остальных опций select, что бы он не повторялся (при первой загрузке страницы)
+  $('select').not('select[id="id_questions-'+ select_id +'-theme"]').each(function(index, element) {
+    $(this).find('option[value="'+ valueOfSelect +'"]').remove()
+  });
+}
+//Функция вынимает значение select при выборе (НЕ при нажатии) из помещавет его в переменную previous
+function ThemFocus(event) {
+  event.preventDefault()
+  let SelVal = event.target.value
+  let SelText = event.target.options[event.target.selectedIndex].text
+  previous['value'] = SelVal
+  previous['text'] = SelText
+
+
+
+}
+//Базовая функция подсчёта вопросов при измении любого из полей количества вопросов
+function mainQCount() {
+  totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
+  totalQNum.innerHTML = totalQNum.value;
+  $(':input[type="number"]').not(':input[name="test_name-pass_score"]').each(function(index, element) {
+    let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+    let delMarker = document.getElementById("id_questions-" + idNum + "-DELETE") // CheckBox поля "Удалить тему"
+
+    if ( delMarker.checked != true) {
+      let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
+      if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
         let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
-
-        if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
-            totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
-            totalQNum.innerHTML = totalQNum.value;
-
-        } else {
-            totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
-            totalQNum.innerHTML = totalQNum.value;
-                }
-
-            element.addEventListener('input', QNumChanged); // Вешаем listener на объект input
-
-        });
-
-
-    //Базовая функция подсчёта вопросов при измении любого из полей количества вопросов
-    function mainQCount() {
-        totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
+        totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
         totalQNum.innerHTML = totalQNum.value;
-        $(':input[type="number"]').not(':input[name="test_name-pass_score"]').each(function(index, element) {
-            let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
-            let delMarker = document.getElementById("id_questions-" + idNum + "-DELETE") // CheckBox поля "Удалить тему"
 
-            if ( delMarker.checked != true) {
-                let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
-                if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
-                    let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
-                    totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
-                    totalQNum.innerHTML = totalQNum.value;
+      } else {
+        totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
+        totalQNum.innerHTML = totalQNum.value;
+      };
 
-                } else {
-                    totalQNum.value = parseInt(document.getElementById("target_them_num").value)*parseInt(element.value) + parseInt(totalQNum.value); //Переводим значения в цифры и складываем
-                    totalQNum.innerHTML = totalQNum.value;
-                    };
-            };
+      // Меняем цвет в зависимости от количества вопросов
+      if ( totalQNum.value > 100 && totalQNum.value < 150 ) {  //Если количество вопросов больше 100 но меньше 150
+        $("#total_q_num").attr("style", "color: rgb(204, 198, 22);");
+      } else if ( totalQNum.value > 150 ) {
+        $("#total_q_num").attr("style", "color: rgb(142, 23, 11);");
+      } else { $("#total_q_num").attr("style", "color:rgb(209, 209,209);");
 
-        });
+      };
 
-        //Анимация количества вопросов
-        $("#total_q_num").animate( {
-		    fontSize: "23px",
-	            }, 130 );
-	    $("#total_q_num").animate( {
-		    fontSize: "19px",
-	            }, 130 );
-        };
+    };
 
-    //Функция отслеживает изменение поля количества вопросов
-    function QNumChanged() {
-        event.preventDefault();
-        mainQCount()
-        }
+  });
 
+  //Анимация количества вопросов
+  $("#total_q_num").animate( {
+    fontSize: "23px",
+  }, 130 );
+  $("#total_q_num").animate( {
+    fontSize: "19px",
+  }, 130 );
+};
+//Функция отслеживает изменение поля количества вопросов
+function QNumChanged() {
+  event.preventDefault();
+  mainQCount()
+}
 //Функция деактивации строки, если выбрать "Удалить тему"
-    //Выбираем все checkbox который относятся к "Удалить тему"
-    $(':input[type="checkbox"][name^=questions-][name$=-DELETE]').each(function(index, element) {
-        element.addEventListener('input', markToDelete); // Вешаем listener на объект input
-        //Если какая-то тема была отмечена к удалению при загрузке страницы (возврат из-за ошибки ввода пользователя)
-        let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
-        if (element.checked == true) {
-                $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
-            } else {
-                $("#for_crossout_" + idNum).removeClass();
-            }
-        });
+//Выбираем все checkbox который относятся к "Удалить тему"
+$(':input[type="checkbox"][name^=questions-][name$=-DELETE]').each(function(index, element) {
+  element.addEventListener('input', markToDelete); // Вешаем listener на объект input
+  //Если какая-то тема была отмечена к удалению при загрузке страницы (возврат из-за ошибки ввода пользователя)
+  let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+  if (element.checked == true) {
+    $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
+  } else {
+    $("#for_crossout_" + idNum).removeClass();
+  }
+});
 
-    function markToDelete(event) {
+function markToDelete(event) {
 
-        let idNum = event.target.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
+  let idNum = event.target.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
 
-        if (event.target.checked == true) {
+  if (event.target.checked == true) {
 
-                $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
-            } else {
-                $("#for_crossout_" + idNum).removeClass();
-            }
-        //Пересчитываем количество вопросов
-        mainQCount()
-        }
+    $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
+  } else {
+    $("#for_crossout_" + idNum).removeClass();
+  }
+  //Пересчитываем количество вопросов
+  mainQCount()
+}
 
 
 //Если тест тренировочный, что скрываем возможность выбора, кому отправлять email
-        let trainingMark = document.getElementById("id_test_name-training")
-        let emailSelecetBlock = document.getElementById("email_select_panel")
+let trainingMark = document.getElementById("id_test_name-training")
+let emailSelecetBlock = document.getElementById("email_select_panel")
 
-        if (trainingMark.checked == true) {
-                    emailSelecetBlock.style.display = 'none';
-                    $("#training_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
+if (trainingMark.checked == true) {
+  emailSelecetBlock.style.display = 'none';
+  $("#training_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
 
-            }   else {
-                    emailSelecetBlock.style.display = 'block';
-                    $("#training_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
+}   else {
+  emailSelecetBlock.style.display = 'block';
+  $("#training_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
 
-            }
+}
 
-        trainingMark.addEventListener('change', TrainingFunc); // Вешаем listener на объект
-        function TrainingFunc(event) {
-            if (trainingMark.checked == true) {
-                    emailSelecetBlock.style.display = 'none';
-                    $("#training_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
-            }   else {
-                    emailSelecetBlock.style.display = 'block';
-                    $("#training_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
-            }
-        }
-
-
-        // Вычисление количества вопросов
-
-        let Select = document.querySelectorAll("select");
-        //document.getElementById("demo").innerHTML = "Value: " + Select
-        var numberPattern = /\d+/g;  //Регулярное выражение, что бы выбрать номер формы
-
-        for (i of Select) {  // Перебираем уже существующие поля, вешаем listener и подставляем количество вопросов из темы
-
-                    i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
-
-                    // Вынимаем порядковый номер формы, для сихронизации с полем количества вопросов
-                    let select_id = i.name.match( numberPattern ) // Номер поля
-
-                    let valueOfSelect = i.value //Вынимаем значение выбранного поля
-
-                    let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
-
-                    document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
-
-                    let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
-
-                    numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
-
-             };
+trainingMark.addEventListener('change', TrainingFunc); // Вешаем listener на объект
+function TrainingFunc(event) {
+  if (trainingMark.checked == true) {
+    emailSelecetBlock.style.display = 'none';
+    $("#training_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
+  }   else {
+    emailSelecetBlock.style.display = 'block';
+    $("#training_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
+  }
+}
 
 
-        function ThemSelection(event){ //Функция отслеживаем выбранную тему и подставляет количество вопросов
-            event.preventDefault()
-            //let TargetName = event.target
+// Вычисление количества вопросов
 
-            //document.getElementById("demo_0").innerHTML = "Value_0: " + event.target.value
-
-            let select_id = event.target.name.match( numberPattern ) // Номер поля
-
-            //document.getElementById("demo_1").innerHTML = "Value_1: " + select_id
-
-            let valueOfSelect = event.target.value //Вынимаем значение выбранного поля
-            let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
-            document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
-            let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
-            numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
-
-            //Пересчитываем количество вопросов
-            mainQCount()
-
-            }
-
-        //Создаём новые формы
-        let qForm = document.querySelectorAll(".q_forms")
-        let container = document.querySelector("#question_form")
-        let addButton = document.querySelector("#add-form")
-        let totalForms = document.querySelector("#id_questions-TOTAL_FORMS")
+let Select = document.querySelectorAll("select");
 
 
-        let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
-        addButton.addEventListener('click', addForm)
+for (i of Select) {  // Перебираем уже существующие поля, вешаем listener и подставляем количество вопросов из темы
 
-        function addForm(e){
-            e.preventDefault()
+  i.addEventListener('change', ThemSelection); // Вешаем listener на объект select
+  i.addEventListener('focus', ThemFocus) //Вешаем listener на объект select для отлеживания предыдущего значения темы
+  // Вынимаем порядковый номер формы, для сихронизации с полем количества вопросов
+  let select_id = i.name.match( numberPattern ) // Номер поля
 
-            let newForm = qForm[0].cloneNode(true)
-            //Обновляем номера полей в форме
-            let formRegex = RegExp(`questions-(\\d){1}-`,'g')
-            let fieldRegex = RegExp(`max_q_(\\d){1}`,'g')
-            let crossedOutRegex = RegExp(`for_crossout_(\\d){1}`,'g')
+  let valueOfSelect = i.value //Вынимаем значение выбранного поля
 
+  //Убираем выбранный элемент в select из остальных опций select, что бы он не повторялся (при первой загрузке страницы)
+  ThemSelectorsDel(select_id, valueOfSelect)
 
+  let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
 
-            formNum++
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formNum}-`)
-            newForm.innerHTML = newForm.innerHTML.replace(fieldRegex, `max_q_${formNum}`)
-            newForm.innerHTML = newForm.innerHTML.replace(crossedOutRegex, `for_crossout_${formNum}`)
-            container.insertBefore(newForm, addButton)
-            var sp1 = document.createElement("br")
-            container.insertBefore(sp1, addButton)
+  document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
 
-            //newForm.addEventListener('change', ThemSelection); // Вешаем listener на объект select
+  let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
+
+  numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
+
+}
 
 
-
-            totalForms.setAttribute('value', `${formNum+1}`)
-
-            // Устанавливаем начальные значения и listener
-            let q_field = document.getElementById(`id_questions-${formNum}-q_num`) // Ищем новое поле с количеством вопросов
-            q_field.addEventListener('input', QNumChanged); // Вешаем listener на объект input
-            q_field.setAttribute('value', '1')
-            let them_field = document.getElementById(`id_questions-${formNum}-theme`) // Ищем новое поле с темой
-            them_field.addEventListener('change', ThemSelection);
-            them_field.value = '5'
-            let numOfqAct = document.getElementById('5').value
-            document.getElementById("max_q_" + formNum).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
-
-            let delete_field = document.getElementById(`id_questions-${formNum}-DELETE`) // Ищем новое поле с 'Удалить тему'
-            delete_field.addEventListener('input', markToDelete); // Вешаем listener на объект checkbox 'Удалить тему'
-
-            $("#for_crossout_" + formNum).removeClass();  // Если изначальной форме присвоен класс css, то убираем его
+function ThemSelection(event){ //Функция отслеживаем выбранную тему и подставляет количество вопросов
+  event.preventDefault()
 
 
-            //Пересчитываем количество вопросов
-            mainQCount()
-        }
+  let select_id = event.target.name.match( numberPattern ) // Номер поля
+  let valueOfSelect = event.target.value //Вынимаем значение выбранного поля
+  let numOfqAct = document.getElementById(valueOfSelect).value // Вынимаем количество вопросов из скрытого поля
+  document.getElementById("max_q_" + select_id).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+  let numField = document.getElementById("id_questions-" + select_id + "-q_num") // Ищем объект поля ввода количества вопросов
+  numField.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение
+
+  //Удаляем выбраную тему из остальных селекторов
+  ThemSelectorsDel(select_id, valueOfSelect)
+  //Добавлем предыдущую тему во все селекторы
+  ThemSelectorsAdd(event)
+  //Пересчитываем количество вопросов
+  mainQCount()
+  event.target.blur() // Снимаем фокус с объекта, что бы обновлялась переменная previous
+
+}
+
+
+//Добавляем кнопку "Добавить форму"
+let addButton = document.querySelector("#add-form")
+addButton.addEventListener('click', addForm)
+
+function addForm(e){
+  e.preventDefault()
+
+  let Select = document.querySelectorAll("select");
+  let allQ = true
+  for (themID of themList) {
+    let flag = true
+
+    for (itemValue of Select) {
+      if (themID === parseInt(itemValue.value)) {
+        flag = false
+      }
+    }
+
+    if (flag) {
+      allQ = false
+      //Создаём новые формы
+      let qForm = document.querySelectorAll(".q_forms")
+      let totalForms = document.querySelector("#id_questions-TOTAL_FORMS")
+      let newForm = qForm[0].cloneNode(true)
+      let formNum = qForm.length-1 // Get the number of the last form on the page with zero-based indexing
+      let container = document.querySelector("#question_form")
+      //Обновляем номера полей в форме
+      let formRegex = RegExp(`questions-(\\d){1}-`,'g')
+      let fieldRegex = RegExp(`max_q_(\\d){1}`,'g')
+      let crossedOutRegex = RegExp(`for_crossout_(\\d){1}`,'g')
 
 
 
+      formNum++
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `questions-${formNum}-`)
+      newForm.innerHTML = newForm.innerHTML.replace(fieldRegex, `max_q_${formNum}`)
+      newForm.innerHTML = newForm.innerHTML.replace(crossedOutRegex, `for_crossout_${formNum}`)
+      container.insertBefore(newForm, addButton)
+      var sp1 = document.createElement("br")
+      container.insertBefore(sp1, addButton)
 
+      //newForm.addEventListener('change', ThemSelection); // Вешаем listener на объект select
+
+
+
+      totalForms.setAttribute('value', `${formNum+1}`)
+
+      // Устанавливаем начальные значения и listener
+      let q_field = document.getElementById(`id_questions-${formNum}-q_num`) // Ищем новое поле с количеством вопросов
+      q_field.addEventListener('input', QNumChanged); // Вешаем listener на объект input
+      q_field.setAttribute('value', '1')
+      let them_field = document.getElementById(`id_questions-${formNum}-theme`) // Ищем новое поле с темой
+      them_field.addEventListener('change', ThemSelection);
+
+      let numOfqAct = document.getElementById(themID).value
+      document.getElementById("max_q_" + formNum).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
+
+      let delete_field = document.getElementById(`id_questions-${formNum}-DELETE`) // Ищем новое поле с 'Удалить тему'
+      delete_field.addEventListener('input', markToDelete); // Вешаем listener на объект checkbox 'Удалить тему'
+
+      $("#for_crossout_" + formNum).removeClass();  // Если изначальной форме присвоен класс css, то убираем его
+      //Удаляем выбранную тему в остальных селекторах
+      ThemSelectorsDel(formNum, themID)
+      //Удаляем тему из оригинала клона темы
+      $(newForm).find('option[value="'+ them_field.value +'"]').remove(); //Удаляем текущее значание копируемой формы
+      them_field.value = themID
+      //Пересчитываем количество вопросов
+      mainQCount()
+      break; // Если нашлась тема, которая не встречается в остальных селекторах, выходим из цикла
+    }
+  }
+  if (allQ) {
+    alert('Все темы выбраны')
+  }
+}
 </script>
 
 {% endblock %}

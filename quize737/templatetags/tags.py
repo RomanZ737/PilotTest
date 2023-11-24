@@ -5,6 +5,13 @@ from django.contrib.auth.models import User
 register = template.Library()
 
 
+@register.filter(name='dict_keys')
+def dict_to_keys_val(dict):
+    array = []
+    for key in dict:
+        array.append(key.id)
+    return array
+
 @register.filter(name='has_group')
 def has_group(user, group_name):
     str_new = ''.join(group_name).split(',')
