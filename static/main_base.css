@@ -714,7 +714,7 @@ div.test_theme_list {
 }
 
 select.select_them {
-    width: 217px;
+    width: 215px;
 }
 
 
@@ -738,7 +738,7 @@ div.test_training {
 }
 
 span.test_theme_del {
-    padding-left: 7px;
+    /*padding-left: 7px;*/
 }
 
 span.vertical_line {
@@ -947,7 +947,7 @@ div.crossed_out_inactive:before {
 
 div.max_q_num_in_theme {
     display: inline-block;
-    width: 90px;
+    width: 59px;
 }
 
 
