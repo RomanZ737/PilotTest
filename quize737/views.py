@@ -1877,7 +1877,7 @@ def user_list(request):
                     total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
                                                           profile__position__contains=position,
                                                           groups__name__contains=group,
-                                                          usertests__test_name__name__contains=test).exclude(
+                                                          usertests__test_name__name=test).exclude(
                         username='roman').distinct().order_by('last_name')
                 else:
                     total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type,
@@ -2369,9 +2369,9 @@ def user_detales(request, id):
                                                      date_before=test['date_before'])
 
                             logger_user_action.warning(f'Пользователю: '
-                                                       f'<b>{user_object.profile.family_name}</b>'
+                                                       f'<b>{user_object.profile.family_name} '
                                                        f'{user_object.profile.first_name[0]}.'
-                                                       f'{user_object.profile.middle_name[0]}.\n'
+                                                       f'{user_object.profile.middle_name[0]}.</b>\n'
                                                        f'Назначен Тест: <b>{test["test_name"]}</b>\n'
                                                        f'Количество попыток: <b>{test["num_try"]}</b>\n'
                                                        f'Выполнить до: <b>{test["date_before"]}</b>\n\n'
