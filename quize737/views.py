@@ -923,7 +923,7 @@ def tests_results_list(request):
                 context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                            'position_list': position_list, 'group_list': group_list,
                            'results_list_options': results_list_options, 'user_search_input': user_search_input}
-                return render(request, 'tests_results_list.html', context=context).order_by('-date_end')
+                return render(request, 'tests_results_list.html', context=context)
             else:
                 paginator = Paginator(total_results_list, 10)
                 page_number = request.GET.get('page', 1)
