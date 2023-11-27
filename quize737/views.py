@@ -923,7 +923,7 @@ def tests_results_list(request):
                 context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                            'position_list': position_list, 'group_list': group_list,
                            'results_list_options': results_list_options, 'user_search_input': user_search_input}
-                return render(request, 'tests_results_list.html', context=context).order_by('-date_end')
+                return render(request, 'tests_results_list.html', context=context)
             else:
                 paginator = Paginator(total_results_list, 10)
                 page_number = request.GET.get('page', 1)
@@ -1877,7 +1877,7 @@ def user_list(request):
                     total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
                                                           profile__position__contains=position,
                                                           groups__name__contains=group,
-                                                          usertests__test_name__name__contains=test).exclude(
+                                                          usertests__test_name__name=test).exclude(
                         username='roman').distinct().order_by('last_name')
                 else:
                     total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type,
