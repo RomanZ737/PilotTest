@@ -2258,9 +2258,9 @@ def user_detales(request, id):
                     UserTests.objects.filter(user=user_object,
                                              test_name=test['test_name']).delete()  # Удаляем тест у пользователя
                     logger_user_action.warning(f'У Пользователя: '
-                                               f'<b>{user_object.profile.family_name}</b>'
+                                               f'<b>{user_object.profile.family_name} '
                                                f'{user_object.profile.first_name[0]}.'
-                                               f'{user_object.profile.middle_name[0]}.\n'
+                                               f'{user_object.profile.middle_name[0]}.</b>\n'
                                                f'Удалён Тест: <b>{test["test_name"]}</b>\n\n'
                                                f'<b>User: </b>{request.user.profile.family_name}'
                                                f' {request.user.profile.first_name[0]}.'
@@ -2369,9 +2369,9 @@ def user_detales(request, id):
                                                      date_before=test['date_before'])
 
                             logger_user_action.warning(f'Пользователю: '
-                                                       f'<b>{user_object.profile.family_name}</b>'
+                                                       f'<b>{user_object.profile.family_name} '
                                                        f'{user_object.profile.first_name[0]}.'
-                                                       f'{user_object.profile.middle_name[0]}.\n'
+                                                       f'{user_object.profile.middle_name[0]}.</b>\n'
                                                        f'Назначен Тест: <b>{test["test_name"]}</b>\n'
                                                        f'Количество попыток: <b>{test["num_try"]}</b>\n'
                                                        f'Выполнить до: <b>{test["date_before"]}</b>\n\n'
@@ -2795,9 +2795,9 @@ def selected_users_test(request):
                                                      num_try=test['num_try'],
                                                      date_before=test['date_before'])
                             logger_user_action.warning(f'Пользователю: '
-                                                       f'<b>{user.profile.family_name}</b>'
+                                                       f'<b>{user.profile.family_name} '
                                                        f'{user.profile.first_name[0]}.'
-                                                       f'{user.profile.middle_name[0]}.\n'
+                                                       f'{user.profile.middle_name[0]}.</b>\n'
                                                        f'Назначен Тест: <b>{test["test_name"]}</b>\n'
                                                        f'Количество попыток: <b>{test["num_try"]}</b>\n'
                                                        f'Выполнить до: <b>{test["date_before"]}</b>\n\n'
