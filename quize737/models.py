@@ -85,9 +85,9 @@ class QuizeSet(models.Model):
 
 # Объект результат теста конкретного пользователя
 class QuizeResults(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.SET_DEFAULT, verbose_name='ID пользователя',
-                                help_text='ID пользователя, для упрощённого поиска результатов', null=True,
-                                default='User Deleted')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID пользователя',
+                                help_text='ID пользователя, для упрощённого поиска результатов'
+                                )
     user_name = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                  help_text='Имя пользователя, который проходил тест')
     quize_name = models.CharField(max_length=200, verbose_name='Название теста',
@@ -155,8 +155,8 @@ class FileUpload(models.Model):
 
 #  Результаты ответов конкретного пользователя
 class AnswersResults(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, max_length=500, verbose_name='Пользователь',
-                             help_text='Объект пользователя', default='User Deleted')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, max_length=500, verbose_name='Пользователь',
+                             help_text='Объект пользователя')
     results = models.ForeignKey(QuizeResults, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',
                                 help_text='Объект с результатами теста конкретного пользователя')
     question = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',

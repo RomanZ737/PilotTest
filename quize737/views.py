@@ -2478,6 +2478,7 @@ def new_user(request):
 @login_required
 @group_required('KRS')
 def del_user(request, id):
+
     user_object = User.objects.get(id=id)
     logger_user_action.warning(f'Удалён Пользователь: '
                                f'<b>{user_object.profile.family_name} '
@@ -2488,7 +2489,8 @@ def del_user(request, id):
                                f'<b>User: </b>{request.user.profile.family_name}'
                                f' {request.user.profile.first_name[0]}.'
                                f'{request.user.profile.middle_name[0]}.')
-    User.objects.get(id=id).delete()
+    user_object.delete()
+    # User.objects.get(id=id).delete()
     previous_url = request.META.get('HTTP_REFERER')
     return HttpResponseRedirect(previous_url)
     # return redirect('quize737:user_list')
