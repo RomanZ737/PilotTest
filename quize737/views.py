@@ -1906,7 +1906,6 @@ def user_list(request):
 
         else:
 
-
             total_user_list = User.objects.all().order_by('last_name').exclude(
                 username='roman')  # Вынимаем всех пользователей, кроме superuser
             total_user_number = User.objects.all().exclude(username='roman').count()
@@ -2776,11 +2775,11 @@ def selected_users_test(request):
             for test in tests_for_group_form.cleaned_data:
                 #  Удаляем все объекты
                 # Проверяем было ли указано имя объекта
-                try:
-                    if UserTests.objects.get(test_name=test['test_name']):
-                        UserTests.objects.filter(test_name=test['test_name']).delete()
-                except Exception:
-                    pass
+                # try:
+                #     if UserTests.objects.get(test_name=test['test_name']):
+                #         UserTests.objects.filter(test_name=test['test_name']).delete()
+                # except Exception:
+                #     pass
                 # Создаём только те объекты, которые не помечены для удаления
                 if not test['DELETE']:
                     #  Перебираем всех выбранных пользователей
