@@ -13,9 +13,25 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = users.models.Profile
         fields = ('family_name', 'first_name', 'middle_name', 'position', 'ac_type')
+        widgets = {
+            'family_name': forms.Textarea(attrs={'style': 'font-size: 20px;', 'cols': 15, 'rows': 1}),
+            'first_name': forms.Textarea(attrs={'style': 'font-size: 20px;', 'cols': 15, 'rows': 1}),
+            'middle_name': forms.Textarea(attrs={'style': 'font-size: 20px;', 'cols': 15, 'rows': 1}),
+        }
 
 
-#  Редактируем параметры польхователя
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = users.models.Profile
+        fields = ('family_name', 'first_name', 'middle_name')
+        widgets = {
+            'family_name': forms.Textarea(attrs={'style': 'font-size: 30px;'}),
+            'first_name': forms.Textarea(attrs={'style': 'font-size: 30px;'}),
+            'middle_name': forms.Textarea(attrs={'style': 'font-size: 30px;'}),
+        }
+
+
+#  Редактируем параметры пользователя
 class EditUserForm(forms.ModelForm):
     class Meta:
         model = User
@@ -33,6 +49,10 @@ class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+        widgets = {
+            #'username': forms.Textarea(attrs={'style': 'font-size: 15px;', 'cols': 20, 'rows': 1}),
+            #'email': forms.Textarea(attrs={'style': 'font-size: 10px;', 'cols': 15, 'rows': 1}),
+        }
 
 
 # class LoginForm(forms.ModelForm):

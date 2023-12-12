@@ -12,12 +12,13 @@
         <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
     </legend>
 <div class="block-list">
-   <h1> {{user_obj.profile.family_name}} {{user_obj.profile.first_name}} {{user_obj.profile.middle_name}}</h1>
+    <form id="user_edit_form" method='post'>
+   <h1> {{form_profile.family_name}} {{form_profile.first_name}} {{form_profile.middle_name}}</h1>
 
     {% for error in form_user.errors.values %}
         {{error}}
     {% endfor %}
-  <form id="user_edit_form" method='post'>
+
       {% csrf_token %}
     <input type="hidden" name="previous_url" value="{{ previous_url }}">
     <p>Квалификация:
@@ -93,24 +94,19 @@
 
 
 <script>
-    //Скрипт меняет размер поля вопроса под фактическое количество символов
-    var login_text_Length = document.getElementById("id_username").value.length;
-    var login_rows_length = 1
-    if ( login_text_Length > 100 ) { login_rows_length = Math.ceil(login_text_Length/100);
+
+    let TextExtra = document.querySelectorAll("textarea");
+    //Меняем размер поля ввода под размер текста в поле
+    for (i of TextExtra) {
+        var login_text_Length = i.value.length;
+        var login_rows_length = 1
+        if ( login_text_Length > 100 ) { login_rows_length = Math.ceil(login_text_Length/100);
                                   login_text_Length = 100 };
-    var login_field = document.getElementById("id_username");
-    login_field.setAttribute("cols", login_text_Length);
-    login_field.setAttribute("rows", login_rows_length);
+        var login_field = i;
+        login_field.setAttribute("cols", login_text_Length);
+        login_field.setAttribute("rows", login_rows_length);
+    }
 
-    //----------------------------------------------------
-
-    var q_text_Length = document.getElementById("id_email").value.length;
-    var q_rows_length = 1
-    if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
-                                  q_text_Length = 100 };
-    var q_field = document.getElementById("id_email");
-    q_field.setAttribute("cols", q_text_Length);
-    q_field.setAttribute("rows", q_rows_length);
 
 
 </script>

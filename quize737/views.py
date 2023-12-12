@@ -32,7 +32,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
     NewThemeForm, MyNewTestFormQuestions, AdminMessForm
-from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm
+from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm, EditProfileForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
@@ -2135,6 +2135,7 @@ def edit_user(request, id):
     all_groups = Group.objects.all()  # Все существующие группы
     if request.method == 'POST':
         form_user = EditUserForm(request.POST, instance=user_obj)
+        form_profile = EditProfileForm(request.POST, instance=user_obj)
         new_position = request.POST.get('position')  # Новая должность
         changed_groups = request.POST.getlist('group')  # Новые группы
         new_ac_type = request.POST.get('ac_type')  # Новый тип ВС
@@ -2201,8 +2202,24 @@ def edit_user(request, id):
         # TODO: долелать автоматическое изменение группы, в случаем изменения типа ВС
 
         # Проверяем форму Логина и Email
-        if form_user.is_valid():
+
+        if form_user.is_valid() and form_profile.is_valid():
             form_user.save()
+            #form_profile.save()
+            # print('Name:', form_profile.cleaned_data['first_name'])
+            # print('Family Name:', form_profile.cleaned_data['family_name'])
+            # print('username: ', form_user.cleaned_data['username'])
+
+            # user_obj.username = form_user.cleaned_data['username']
+            # user_obj.email = form_user.cleaned_data['email']
+            user_obj.first_name = form_profile.cleaned_data['first_name']
+            user_obj.last_name = form_profile.cleaned_data['family_name']
+            user_obj.save()
+            user_obj.profile.family_name = form_profile.cleaned_data['family_name']
+            user_obj.profile.first_name = form_profile.cleaned_data['first_name']
+            user_obj.profile.middle_name = form_profile.cleaned_data['middle_name']
+            user_obj.profile.save()
+
             # Возвращаем пользователя на исходную страницу
             previous_url = request.POST.get('previous_url', '/')
 
@@ -2218,7 +2235,7 @@ def edit_user(request, id):
 
         else:
             form_user = EditUserForm(request.POST, instance=user_obj)
-            form_profile = ProfileForm()
+            form_profile = EditProfileForm(request.POST, instance=user_obj)
             context = {'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list,
                        'form_user': form_user, 'form_profile': form_profile, 'ac_type': ac_type_list}
             return render(request, 'edit_user.html', context=context)
@@ -2229,7 +2246,9 @@ def edit_user(request, id):
         else:
             previous_url = request.META.get('HTTP_REFERER')
         form_user = EditUserForm(initial={"username": user_obj.username, 'email': user_obj.email})
-        form_profile = ProfileForm()
+        form_profile = EditProfileForm(initial={'family_name': user_obj.profile.family_name,
+                                                'first_name': user_obj.profile.first_name,
+                                                'middle_name': user_obj.profile.middle_name})
         context = {'user_obj': user_obj, 'all_groups': all_groups, 'position_list': position_list,
                    'form_user': form_user, 'form_profile': form_profile, 'ac_type': ac_type_list,
                    'previous_url': previous_url}
