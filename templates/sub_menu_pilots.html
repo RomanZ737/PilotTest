@@ -1,0 +1,30 @@
+{% if page == '/user_list/' %}
+    <a href="{% url 'quize737:user_list' %}">ПИЛОТЫ</a>
+{% else %}
+    <a href="{% url 'quize737:user_list' %}">Пилоты</a>
+{% endif %}
+<span style="color: black;"> | </span>
+{% if page == '/new_user/' %}
+    <a href="{% url 'quize737:new_user' %}">ДОБАВИТЬ ПИЛОТА</a>
+{% else %}
+    <a href="{% url 'quize737:new_user' %}">Добавить Пилота</a>
+{% endif %}
+<span style="color: black;"> | </span>
+{% if page == '/group_list/' %}
+    <a href="{% url 'quize737:group_list' %}">ГРУППЫ</a>
+{% else %}
+    <a href="{% url 'quize737:group_list' %}">Группы</a>
+{% endif %}
+<span style="color: black;"> | </span>
+{% if page == '/new_group/' %}
+    <a href="{% url 'quize737:new_group' %}">ДОБАВИТЬ ГРУППУ</a>
+{% else %}
+    <a href="{% url 'quize737:new_group' %}">Добавить Группу</a>
+{% endif %}
+<span style="color: black;"> | </span>
+{% if page == '/user_log/' %}
+<a href="{% url 'dbLogs:user_log' %}">ЖУРНАЛ</a>
+{% else %}
+    <a href="{% url 'dbLogs:user_log' %}">Журнал</a>
+{% endif %}
+

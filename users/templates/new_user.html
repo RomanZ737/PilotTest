@@ -3,13 +3,7 @@
 {% block content %}
 <fieldset>
     <legend>
-        <a href="{% url 'quize737:user_list' %}"> Список Пилотов </a>
-        <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:new_user' %}">ДОБАВИТЬ ПИЛОТА</a>
-        <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:group_list' %}">Список Прупп</a>
-        <span style="color: black;"> | </span>
-        <a href="{% url 'quize737:new_group' %}">Добавить группу</a>
+        {% include "sub_menu_pilots.html" with page=request.path %}
     </legend>
     {% for err_form_user in form_user.errors.values %}
         {{err_form_user}}

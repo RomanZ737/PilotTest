@@ -22,6 +22,7 @@ from users import views as users_views
 from django.contrib.auth import views as auth_views
 from quize737 import views as quize737_views
 from users.forms import LoginForm, RestorePasword
+from dbLogs import views as dbLogs_views
 
 from django.contrib.auth.views import (
     LogoutView,
@@ -40,6 +41,7 @@ urlpatterns = [
                   path('', quize737_views.start, name='start'),
                   path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=LoginForm), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
+                  path('dbLogs/', include('dbLogs.urls', namespace='dbLogs')),
                   path('DBLoad/', include('DBLoad.urls', namespace='DBLoad')),
                   path('profile/', users_views.profile, name='profile'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
