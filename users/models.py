@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from quize737.models import TestConstructor
+from quize737.models import TestConstructor, QuestionSet
 import datetime
 from field_validators.validators import validate_not_zero
 
@@ -81,3 +81,9 @@ class TestExpired(models.Model):
 
     def __str__(self):
         return f'{self.user.last_name} {self.user.first_name}, Test: {self.test.test_name}, Дата: {self.test.date_before.strftime("%d.%m.%Y %H:%M")}'
+
+
+# Модель закладок редавтора вопросов
+class QuestionEditorBookMarks(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Модель пользователя')
+    question = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, verbose_name='Модель вопроса')

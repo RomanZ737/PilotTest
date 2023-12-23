@@ -52,6 +52,8 @@ class QuestionSet(models.Model):
                                help_text='Поле используется если вопрос подразумевает несколько правильных ответов',
                                blank=True, null=True)
     ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACType.choices, null=True)
+    is_active = models.BooleanField(verbose_name='Не активный вопрос', default=True,
+                                    help_text='Если вопрос не активен, то в тест пользователю он не попадает')
 
     class Meta:
         ordering = ['-them_name']
