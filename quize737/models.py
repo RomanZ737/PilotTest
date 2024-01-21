@@ -4,6 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 import pytz
 from django.utils.timezone import now
+from choices import ACTypeQ
 
 
 # Модель тем вопросов
@@ -19,14 +20,6 @@ class Thems(models.Model):
 
 # Вся база вопросов по всем темам
 class QuestionSet(models.Model):
-
-    class ACType(models.TextChoices):
-        B737 = 'B737', 'Boeing 737'
-        B777 = 'B777', 'Boeing 777'
-        A32X = 'A32X', 'Airbus 32X'
-        A33X = 'A33X', 'Airbus 33X'
-        ANY = 'ANY', 'ANY TYPE'
-
     # Имя темы связано с классом Them
     them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
     question = models.TextField(verbose_name='Вопрос')
@@ -51,7 +44,7 @@ class QuestionSet(models.Model):
     answers = models.CharField(max_length=500, verbose_name='Ответы на вопрос',
                                help_text='Поле используется если вопрос подразумевает несколько правильных ответов',
                                blank=True, null=True)
-    ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACType.choices, null=True)
+    ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACTypeQ.choices, null=True)
     is_active = models.BooleanField(verbose_name='Не активный вопрос', default=True,
                                     help_text='Если вопрос не активен, то в тест пользователю он не попадает')
 
@@ -125,10 +118,10 @@ class TestConstructor(models.Model):
                                      verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
     training = models.BooleanField(verbose_name='Тренировочный тест', default=False)
-
     ac_type = models.CharField(max_length=255, verbose_name='Тип ВС')
-
     email_to_send = models.TextField(verbose_name='email адреса для рассылки результатов', null=True)
+    is_active = models.BooleanField(verbose_name='Активен тест или нет', default=True,
+                                    help_text='Если тест не активен, то он перемещается в архив')
 
     def __str__(self):
         return f'{self.name}'

@@ -28,6 +28,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload, \
     AnswersResults
+from dbLogs.models import UserChangeLog
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
@@ -38,6 +39,7 @@ from reportlab.pdfbase import pdfmetrics  # Библиотека для форм
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
 from reportlab.pdfbase.ttfonts import TTFont
 from users.models import Profile, UserTests, GroupsDescription, TestExpired
+from choices import ACTypeQ, ACTypeP, Position
 
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -908,7 +910,7 @@ def tests_results_list(request):
     for group in groups:
         group_list.append(group)
     group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
-    position_list = Profile.Position.values
+    position_list = Position.values
     position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
     user_search_input = request.GET.get("user_search")
     filter_input = request.GET.getlist("filter")
@@ -1045,7 +1047,7 @@ def question_list(request):
     them_list = Thems.objects.all()
     user_search_input = request.GET.get("question_search")
     filter_input = request.GET.getlist("filter")
-    ac_type_list = QuestionSet.ACType.values  # Создаём список всех типов самолёта
+    ac_type_list = ACTypeQ.values  # Создаём список всех типов самолёта
     ac_type_list.append('Все')  # Добавляем вариант "Все"
 
     no_search_result = False
@@ -1480,7 +1482,7 @@ def test_editor(request):
 @login_required
 @group_required('KRS')
 def new_test_ac_type(request):
-    ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
+    ac_types_list = ACTypeP.values  # Список типов ВС для фильтра
     ac_types_list.append('Все')  # Добавляем в выбор вариант 'Все'
     context = {'ac_type': ac_types_list}
     return render(request, 'new_test_ac_type.html', context=context)
@@ -1804,9 +1806,9 @@ def user_list(request):
             test_list.append(test)
         group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
         test_list.append({'name': 'Все'})  # Добавляем выбор всех тестов
-        position_list = Profile.Position.values
+        position_list = Position.values
         position_list.append('Все')  # Добавляем вариант выбора всех должностей
-        ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
+        ac_types_list = ACTypeP.values  # Список типов ВС для фильтра
         ac_types_list.append('Все')
         user_search_input = request.GET.get("user_search")
         filter_input = request.GET.getlist("position_filter")
@@ -1929,16 +1931,16 @@ def group_users(request, id):
     for test in tests:
         test_list.append(test)
     test_list.append({'name': 'Все'})  # Добавляем выбор всех тестов
-    position_list = Profile.Position.values
+    position_list = Position.values
     position_list.append('Все')  # Добавляем вариант выбора всех должностей
-    ac_types_list = Profile.ACType.values  # Список типов ВС для фильтра
+    ac_types_list = ACTypeP.values  # Список типов ВС для фильтра
     ac_types_list.append('Все')
     groups = Group.objects.all().values()
     group_list = []
     for group in groups:
         group_list.append(group)
     group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
-    position_list = Profile.Position.values
+    position_list = Position.values
     position_list.append('Все')  # Добавляем вариант выбора всехдолжностей
     no_search_result = False
     total_user_list = User.objects.filter(groups=id).order_by('last_name')
@@ -2129,8 +2131,8 @@ def group_del(request, id):
 @login_required
 @group_required('KRS')
 def edit_user(request, id):
-    position_list = Profile.Position.labels  # Вырианты выбора должности пилота
-    ac_type_list = Profile.ACType.labels  # Варианты выбора типа ВС пилота
+    position_list = Position.labels  # Вырианты выбора должности пилота
+    ac_type_list = ACTypeP.labels  # Варианты выбора типа ВС пилота
     user_obj = User.objects.get(id=id)  # Объект пользователя
     all_groups = Group.objects.all()  # Все существующие группы
     if request.method == 'POST':
@@ -2142,8 +2144,22 @@ def edit_user(request, id):
         old_position = user_obj.profile.position  # Текущая (старая) должность
         old_ac_type = user_obj.profile.ac_type  # Текущий (старый) тип ВС
 
+        logger_user_action.warning(f'<b>Изменены данные Пилота: </b>{user_obj.profile.family_name}'
+                                   f'{user_obj.profile.first_name[0]}.'
+                                   f'{user_obj.profile.middle_name[0]}.\n\n'
+                                   f'<b>User:</b> {request.user.profile.family_name}'
+                                   f' {request.user.profile.first_name[0]}.'
+                                   f'{request.user.profile.middle_name[0]}.')
+
+        UserChangeLog.objects.create(user_changed=user_obj,
+                                     description="Изм. данных",
+                                     user_done=f'{request.user.profile.family_name}'
+                                               f'{request.user.profile.first_name[0]}.'
+                                               f'{request.user.profile.middle_name[0]}.'
+                                     )
+
         # Проверяем должность (квалификацию), при необходимости обновляем должность и группу
-        for j in Profile.Position.choices:  # Выясняем соответсвие названию выбора и самому выбору
+        for j in Position.choices:  # Выясняем соответсвие названию выбора и самому выбору
             if j[1] == new_position:
                 new_position = j[0]
                 break
@@ -2152,15 +2168,7 @@ def edit_user(request, id):
             user_obj.profile.position = new_position
             user_obj.profile.save()
 
-            logger_user_action.warning(f'<b>Изменена Квалификация сотрудника </b>{user_obj.profile.family_name}'
-                                       f'{user_obj.profile.first_name[0]}.'
-                                       f'{user_obj.profile.middle_name[0]}.\n\n'
-                                       f'<b>Новая квалификация</b>: {new_position}'
-                                       f'Старая квалификация: {old_position}'
 
-                                       f'<b>User:</b> {request.user.profile.family_name}'
-                                       f' {request.user.profile.first_name[0]}.'
-                                       f'{request.user.profile.middle_name[0]}.')
 
             position_name_group = new_position + ' ' + user_obj.profile.ac_type
 
@@ -2191,7 +2199,7 @@ def edit_user(request, id):
             user_obj.groups.add(group_obj)
 
         #  Проверям ТИП ВС
-        for j in Profile.ACType.choices:  # Выясняем соответсвие названию выбора и самому выбору
+        for j in ACTypeP.choices:  # Выясняем соответсвие названию выбора и самому выбору
             if j[1] == new_ac_type:
                 new_ac_type = j[0]
                 break
@@ -2271,6 +2279,8 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
         if tests_for_user_form.is_valid():
             for test in tests_for_user_form.cleaned_data:
+                # print('TEST:', test)
+                # print('TEST_OBJ:', test['test_name'].id)
                 #  Удаляем все объекты
                 if test['DELETE']:
                     UserTests.objects.filter(user=user_object,
@@ -2283,6 +2293,15 @@ def user_detales(request, id):
                                                f'<b>User: </b>{request.user.profile.family_name}'
                                                f' {request.user.profile.first_name[0]}.'
                                                f'{request.user.profile.middle_name[0]}.')
+                    UserChangeLog.objects.create(user_changed=user_object,
+                                                 description="Удалён Тест",
+                                                 test_id=test['test_name'].id,
+                                                 test_name=test["test_name"],
+                                                 user_done=f'{request.user.profile.family_name}'
+                                                           f'{request.user.profile.first_name[0]}.'
+                                                           f'{request.user.profile.middle_name[0]}.'
+                                                 )
+
                     try:  # Ищем и удаляем начатые, но не законченные тесты (сам сформированный временный тест с вопросами)
                         QuizeSet.objects.get(user_under_test=user_object.username,
                                              quize_name=test['test_name']).delete()
@@ -2309,31 +2328,78 @@ def user_detales(request, id):
                                                f'Кол-во попыток установлено: {test["num_try"]}\n<br>' \
                                                f'Выполнить до было: {instance.date_before.strftime("%d.%m.%Y")}\n<br>' \
                                                f'Выполнить до установлено: {test["date_before"].strftime("%d.%m.%Y")}<br>'
+                                        # Записываем журнал, для просмотра пользователем
+                                        UserChangeLog.objects.create(user_changed=user_object,
+                                                                     description="Кол-во попыток",
+                                                                     test_id=test['test_name'].id,
+                                                                     test_name=test["test_name"],
+                                                                     old_num_try=instance.num_try,
+                                                                     new_num_try=int(test["num_try"]),
+                                                                     user_done=f'{request.user.profile.family_name}'
+                                                                               f'{request.user.profile.first_name[0]}.'
+                                                                               f'{request.user.profile.middle_name[0]}.'
+                                                                     )
+                                        # Записываем журнал, для просмотра пользователем
+                                        UserChangeLog.objects.create(user_changed=user_object,
+                                                                     description="Изм. дата",
+                                                                     test_id=test['test_name'].id,
+                                                                     test_name=test["test_name"],
+                                                                     old_date=instance.date_before,
+                                                                     new_date=test["date_before"],
+                                                                     user_done=f'{request.user.profile.family_name}'
+                                                                               f'{request.user.profile.first_name[0]}.'
+                                                                               f'{request.user.profile.middle_name[0]}.'
+                                                                     )
+
                                     elif int(instance.num_try) != int(test['num_try']) or instance.date_before != test[
                                         'date_before']:
                                         if int(instance.num_try) != int(test['num_try']):
                                             text = f'Кол-во попыток было: {instance.num_try}<br>\n' \
                                                    f'Кол-во попыток установлено: {test["num_try"]}<br>\n'
+                                            # Записываем журнал, для просмотра пользователем
+                                            UserChangeLog.objects.create(user_changed=user_object,
+                                                                         description="Кол-во попыток",
+                                                                         test_id=test['test_name'].id,
+                                                                         test_name=test["test_name"],
+                                                                         old_num_try=instance.num_try,
+                                                                         new_num_try=int(test["num_try"]),
+                                                                         user_done=f'{request.user.profile.family_name}'
+                                                                                   f'{request.user.profile.first_name[0]}.'
+                                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                                         )
                                         else:
                                             text = f'Выполнить до было: {instance.date_before.strftime("%d.%m.%Y")}<br>\n' \
                                                    f'Выполнить до установлено: {test["date_before"].strftime("%d.%m.%Y")}<br>'
+                                            UserChangeLog.objects.create(user_changed=user_object,
+                                                                         description="Изм. дата",
+                                                                         test_id=test['test_name'].id,
+                                                                         test_name=test["test_name"],
+                                                                         old_date=instance.date_before,
+                                                                         new_date=test["date_before"],
+                                                                         user_done=f'{request.user.profile.family_name}'
+                                                                                   f'{request.user.profile.first_name[0]}.'
+                                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                                         )
                                     return text
 
+                                # Формируем текст сообщения
+                                info_text = test_param_check()
+                                #  Записываем лог
                                 logger_user_action.warning(f'Изменены параметры теста пользователя: '
                                                            f'<b>{user_object.profile.family_name} </b>'
                                                            f'{user_object.profile.first_name[0]}.'
                                                            f'{user_object.profile.middle_name[0]}.\n'
                                                            f'Тест: <b>{test["test_name"]}</b>\n'
-                                                           f'{test_param_check()}\n\n'
+                                                           f'{info_text}\n\n'
                                                            f'<b>User: </b>{request.user.profile.family_name}'
                                                            f' {request.user.profile.first_name[0]}.'
                                                            f'{request.user.profile.middle_name[0]}.')
 
-                                #  Отправляем письмо пользователю о назначенном тесте
+                                #  Отправляем письмо пользователю об изменениях в тесте
                                 subject = f"Изменены параметры Теста: '{test['test_name']}'"
                                 message = f"<p style='font-size: 25px;'><b>Уважаемый, {user_object.profile.first_name} {user_object.profile.middle_name}.</b></p><br>" \
                                           f"<p style='font-size: 20px;'>В тест: <b>'{test['test_name']}'</b> внесены следующие изменения:</p>" \
-                                          f"<p style='font-size: 20px;'>{test_param_check()}</p>" \
+                                          f"<p style='font-size: 20px;'>{info_text}</p>" \
                                           f"<p style='font-size: 20px;'>На портале <a href='{config('SITE_URL', default='')}'>Pilot Test</a></p>" \
                                           f"<br>" \
                                           f"<br>" \
@@ -2385,7 +2451,16 @@ def user_detales(request, id):
                                                      num_try_initial=test['num_try'],
                                                      num_try=test['num_try'],
                                                      date_before=test['date_before'])
-
+                            # Записываем журнал, для просмотра пользователем
+                            UserChangeLog.objects.create(user_changed=user_object,
+                                                         description="Назначен тест",
+                                                         test_id=test['test_name'].id,
+                                                         test_name=test["test_name"],
+                                                         test_date_due=test['date_before'],
+                                                         user_done=f'{request.user.profile.family_name}'
+                                                                   f'{request.user.profile.first_name[0]}.'
+                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                         )
                             logger_user_action.warning(f'Пользователю: '
                                                        f'<b>{user_object.profile.family_name} '
                                                        f'{user_object.profile.first_name[0]}.'
@@ -2434,7 +2509,7 @@ def user_detales(request, id):
                        'form_errors': form_errors, 'user_id': id, 'previous_url': previous_url}
             return render(request, 'user_ditales.html', context=context)
     else:
-        user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
+        user_tests = UserTests.objects.filter(user=id).values('id', 'test_name', 'num_try', 'date_before')
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
@@ -2814,6 +2889,17 @@ def selected_users_test(request):
                                                      num_try_initial=test['num_try'],
                                                      num_try=test['num_try'],
                                                      date_before=test['date_before'])
+                            # Записываем журнал, для просмотра пользователем
+                            UserChangeLog.objects.create(user_changed=user,
+                                                         description="Назначен тест",
+                                                         test_id=test['test_name'].id,
+                                                         test_name=test["test_name"],
+                                                         test_date_due=test['date_before'],
+                                                         user_done=f'{request.user.profile.family_name}'
+                                                                   f'{request.user.profile.first_name[0]}.'
+                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                         )
+
                             logger_user_action.warning(f'Пользователю: '
                                                        f'<b>{user.profile.family_name} '
                                                        f'{user.profile.first_name[0]}.'

@@ -5,7 +5,7 @@
 
 <fieldset>
     <legend>
-        {% include "sub_menu_pilots.html" with page=request.path%}
+        {% include "sub_menu_pilots.html" with page=request.path %}
     </legend>
     <div class="block-list">
         <div class="block_none_light_up">
@@ -109,174 +109,76 @@
             </div>
 
         </div>
-        <div style="position: relative;display: block;height: 22px;">
-            <div style="display: none;" class="inline_option" id="inline_option_block">
-
-                <a id="assign_test_to_selected_users" href="#">Назначить Тест</a>
-                <span style="color: black">|</span>
-                <a id="make_new_group_to_selected_users" href="#">Создать группу</a>
-                <span style="color: black">|</span>
-                <a id="add_to_group_selected_users" href="#">Добавить в группу</a>
-                <span style="color: black">|</span>
-                <a href="{% url 'quize737:user_list' %}"><span>Отменить</span></a>
-
-            </div>
-                <div class="total_user_num">Всего: {{user_num}}</div>
-        </div>
-
     </div>
-
-    {% if no_search_results %}
-    <div>
         {% comment "Если были выбраны пользователи" %}
             Если переход на страницу был после поиска или фитрации и резльтатов поиска и фильтрации нет,
             а выбранные пользователи есть, то они будут отображены здесь
         {% endcomment %}
-        {% if selected_users %}
-            {% include "user_list_checked.html" %}
-            <hr/>
-            <br>
-        {% endif %}
-        <span style="color: rgb(209, 209,209);">{{results}}</span>
+
+        {% for event in results %}
+
+        <div class="block_light_up">
+            <div class="date_for_log">
+                {{event.timestamp | date:"d.m.y-H:i:s"}} UTC
+            </div>
+            <div class="fio_column_short">
+                <a href="{% url 'quize737:user_detales' event.user_changed.id %}">
+                    {{event.user_changed.profile.family_name}}
+                    {{event.user_changed.profile.first_name.0}}.
+                    {{event.user_changed.profile.middle_name.0}}.
+                </a>
+            </div>
+            <div class="list-ac_type">
+                <span class="theme_color">{{event.user_changed.profile.ac_type}}</span>
+            </div>
+
+<!--            <div class="list-position">-->
+<!--                <span class="theme_color">{{event.user_changed.profile.position}}</span>-->
+<!--            </div>-->
+            <div class="log_event_name" title="{{event.get_description_display}}">
+                {{event.description}}
+            </div>
+                {% if event.test_name %}
+                    <div class="list-user_test_list" title="{{event.test_name}}">{{event.test_name|truncatechars:12}}</div>
+                {% else %}
+                    <div class="list-user_test_list"></div>
+                {% endif %}
+
+
+
+
+            {% if event.description == 'Назначен тест' %}
+                {% comment "Если присутствует дата окончания теста" %}
+                {% endcomment %}
+
+                <div class="list-date-for-log">
+                    {{event.test_date_due | date:"d.m.y"}}
+                </div>
+            {% elif event.description == 'Изм. дата' %}
+                <div class="list-date-for-log">
+                    {{event.old_date | date:"d.m"}} => {{event.new_date | date:"d.m"}}
+                </div>
+            {% elif event.description == 'Кол-во попыток' %}
+                <div class="list-date-for-log">
+                    {{event.old_num_try}} => {{event.new_num_try}}
+                </div>
+            {% else %}
+                <div class="list-date-for-log"></div>
+            {% endif %}
+            <div class="fio_column_short">
+                {{event.user_done}}
+            </div>
     </div>
-    {% else %}
-    {% include "user_list_common.html" %}
+
+        {% endfor %}
     <br>
     <div style="display: block;" id="paginator">
 
-        {% include "paginator_2.html" with page=user_list %}
-        {% endif %}
+        {% include "paginator_2.html" with page=results %}
+
     </div>
 </fieldset>
 
-
-
-<!--<script src="{% static 'js/user_list/checkbox_check.js' %}"></script>-->
-
-<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
-
-<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>-->
-
-<script>
-
-    var checkBox = document.querySelectorAll("input")  //Выбираем все объекты 'input'
-    var optionsBlock = document.getElementById("inline_option_block")
-    var paginator = document.getElementById("paginator") // Берем блок paginator
-    var checkBoxForm
-
-    for (i of checkBox) {  //перебираем в цикле все элементы 'checkbox'
-        i.addEventListener('change', UserSelected);
-        if (i.checked == true) { // Если пользователь устанавливает галку
-                    optionsBlock.style.display = 'inline-block';
-                    checkBoxForm = $("#checkboxes").serialize();
-                    console.log('boxes:' + checkBoxForm);
-//                    if ( paginator != null) {
-//                        //console.log('paginator' + paginator);
-//                        paginator.style.display = 'none';
-//                       }
-
-                    }
-    }
-
-    function UserSelected(event){
-        event.preventDefault();
-        if (event.target.checked == true) {
-            checkBoxForm = $("#checkboxes").serialize();
-//            console.log('boxes:' + checkBoxForm);
-            if (optionsBlock.style.display == "none") {
-            optionsBlock.style.display = 'inline-block';
-            }
-            } else {  //Если пользователь убирает галку, то проверяем есть ли ckeckbox с установленной галкой
-                var boxFlag = false;
-                for (i of checkBox) {
-                    if (i.checked == true) {
-                        checkBoxForm = $("#checkboxes").serialize();
-                        boxFlag = true;
-                        break;
-                    }
-                }
-                if (boxFlag != true) {
-                optionsBlock.style.display = 'none';
-                checkBoxForm = '';
-                }
-        }
-    }
-
-
-</script>
-
-<script>
-
-    // При нажатии кнопки "Фильтр", собираются данные из двух форм и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#submitFilter').click(function() {
-        var form_1 = $("#position_filter, #checkboxes").serialize();
-        $.get("{% url 'quize737:user_list' %}", form_1, function(content){
-            //console.log(form_1);
-            //$("html").html(content);
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Поиск", собираются данные из двух форм и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#submitSearch').click(function() {
-        var form_2 = $("#user_search, #checkboxes").serialize();
-        $.get("{% url 'quize737:user_list' %}", form_2, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Сбросить Фильтр", собираются данные из двух форм и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#resetFilterButton').click(function() {
-        var form_3 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:user_list' %}", form_3, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Назначить Тест", собираются данные из формы "checkboxes" и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#assign_test_to_selected_users').click(function() {
-        var form_4 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:selected_users_test' %}", form_4, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-
-    // При нажатии кнопки "Создать группу", собираются данные из формы "checkboxes" и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#make_new_group_to_selected_users').click(function() {
-        var form_5 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:selected_users_new_group' %}", form_5, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-    // При нажатии кнопки "Добавить в группу", собираются данные из формы "checkboxes" и отправляются на обработку
-    // При таком виде возврата данных важно использовать для переменных только var а не let (во всех JS документа!!)
-    $('#add_to_group_selected_users').click(function() {
-        var form_6 = $("#checkboxes").serialize();
-        $.get("{% url 'quize737:selected_users_add_to_group' %}", form_6, function(content){
-            document.open();
-            document.write(content);
-            document.close();
-            });
-        });
-
-</script>
 
 
 {% endblock %}

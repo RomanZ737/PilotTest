@@ -3,27 +3,17 @@ from django.contrib.auth.models import User, Group
 from quize737.models import TestConstructor, QuestionSet
 import datetime
 from field_validators.validators import validate_not_zero
+from choices import Position, ACTypeP
 
 
 class Profile(models.Model):
-    class Position(models.TextChoices):
-        PIC = 'КВС', 'Командир ВС'
-        COPILOT = 'ВП', 'Второй пилот'
-        INSTRUCTOR = 'ПИ', 'Пилот-инструктор'
-
-    class ACType(models.TextChoices):
-        B737 = 'B737', 'Boeing 737'
-        B777 = 'B777', 'Boeing 777'
-        A32X = 'A32X', 'Airbus 32X'
-        A33X = 'A33X', 'Airbus 33X'
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
     family_name = models.CharField(max_length=30, verbose_name='Фамилия', default=None)
     first_name = models.CharField(max_length=30, verbose_name='Имя', default=None)
     middle_name = models.CharField(max_length=30, verbose_name='Отчество', default=None)
     position = models.CharField(max_length=10, verbose_name='Должность', choices=Position.choices)
-    ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACType.choices)
+    ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACTypeP.choices)
 
     def position_readable(self):
         # Get value from choices enum
@@ -37,12 +27,12 @@ class Profile(models.Model):
     #     return f'{self.family_name} {self.first_name}'
 
     def __str__(self):
-        return "{id}, {profile_id}, {family_name} {first_name} {value} ({display_value})".format(  profile_id=self.id,
-                                                                                    id=self.user.id,
-                                                                                    family_name=self.family_name,
-                                                                                    first_name=self.first_name,
-                                                                                    value=self.position,
-                                                                                    display_value=self.get_position_display())
+        return "{id}, {profile_id}, {family_name} {first_name} {value} ({display_value})".format(profile_id=self.id,
+                                                                                                 id=self.user.id,
+                                                                                                 family_name=self.family_name,
+                                                                                                 first_name=self.first_name,
+                                                                                                 value=self.position,
+                                                                                                 display_value=self.get_position_display())
 
 
 #  Модель для описания группы

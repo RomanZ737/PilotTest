@@ -232,13 +232,53 @@ div.list-ac_type {  /* блок Типа ВС в таблице */
 div.list-date {     /* блок Дата в таблице */
     position: relative;
     display: inline-block;
-    width: 77px%;
+    width: 77px;
     text-align: center;
     padding-left: 5px;
     padding-right: 5px;
     vertical-align: middle;
     /* margin: 3px; */
     border-left: 1px solid black;
+}
+
+div.list-date-for-log {     /* блок Дата в таблице */
+    position: relative;
+    display: inline-block;
+    width: 106px;
+    color: rgb(209, 209,209);
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
+}
+
+div.date_for_log {
+    position: relative;
+    display: inline-block;
+    width: 164px;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px;
+    border-left: 1px solid black; */
+}
+
+div.log_event_name {
+    position: relative;
+    display: inline-block;
+    width: 127px;
+    text-align: left;
+    color: rgb(209, 209,209);
+    font-size: 18px;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: middle;
+    /* margin: 3px; */
+    border-left: 1px solid black;
+    /*border-right: 1px solid black; */
 }
 
 div.list-position {  /* блок Должность в таблице */
@@ -779,9 +819,8 @@ div.test_total_users {
 div.list-user_test_list {
     position: relative;
     display: inline-block;
-    width: 140px;
-    vertical-align: middle
-    border-left: 1px solid black;
+    width: 103px;
+    vertical-align: middle;
     padding-left: 5px;
     padding-right: 5px;
     /* margin: 4px; */
@@ -857,7 +896,7 @@ div.inline_option {
 div.fio_column_short {
     position: relative;
     display: inline-block;
-    width: 200px;
+    width: 165px;
     padding-left: 5px;
     padding-right: 5px;
     border-left: 1px solid black;

@@ -41,7 +41,7 @@ urlpatterns = [
                   path('', quize737_views.start, name='start'),
                   path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=LoginForm), name='login'),
                   path('', include('quize737.urls', namespace='quize737')),
-                  path('dbLogs/', include('dbLogs.urls', namespace='dbLogs')),
+                  path('', include('dbLogs.urls', namespace='dbLogs')),
                   path('DBLoad/', include('DBLoad.urls', namespace='DBLoad')),
                   path('profile/', users_views.profile, name='profile'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
