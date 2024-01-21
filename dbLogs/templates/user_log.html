@@ -128,7 +128,7 @@
                     {{event.user_changed.profile.middle_name.0}}.
                 </a>
             </div>
-            <div class="list-ac_type">
+            <div class="list-ac_type" title="Тип ВС: {{event.user_changed.profile.get_ac_type_display}}">
                 <span class="theme_color">{{event.user_changed.profile.ac_type}}</span>
             </div>
 
@@ -151,21 +151,21 @@
                 {% comment "Если присутствует дата окончания теста" %}
                 {% endcomment %}
 
-                <div class="list-date-for-log">
+                <div class="list-date-for-log" title="Дата до которой надо выполнить тест">
                     {{event.test_date_due | date:"d.m.y"}}
                 </div>
             {% elif event.description == 'Изм. дата' %}
-                <div class="list-date-for-log">
+                <div class="list-date-for-log" title='Старая дата: {{event.old_date | date:"d.m.y"}}, Новая дата: {{event.new_date | date:"d.m.y"}}'>
                     {{event.old_date | date:"d.m"}} => {{event.new_date | date:"d.m"}}
                 </div>
             {% elif event.description == 'Кол-во попыток' %}
-                <div class="list-date-for-log">
+                <div class="list-date-for-log" title="Было попыток: {{event.old_num_try}}, Стало попыток: {{event.new_num_try}}">
                     {{event.old_num_try}} => {{event.new_num_try}}
                 </div>
             {% else %}
                 <div class="list-date-for-log"></div>
             {% endif %}
-            <div class="fio_column_short">
+            <div class="fio_column_short" title="Кто сделал изменение">
                 {{event.user_done}}
             </div>
     </div>
