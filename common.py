@@ -4,6 +4,8 @@ from email.message import EmailMessage
 from email.utils import make_msgid
 from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
 import os
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils import six
 
 admin_email = 'r.zaychenko@nordwindairlines.ru'
 #krs_mail_list = ['pomanz@mail.ru', '733.roman@gmail.com']
@@ -92,3 +94,30 @@ def send_email(request, email_msg):
     # server.sendmail(FROM, TO, message.encode('utf-8'))
     server.send_message(msg)
     server.quit()
+
+
+# Декоратор проверки группы пользователя для доступа
+def group_required(group, login_url=None, raise_exception=False):
+    """
+    Decorator for views that checks whether a user has a group permission,
+    redirecting to the log-in page if necessary.
+    If the raise_exception parameter is given the PermissionDenied exception
+    is raised.
+    """
+
+    def check_perms(user):
+        if isinstance(group, six.string_types):
+            groups = (group,)
+        else:
+            groups = group
+        # First check if the user has the permission (even anon users)
+
+        if user.groups.filter(name__in=groups).exists() | user.is_superuser:
+            return True
+        # In case the 403 handler should be called raise the exception
+        if raise_exception:
+            raise PermissionDenied
+        # As the last resort, show the login form
+        return False
+
+    return user_passes_test(check_perms, login_url=login_url)
