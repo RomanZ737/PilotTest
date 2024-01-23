@@ -33,7 +33,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
     NewThemeForm, MyNewTestFormQuestions, AdminMessForm
-from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm, EditProfileForm
+from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm, \
+    EditProfileForm
 from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics  # Библиотека для формирования pdf файла
 from reportlab.lib.units import inch  # Библиотека для формирования pdf файла
@@ -50,7 +51,7 @@ logger_user_action = logging.getLogger('USER ACTION')
 loger_pilot_answer = logging.getLogger('PILOT ANSWER')
 
 
-#Декоратор проверки группы пользователя для доступа
+# Декоратор проверки группы пользователя для доступа
 # def group_required(group, login_url=None, raise_exception=False):
 #     """
 #     Decorator for views that checks whether a user has a group permission,
@@ -77,7 +78,7 @@ loger_pilot_answer = logging.getLogger('PILOT ANSWER')
 #     return user_passes_test(check_perms, login_url=login_url)
 
 
-#Формироваине теста с вопросами из всех тем
+# Формироваине теста с вопросами из всех тем
 def all_them_q_set():
     pass
 
@@ -109,7 +110,7 @@ def start(request, id=None):
                 question_pisition = q_num_list[int(q_amount) - 1]
 
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                #question = QuestionSet.objects.filter(id=question_pisition).values()
+                # question = QuestionSet.objects.filter(id=question_pisition).values()
 
                 # Объект "следующего" вопроса
                 try:
@@ -233,7 +234,7 @@ def start(request, id=None):
                     sequence_number]  # Номер вопроса в списке вопросов пользователя
 
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                #question = QuestionSet.objects.filter(id=question_pisition).values()
+                # question = QuestionSet.objects.filter(id=question_pisition).values()
                 # Вынимаем объект вопроса
                 try:
                     question_instance = QuestionSet.objects.get(id=question_pisition)
@@ -441,7 +442,7 @@ def next_question(request):
                     # Номер позиции вопроса в списке
                     question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
                     # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                    #question = QuestionSet.objects.filter(id=question_pisition).values()
+                    # question = QuestionSet.objects.filter(id=question_pisition).values()
                     # Объект "следующего" вопроса
                     try:
                         question_instance = QuestionSet.objects.get(id=question_pisition)
@@ -590,7 +591,6 @@ def next_question(request):
                             else:
                                 updated_score_number = user_result_data[0]['score_number'] + 1
 
-
                             # Обновляем количетво баллов
                             QuizeResults.objects.filter(id=request.POST.get('result_id')).update(
                                 score_number=updated_score_number)
@@ -627,7 +627,7 @@ def next_question(request):
                         question_id = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
 
                         # Достаём нужный вопрос из базы вопросов по сквозному номеру
-                        #question = QuestionSet.objects.filter(id=question_id).values()
+                        # question = QuestionSet.objects.filter(id=question_id).values()
 
                         # Объект "следующего" вопроса
                         try:
@@ -768,7 +768,6 @@ def next_question(request):
                                         user_answers.append(number)
                                 answer = []
                                 for user_answer in user_answers:
-
                                     answer.append(getattr(question.question, f'option_{user_answer}'))
                                 question_block['user_answer'] = answer
 
@@ -952,7 +951,8 @@ def tests_results_list(request):
                     result = False
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
-                                                              conclusion__exact=result, in_progress=False).distinct().order_by('-date_end')
+                                                              conclusion__exact=result,
+                                                              in_progress=False).distinct().order_by('-date_end')
             else:
                 total_user_list = QuizeResults.objects.filter(user_id__profile__position__icontains=position,
                                                               user_id__groups__name__icontains=group,
@@ -1030,7 +1030,6 @@ def test_result_details(request, id):
                     user_answers.append(number)
             answer = []
             for user_answer in user_answers:
-
                 answer.append(getattr(question.question, f'option_{user_answer}'))
             question_block['user_answer'] = answer
 
@@ -1051,6 +1050,8 @@ def question_list(request):
     filter_input = request.GET.getlist("filter")
     ac_type_list = ACTypeQ.values  # Создаём список всех типов самолёта
     ac_type_list.append('Все')  # Добавляем вариант "Все"
+    active_q_filter = ['Все', 'Активные', 'НЕ Активные']
+    misc_filter = ['Все', 'АУЦ NWS', 'Кроме АУЦ NWS', 'На время', 'Не на время']
     # Если пользователь деактивировал вопрос
     if 'q_id' in request.GET:
         q_id = request.GET.get('q_id')
@@ -1060,34 +1061,38 @@ def question_list(request):
         else:
             q_object.is_active = True
         q_object.save()
-
-        question_list = QuestionSet.objects.all()
-        q_count = question_list.count()
-        paginator = Paginator(question_list, 15)
-        page_number = request.GET.get('page', 1)
-        questions = paginator.page(page_number)
-        filtered = None
-        context = {'questions': questions, 'them_list': them_list, 'filtered': filtered, 'q_count': q_count,
-                   'ac_type': ac_type_list}
-        return render(request, 'question_list.html', context=context)
+        previous_url = request.META.get('HTTP_REFERER')
+        return redirect(previous_url)
+        # question_list = QuestionSet.objects.all()
+        # q_count = question_list.count()
+        # paginator = Paginator(question_list, 15)
+        # page_number = request.GET.get('page', 1)
+        # questions = paginator.page(page_number)
+        # filtered = None
+        # context = {'questions': questions, 'them_list': them_list, 'filtered': filtered, 'q_count': q_count,
+        #            'ac_type': ac_type_list}
+        # return render(request, 'question_list.html', context=context)
 
     no_search_result = False
     if user_search_input or filter_input:
         if user_search_input:
-            total_questions_list = QuestionSet.objects.filter(Q(question__icontains=f'{user_search_input}'))
+            total_questions_list = QuestionSet.objects.filter(Q(question__icontains=user_search_input))
             q_count = total_questions_list.count()
             if not total_questions_list:
                 no_search_result = True
                 results = f'Вопросы по запросу "{user_search_input}" не найдены'
                 context = {'no_search_results': no_search_result, 'results': results, 'them_list': them_list,
-                           'q_count': q_count, 'user_search_input': user_search_input}
+                           'q_count': q_count, 'user_search_input': user_search_input,
+                           'active_q_filter': active_q_filter, 'misc_filter': misc_filter}
                 return render(request, 'question_list.html', context=context)
             else:
                 paginator = Paginator(total_questions_list, 15)
                 page_number = request.GET.get('page', 1)
                 results_list_pages = paginator.page(page_number)
                 context = {'questions': results_list_pages, 'no_search_results': no_search_result,
-                           'them_list': them_list, 'q_count': q_count, 'user_search_input': user_search_input}
+                           'them_list': them_list, 'q_count': q_count,
+                           'user_search_input': user_search_input,
+                           'active_q_filter': active_q_filter, 'misc_filter': misc_filter}
                 return render(request, 'question_list.html', context=context)
         else:
             them = ''
@@ -1098,13 +1103,30 @@ def question_list(request):
                 ac_type = filter_input[1]
 
             them_q_list = QuestionSet.objects.filter(them_name__name__icontains=them, ac_type__icontains=ac_type)
+            if filter_input[2] != 'Все': # Фильтруем Активные/Не активные вопросы
+                if filter_input[2] == 'Активные':
+                    them_q_list = them_q_list.filter(is_active=True)
+                else:
+                    them_q_list = them_q_list.filter(is_active=False)
+
+            if filter_input[3] != 'Все':  # Фильтруем вопросы АУЦ
+                if filter_input[3] == 'АУЦ NWS':
+                    them_q_list = them_q_list.filter(is_for_center=True)
+                elif filter_input[3] == 'Кроме АУЦ NWS':
+                    them_q_list = them_q_list.filter(is_for_center=False)
+                elif filter_input[3] == 'На время':
+                    them_q_list = them_q_list.filter(is_timelimited=True)
+                elif filter_input[3] == 'Не на время':
+                    them_q_list = them_q_list.filter(is_timelimited=False)
+
             q_count = them_q_list.count()  # Подстчитываем количество вопросов
             paginator = Paginator(them_q_list, 15)
             page_number = request.GET.get('page', 1)
             results_list_pages = paginator.page(page_number)
             context = {'questions': results_list_pages, 'no_search_results': no_search_result,
                        'them_list': them_list, 'filter_input': filter_input, 'q_count': q_count,
-                       'ac_type': ac_type_list}
+                       'ac_type': ac_type_list, 'active_q_filter': active_q_filter,
+                       'misc_filter': misc_filter}
             return render(request, 'question_list.html', context=context)
     else:
         question_list = QuestionSet.objects.all()
@@ -1113,8 +1135,10 @@ def question_list(request):
         page_number = request.GET.get('page', 1)
         questions = paginator.page(page_number)
         filtered = None
-        context = {'questions': questions, 'them_list': them_list, 'filtered': filtered, 'q_count': q_count,
-                   'ac_type': ac_type_list}
+        context = {'questions': questions, 'them_list': them_list,
+                   'filtered': filtered, 'q_count': q_count,
+                   'ac_type': ac_type_list, 'active_q_filter': active_q_filter,
+                   'misc_filter': misc_filter}
         return render(request, 'question_list.html', context=context)
 
 
@@ -1853,13 +1877,13 @@ def user_list(request):
                         total_user_list = User.objects.filter(
                             Q(profile__first_name__icontains=f'{user_search_data[0]}'),
                             Q(profile__middle_name__icontains=f'{user_search_data[1]}'),
-                        is_active=True).exclude(username='roman')
+                            is_active=True).exclude(username='roman')
                 elif len(user_search_data) == 1:
                     total_user_list = User.objects.filter(
                         Q(profile__family_name__icontains=f'{user_search_data[0]}') | Q(
                             profile__first_name__icontains=f'{user_search_data[0]}') | Q(
                             profile__middle_name__icontains=f'{user_search_data[0]}'),
-                    is_active=True).exclude(username='roman')
+                        is_active=True).exclude(username='roman')
                 else:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
@@ -2195,8 +2219,6 @@ def edit_user(request, id):
             user_obj.profile.position = new_position
             user_obj.profile.save()
 
-
-
             position_name_group = new_position + ' ' + user_obj.profile.ac_type
 
         all_groups_set = set()  # Множество для хранения стринговых названий групп
@@ -2240,7 +2262,7 @@ def edit_user(request, id):
 
         if form_user.is_valid() and form_profile.is_valid():
             form_user.save()
-            #form_profile.save()
+            # form_profile.save()
             # print('Name:', form_profile.cleaned_data['first_name'])
             # print('Family Name:', form_profile.cleaned_data['family_name'])
             # print('username: ', form_user.cleaned_data['username'])
@@ -2554,9 +2576,9 @@ def new_user(request):
     form_profile = ProfileForm()
     if request.method == 'POST':
         print('POST:', request.POST)
-        try: # Проверяем существование пользователя, если существует, то активируем
+        try:  # Проверяем существование пользователя, если существует, то активируем
             user_obj = User.objects.get(username=request.POST.get('username'))
-            if user_obj.is_active: # Если пользователь существует и активен
+            if user_obj.is_active:  # Если пользователь существует и активен
                 form_user = UserRegisterForm(request.POST)
                 form_profile = ProfileForm(request.POST)
                 if form_user.is_valid() and form_profile.is_valid():
@@ -2600,7 +2622,7 @@ def new_user(request):
                     context = {'form_user': form_user, 'form_profile': form_profile}
                     return render(request, 'new_user.html', context=context)
 
-            else: # Если пользователь существует и не активен, активируем
+            else:  # Если пользователь существует и не активен, активируем
                 user_obj.is_active = True
                 user_obj.save()
                 UserChangeLog.objects.create(user_changed=user_obj,
@@ -2662,7 +2684,6 @@ def new_user(request):
 @login_required
 @group_required('KRS')
 def del_user(request, id):
-
     user_object = User.objects.get(id=id)
     logger_user_action.warning(f'Удалён Пользователь: '
                                f'<b>{user_object.profile.family_name} '
@@ -2682,7 +2703,7 @@ def del_user(request, id):
 
     user_object.is_active = False
     user_object.save()
-    #user_object.delete()
+    # user_object.delete()
     # User.objects.get(id=id).delete()
     previous_url = request.META.get('HTTP_REFERER')
     return HttpResponseRedirect(previous_url)

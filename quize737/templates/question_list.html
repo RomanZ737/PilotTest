@@ -12,16 +12,29 @@
 
     <div class="block-list">
         <div class="block_none_light_up">
-            <div class="search-form">
-                <form id="question_search" action="{% url 'quize737:question_list' %}" method="get">
-                    <input type="text" name="question_search" placeholder="Поиск вопроса..." value="{{user_search_input}}">
-                    <input type="submit" value="Искать">
-                </form>
+            <div style="width: 834px;">
+                <div class="search-form-q_base">
+                    <form id="question_search" action="{% url 'quize737:question_list' %}" method="get">
+                        <input type="text" name="question_search" placeholder="Поиск вопроса..." value="{{user_search_input}}">
+                        <input type="submit" value="Искать">
+                    </form>
+                </div>
+                 <div class="list-q_count">
+                    {% if filter_input %}
+                        {% for theme in them_list %}
+                            {% if theme.name == filter_input.0 %}
+                                <span class="mark_up">{{theme.name}}: {{q_count}}</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <span class="mark_up">Все темы: {{q_count}}</span>
+                    {% endif %}
+                </div>
             </div>
             <div class="filter-form">
                 <div class="filter_related_questions">
                     <form id="theme_filter" action="{% url 'quize737:question_list' %}" method="get">
-                    <select class="theme_filter" name="filter">
+                    <select name="filter" title="Тема вопроса">
                         {% for option in them_list %}
                             {% if filter_input %}
                                 {% if option.name == filter_input.0 %}
@@ -38,7 +51,7 @@
                             {% endif %}
                     {% endfor %}
                 </select>
-                    <select class="ac_type_filter" name="filter">
+                    <select name="filter" title="Тип ВС">
                         {% for ac in ac_type %}
                             {% if filter_input %}
                                 {% if ac == filter_input.1 %}
@@ -55,6 +68,40 @@
                             {% endif %}
                     {% endfor %}
                 </select>
+                    <select name="filter" title="Статус вопроса">
+                        {% for active in active_q_filter %}
+                            {% if filter_input %}
+                                {% if active == filter_input.2 %}
+                                    <option value="{{active}}" selected>{{active}}</option>
+                                {% else %}
+                                    <option value="{{active}}">{{active}}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if active == "Все" %}
+                                    <option value="{{active}}" selected>{{active}}</option>
+                                {% else %}
+                                    <option value="{{active}}">{{active}}</option>
+                                {% endif %}
+                            {% endif %}
+                    {% endfor %}
+                </select>
+                    <select name="filter" title="Прочие фильтры">
+                        {% for misc in misc_filter %}
+                            {% if filter_input %}
+                                {% if misc == filter_input.3 %}
+                                    <option value="{{misc}}" selected>{{misc}}</option>
+                                {% else %}
+                                    <option value="{{misc}}">{{misc}}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if misc == "Все" %}
+                                    <option value="{{misc}}" selected>{{misc}}</option>
+                                {% else %}
+                                    <option value="{{misc}}">{{misc}}</option>
+                                {% endif %}
+                            {% endif %}
+                    {% endfor %}
+                </select>
                 </form>
                 </div>
                 <div style="display: inline-block;">
@@ -67,17 +114,7 @@
                         <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">
                     </div>
             </div>
-            <div class="list-q_count">
-                    {% if filter_input %}
-                        {% for theme in them_list %}
-                            {% if theme.name == filter_input.0 %}
-                                <span class="mark_up">{{theme.name}}: {{q_count}}</span>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <span class="mark_up">Все темы: {{q_count}}</span>
-                    {% endif %}
-                </div>
+
         </div>
 
 

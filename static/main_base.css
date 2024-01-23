@@ -415,10 +415,17 @@ div.search-form {  /* блок формы поиска */
     margin-right: 10px;
 }
 
+div.search-form-q_base {
+    position: relative;
+    display: inline-block;
+    /* width: 230px; */
+    /* margin-right: 10px; */
+}
+
 div.filter-form {   /* блок формы фильтра */
     position: relative;
     display: inline-block;
-    /* width: 920px; */
+    width: 834px;
 }
 
 div.list-test_name {    /* блок названия теста в таблице */
@@ -593,16 +600,13 @@ div.filter_sign_result {
     padding-left: 20px; */
 }
 
-select.theme_filter {
-    position: relative;
-    display: inline-block;
-    margin-left: 5%;
-}
 
 div.filter_related_questions {
     position: relative;
     display: inline-block;
-    width: 305px;
+    width: 535px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 div.filter_related_users {
@@ -630,10 +634,12 @@ div.button_block {
 }
 
 div.list-q_count {
-    position: relative;
-  /*  display: inline-block;
+    /* position: relative;
+    display: inline-block;
+    display: inline-block;
     margin-left: 10px; */
-    text-align: right;
+    margin-right: 10px;
+    float: right;
 }
 
 div.results-question {
