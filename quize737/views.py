@@ -1822,21 +1822,25 @@ def user_list(request):
                 if len(user_search_data) == 3:
                     total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}'),
                                                           Q(profile__first_name__icontains=f'{user_search_data[1]}'),
-                                                          Q(profile__middle_name__icontains=f'{user_search_data[2]}')).exclude(
+                                                          Q(profile__middle_name__icontains=f'{user_search_data[2]}'),
+                                                          is_active=True).exclude(
                         username='roman')
                 elif len(user_search_data) == 2:
                     total_user_list = User.objects.filter(Q(profile__family_name__icontains=f'{user_search_data[0]}'),
-                                                          Q(profile__first_name__icontains=f'{user_search_data[1]}')).exclude(
+                                                          Q(profile__first_name__icontains=f'{user_search_data[1]}'),
+                                                          is_active=True).exclude(
                         username='roman')
                     if not total_user_list:
                         total_user_list = User.objects.filter(
                             Q(profile__first_name__icontains=f'{user_search_data[0]}'),
-                            Q(profile__middle_name__icontains=f'{user_search_data[1]}')).exclude(username='roman')
+                            Q(profile__middle_name__icontains=f'{user_search_data[1]}'),
+                        is_active=True).exclude(username='roman')
                 elif len(user_search_data) == 1:
                     total_user_list = User.objects.filter(
                         Q(profile__family_name__icontains=f'{user_search_data[0]}') | Q(
                             profile__first_name__icontains=f'{user_search_data[0]}') | Q(
-                            profile__middle_name__icontains=f'{user_search_data[0]}')).exclude(username='roman')
+                            profile__middle_name__icontains=f'{user_search_data[0]}'),
+                    is_active=True).exclude(username='roman')
                 else:
                     no_search_result = True
                     results = f'Пилоты по запросу "{user_search_input}" не найдены'
@@ -1881,12 +1885,14 @@ def user_list(request):
                     total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
                                                           profile__position__contains=position,
                                                           groups__name__contains=group,
-                                                          usertests__test_name__name=test).exclude(
+                                                          usertests__test_name__name=test,
+                                                          is_active=True).exclude(
                         username='roman').distinct().order_by('last_name')
                 else:
                     total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type,
                                                           profile__position__icontains=position,
-                                                          groups__name__icontains=group).exclude(
+                                                          groups__name__icontains=group,
+                                                          is_active=True).exclude(
                         username='roman').distinct().order_by('last_name')
                 if not total_user_list:
                     no_search_result = True
@@ -1910,9 +1916,9 @@ def user_list(request):
 
         else:
 
-            total_user_list = User.objects.all().order_by('last_name').exclude(
+            total_user_list = User.objects.all().order_by('last_name').filter(is_active=True).exclude(
                 username='roman')  # Вынимаем всех пользователей, кроме superuser
-            total_user_number = User.objects.all().exclude(username='roman').count()
+            total_user_number = User.objects.all().filter(is_active=True).exclude(username='roman').count()
             #  Постраничная разбивка
             paginator = Paginator(total_user_list, 20)
             page_number = request.GET.get('page', 1)
@@ -2528,42 +2534,106 @@ def new_user(request):
     form_user = UserRegisterForm()
     form_profile = ProfileForm()
     if request.method == 'POST':
-        form_user = UserRegisterForm(request.POST)
-        form_profile = ProfileForm(request.POST)
-        if form_user.is_valid() and form_profile.is_valid():
-            group = Group.objects.get(name=form_profile.cleaned_data[
-                                               'position'] + ' ' + form_profile.cleaned_data[
-                                               'ac_type'])  # - раскоментить и убрать 'B737'
-            new_user = form_user.save(commit=False)
-            new_user.set_password(form_user.cleaned_data['password1'])
-            new_user.first_name = form_profile.cleaned_data['first_name']
-            new_user.last_name = form_profile.cleaned_data['family_name']
-            new_user.save()
-            new_user.groups.add(group)
-            Profile.objects.create(
-                user=new_user,
-                family_name=form_profile.cleaned_data['family_name'],
-                first_name=form_profile.cleaned_data['first_name'],
-                middle_name=form_profile.cleaned_data['middle_name'],
-                position=form_profile.cleaned_data['position'],
-                ac_type=form_profile.cleaned_data['ac_type']
-                # - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
-            )
+        print('POST:', request.POST)
+        try: # Проверяем существование пользователя, если существует, то активируем
+            user_obj = User.objects.get(username=request.POST.get('username'))
+            if user_obj.is_active: # Если пользователь существует и активен
+                form_user = UserRegisterForm(request.POST)
+                form_profile = ProfileForm(request.POST)
+                if form_user.is_valid() and form_profile.is_valid():
+                    group = Group.objects.get(name=form_profile.cleaned_data[
+                                                       'position'] + ' ' + form_profile.cleaned_data[
+                                                       'ac_type'])
+                    new_user = form_user.save(commit=False)
+                    new_user.set_password(form_user.cleaned_data['password1'])
+                    new_user.first_name = form_profile.cleaned_data['first_name']
+                    new_user.last_name = form_profile.cleaned_data['family_name']
+                    new_user.save()
+                    new_user.groups.add(group)
+                    Profile.objects.create(
+                        user=new_user,
+                        family_name=form_profile.cleaned_data['family_name'],
+                        first_name=form_profile.cleaned_data['first_name'],
+                        middle_name=form_profile.cleaned_data['middle_name'],
+                        position=form_profile.cleaned_data['position'],
+                        ac_type=form_profile.cleaned_data['ac_type']
+                        # - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
+                    )
 
-            logger_user_action.warning(f'Создан Пользователь: '
-                                       f'<b>{form_profile.cleaned_data["family_name"]} '
-                                       f'{form_profile.cleaned_data["first_name"][0]}.'
-                                       f'{form_profile.cleaned_data["middle_name"][0]}.</b>\n'
-                                       f'Квалификация: <b>{form_profile.cleaned_data["position"]}</b>\n'
-                                       f'Тип ВС: <b>{form_profile.cleaned_data["ac_type"]}</b>\n\n'
-                                       f'<b>User: </b>{request.user.profile.family_name}'
-                                       f' {request.user.profile.first_name[0]}.'
-                                       f'{request.user.profile.middle_name[0]}.')
-            return redirect('quize737:user_list')
+                    logger_user_action.warning(f'Создан Пользователь: '
+                                               f'<b>{form_profile.cleaned_data["family_name"]} '
+                                               f'{form_profile.cleaned_data["first_name"][0]}.'
+                                               f'{form_profile.cleaned_data["middle_name"][0]}.</b>\n'
+                                               f'Квалификация: <b>{form_profile.cleaned_data["position"]}</b>\n'
+                                               f'Тип ВС: <b>{form_profile.cleaned_data["ac_type"]}</b>\n\n'
+                                               f'<b>User: </b>{request.user.profile.family_name}'
+                                               f' {request.user.profile.first_name[0]}.'
+                                               f'{request.user.profile.middle_name[0]}.')
+                    UserChangeLog.objects.create(user_changed=new_user,
+                                                 description="Добавлен Пилот",
+                                                 user_done=f'{request.user.profile.family_name}'
+                                                           f'{request.user.profile.first_name[0]}.'
+                                                           f'{request.user.profile.middle_name[0]}.'
+                                                 )
+                    return redirect('quize737:user_list')
 
-        else:
-            context = {'form_user': form_user, 'form_profile': form_profile}
-            return render(request, 'new_user.html', context=context)
+                else:
+                    context = {'form_user': form_user, 'form_profile': form_profile}
+                    return render(request, 'new_user.html', context=context)
+
+            else: # Если пользователь существует и не активен, активируем
+                user_obj.is_active = True
+                user_obj.save()
+                UserChangeLog.objects.create(user_changed=user_obj,
+                                             description="Добавлен Пилот",
+                                             user_done=f'{request.user.profile.family_name}'
+                                                       f'{request.user.profile.first_name[0]}.'
+                                                       f'{request.user.profile.middle_name[0]}.'
+                                             )
+                return redirect('quize737:user_list')
+        except:
+            form_user = UserRegisterForm(request.POST)
+            form_profile = ProfileForm(request.POST)
+            if form_user.is_valid() and form_profile.is_valid():
+                group = Group.objects.get(name=form_profile.cleaned_data[
+                                                   'position'] + ' ' + form_profile.cleaned_data[
+                                                   'ac_type'])
+                new_user = form_user.save(commit=False)
+                new_user.set_password(form_user.cleaned_data['password1'])
+                new_user.first_name = form_profile.cleaned_data['first_name']
+                new_user.last_name = form_profile.cleaned_data['family_name']
+                new_user.save()
+                new_user.groups.add(group)
+                Profile.objects.create(
+                    user=new_user,
+                    family_name=form_profile.cleaned_data['family_name'],
+                    first_name=form_profile.cleaned_data['first_name'],
+                    middle_name=form_profile.cleaned_data['middle_name'],
+                    position=form_profile.cleaned_data['position'],
+                    ac_type=form_profile.cleaned_data['ac_type']
+                    # - Раскоментить на странице new_user.html возможность выбора типа ВС и в forms раскоментить поле ac_type
+                )
+
+                logger_user_action.warning(f'Создан Пользователь: '
+                                           f'<b>{form_profile.cleaned_data["family_name"]} '
+                                           f'{form_profile.cleaned_data["first_name"][0]}.'
+                                           f'{form_profile.cleaned_data["middle_name"][0]}.</b>\n'
+                                           f'Квалификация: <b>{form_profile.cleaned_data["position"]}</b>\n'
+                                           f'Тип ВС: <b>{form_profile.cleaned_data["ac_type"]}</b>\n\n'
+                                           f'<b>User: </b>{request.user.profile.family_name}'
+                                           f' {request.user.profile.first_name[0]}.'
+                                           f'{request.user.profile.middle_name[0]}.')
+                UserChangeLog.objects.create(user_changed=new_user,
+                                             description="Добавлен Пилот",
+                                             user_done=f'{request.user.profile.family_name}'
+                                                       f'{request.user.profile.first_name[0]}.'
+                                                       f'{request.user.profile.middle_name[0]}.'
+                                             )
+                return redirect('quize737:user_list')
+
+            else:
+                context = {'form_user': form_user, 'form_profile': form_profile}
+                return render(request, 'new_user.html', context=context)
     else:
         context = {'form_profile': form_profile, 'form_user': form_user}
         return render(request, 'new_user.html', context=context)
@@ -2584,7 +2654,16 @@ def del_user(request, id):
                                f'<b>User: </b>{request.user.profile.family_name}'
                                f' {request.user.profile.first_name[0]}.'
                                f'{request.user.profile.middle_name[0]}.')
-    user_object.delete()
+    UserChangeLog.objects.create(user_changed=user_object,
+                                 description="Удалён Пилот",
+                                 user_done=f'{request.user.profile.family_name}'
+                                           f'{request.user.profile.first_name[0]}.'
+                                           f'{request.user.profile.middle_name[0]}.'
+                                 )
+
+    user_object.is_active = False
+    user_object.save()
+    #user_object.delete()
     # User.objects.get(id=id).delete()
     previous_url = request.META.get('HTTP_REFERER')
     return HttpResponseRedirect(previous_url)
