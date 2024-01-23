@@ -1051,6 +1051,25 @@ def question_list(request):
     filter_input = request.GET.getlist("filter")
     ac_type_list = ACTypeQ.values  # Создаём список всех типов самолёта
     ac_type_list.append('Все')  # Добавляем вариант "Все"
+    # Если пользователь деактивировал вопрос
+    if 'q_id' in request.GET:
+        q_id = request.GET.get('q_id')
+        q_object = QuestionSet.objects.get(id=q_id)
+        if q_object.is_active:
+            q_object.is_active = False
+        else:
+            q_object.is_active = True
+        q_object.save()
+
+        question_list = QuestionSet.objects.all()
+        q_count = question_list.count()
+        paginator = Paginator(question_list, 15)
+        page_number = request.GET.get('page', 1)
+        questions = paginator.page(page_number)
+        filtered = None
+        context = {'questions': questions, 'them_list': them_list, 'filtered': filtered, 'q_count': q_count,
+                   'ac_type': ac_type_list}
+        return render(request, 'question_list.html', context=context)
 
     no_search_result = False
     if user_search_input or filter_input:

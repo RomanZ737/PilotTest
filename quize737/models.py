@@ -47,6 +47,10 @@ class QuestionSet(models.Model):
     ac_type = models.CharField(max_length=10, verbose_name='Тип ВС', choices=ACTypeQ.choices, null=True)
     is_active = models.BooleanField(verbose_name='Не активный вопрос', default=True,
                                     help_text='Если вопрос не активен, то в тест пользователю он не попадает')
+    is_for_center = models.BooleanField(verbose_name='Вопрос для АУЦ', default=False,
+                                        help_text='Этот вопрос будет включёт в список вопросов учебного центра по теме')
+    is_timelimited = models.BooleanField(verbose_name='Вопрос с ограничение по времени', default=False,
+                                         help_text='Этот вопрос будет включён тест, который ограничен по времени')
 
     class Meta:
         ordering = ['-them_name']

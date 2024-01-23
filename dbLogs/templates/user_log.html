@@ -176,7 +176,7 @@
     $('#submitFilter').click(function() {
         var form_1 = $("#filter, #user_search").serialize();
         $.get("{% url 'dbLogs:user_log' %}", form_1, function(content){
-            console.log(form_1);
+            //console.log(form_1);
             document.open();
             document.write(content);
             document.close();
