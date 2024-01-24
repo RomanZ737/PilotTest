@@ -9,6 +9,7 @@ import sys
 import logging
 import common
 
+from itertools import chain
 from django.utils.datastructures import MultiValueDictKeyError
 from django.http import HttpResponseRedirect
 from urllib.parse import urlparse
@@ -32,7 +33,7 @@ from dbLogs.models import UserChangeLog
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
-    NewThemeForm, MyNewTestFormQuestions, AdminMessForm
+    NewThemeForm, MyNewTestFormQuestions, AdminMessForm, QuestionIssueMess
 from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm, \
     EditProfileForm
 from django.http import HttpResponse
@@ -177,7 +178,7 @@ def start(request, id=None):
                 q_sets_instances = TestQuestionsBay.objects.filter(test_id=question_set_id).values('theme', 'q_num')
                 total_q_number = 0  # Общее количество вопросов в тесте для пользователя
                 all_theme_set = []  # Объекты вопросов для пользователя
-                particular_user_questions = []  # Номера вопросов в сформированном для пользоваетля тесте
+                particular_user_questions = []  # Номера вопросов в сформированном для пользователя тесте
                 # thems_num = Thems.objects.all().count()  # Общее количество тем
                 max_score_number = 0  # Максимальное количество баллов по сгенерированным вопросам
                 # Перебераем темы вопросов
@@ -187,18 +188,30 @@ def start(request, id=None):
                         for theme in Thems.objects.all():
                             if theme.name != 'Все темы':
                                 quiz_set = QuestionSet.objects.filter(Q(them_name=theme.name), (
-                                        Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
-                                # quiz_set = QuestionSet.objects.filter(them_name=theme.id)  # Берем все вопросы с Темой
-                                quiz_set = random.sample(list(quiz_set), int(
-                                    q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
+                                        Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')), is_active=True)
+                                if quiz_set.count() < int(q_set['q_num']):  # если в сете не оказалось достаточно вопросов по соответствующей теме, то делаем случайную выборку по недостающему числу вопросов
+                                    add_num_q = int(q_set['q_num']) - quiz_set.count()
+                                    add_set = QuestionSet.objects.filter(Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY'),
+                                        is_active=True).order_by('?')[:add_num_q]
+                                    quiz_set = list(chain(quiz_set, add_set)) # Соединяем два QuerySet
+                                quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
                                 all_theme_set.append(quiz_set)  # Добавляем выбранные вопросы в список
                                 # Считаем количество вопросов
                                 total_q_number += int(q_set['q_num'])
                     # Сохраняем вопросы для пользователя в базу
                     else:
+
                         quiz_set = QuestionSet.objects.filter(Q(them_name=q_set['theme']),
-                                                              (Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')))
-                        # quiz_set = QuestionSet.objects.filter(them_name=q_set['theme'])
+                                                              (Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')),
+                                                              is_active=True)
+                        if quiz_set.count() < int(q_set['q_num']): # если в сете не оказалось достаточно вопросов по соответствующей теме, (например после формирования теста в конструкторе тесто база вопросов подверглась редактированию)то делаем случайную выборку по недостающему числу вопросов
+
+                            add_num_q = int(q_set['q_num']) - quiz_set.count()
+
+                            add_set = QuestionSet.objects.filter(Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY'),
+                                                                 is_active=True).order_by('?')[:add_num_q]
+
+                            quiz_set = list(chain(quiz_set, add_set)) # Соединяем два QuerySet
                         quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
                         all_theme_set.append(quiz_set)
                         total_q_number += int(q_set['q_num'])
@@ -375,12 +388,9 @@ def start(request, id=None):
 # Генерация последующих вопросов
 def next_question(request):
     try:
-
         if request.method == 'POST':
-
             #  Если пользователь продолжает попытку
             if 'continue_test' in request.POST.keys():
-
                 user_quize_set_id = int(request.POST.get(
                     'tmp_test_id'))  # ID сформированного пользователю теста, удаляется после завершения теста пользователем (с любым результатом)
                 # Количество оставшихся у пользователя вопросов
@@ -391,7 +401,6 @@ def next_question(request):
                 # Номер позиции вопроса в списке
                 question_pisition = q_num_list[int(q_amount[0]['q_sequence_num']) - 1]
 
-                # TODO: Дописать обработку варианта, если такого вопроса в базе не нашлось
                 # Достаём нужный вопрос из базы вопросов по сквозному номеру
                 question = QuestionSet.objects.filter(id=question_pisition).values()
 
@@ -1103,11 +1112,13 @@ def question_list(request):
                 ac_type = filter_input[1]
 
             them_q_list = QuestionSet.objects.filter(them_name__name__icontains=them, ac_type__icontains=ac_type)
-            if filter_input[2] != 'Все': # Фильтруем Активные/Не активные вопросы
+            if filter_input[2] != 'Все':  # Фильтруем Активные/Не активные вопросы
                 if filter_input[2] == 'Активные':
                     them_q_list = them_q_list.filter(is_active=True)
                 else:
                     them_q_list = them_q_list.filter(is_active=False)
+
+            print('filter[3]', filter_input[3])
 
             if filter_input[3] != 'Все':  # Фильтруем вопросы АУЦ
                 if filter_input[3] == 'АУЦ NWS':
@@ -1195,8 +1206,6 @@ def question_list_details(request, id):
             return render(request, 'question_list_details.html', context=context)
 
     elif 'q_switch_id' in request.GET:
-        form = request.GET
-        print('FROM:', form)
         q_object = QuestionSet.objects.get(id=id)
         if q_object.is_active:
             q_object.is_active = False
@@ -1571,7 +1580,8 @@ def create_new_test(request):
     for them_name in thems:
         # Считаем количество вопросов в каждой теме, кроме "Все темы"
         if them_name.id != 5:
-            q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
+            q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY')),
+                                               is_active=True).count()
             if q_num > 0:
                 total_q_num_per_them[them_name] = q_num
                 # totla_q_num += 1
@@ -1709,7 +1719,8 @@ def test_details(request, id):
     for them_name in thems:
         # Считаем количество вопросов в каждой теме, кроме "Все темы"
         if them_name.id != 5:
-            q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY'))).count()
+            q_num = QuestionSet.objects.filter(Q(them_name=them_name), (Q(ac_type=ac_type) | Q(ac_type='ANY')),
+                                               is_active=True).count()
             if q_num > 0:
                 total_q_num_per_them[them_name] = q_num
                 # totla_q_num += 1
@@ -2922,23 +2933,49 @@ def download_questions_bay(request):
 
 # Сообщение об ошибке в вопросе от пользователя, сообщение рассылается всем пользователям в группе 'Редактор Вопросов'
 @login_required
-def issue_mess(request):
-    q_id = int(request.POST.get('issue_q_id'))
-    site_url = config('SITE_URL', default='')
-    q_instance = QuestionSet.objects.get(id=q_id)
-    emails = User.objects.filter(groups__name='Редактор').values('email')
-    to = []  # Список email адресов для рассылки
-    for email in emails:
-        to.append(email['email'])
-    subject = f'Ошибка в Вопросе'
-    message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
-              f'<p style="font-size: 15px;"><b>Сообщил об ошибке в вопросе:</b></p>' \
-              f'<p style="font-size: 15px;"><b>{q_instance.question}</b></p>' \
-              f'<a href="{site_url}/question_list/{q_id}">Редактировать вопрос</a>'
-    email_msg = {'subject': subject, 'message': message, 'to': to}
-    common.send_email(request, email_msg)
+def issue_mess(request, id):
+    if 'issue_q_id' in request.GET:
+    #if request.method == "POST":
+        #form = QuestionIssueMess(request.POST)
+        form = QuestionIssueMess(request.GET)
+        description = request.GET.get('message')
+        #description = request.POST.get('message')
+        if form.is_valid():
+            q_id = int(request.GET.get('issue_q_id'))
+            #q_id = int(request.POST.get('issue_q_id'))
+            site_url = config('SITE_URL', default='')
+            q_instance = QuestionSet.objects.get(id=q_id)
+            q_instance.is_active = False  # Деактивируем вопрос
+            q_instance.save()
+            ac_type = q_instance.ac_type
+            if ac_type != 'ANY':
+                emails = User.objects.filter(groups__name='Редактор', profile__ac_type=ac_type).values('email')
+            else:
+                emails = User.objects.filter(groups__name='Редактор').values('email')
+            to = []  # Список email адресов для рассылки
+            for email in emails:
+                to.append(email['email'])
+            subject = f'Ошибка в Вопросе'
+            message = f'<p style="font-size: 20px;"><b>{request.user.profile.family_name} {request.user.profile.first_name} {request.user.profile.middle_name}</b></p><br>' \
+                      f'<p style="font-size: 15px;"><b>Сообщил об ошибке в вопросе:</b></p>' \
+                      f'<p style="font-size: 15px;"><b>{q_instance.question}</b></p>' \
+                      f'<p style="font-size: 15px;"><b>Сообщение пользователя:</b></p>' \
+                      f'<p style="font-size: 15px;"><b>{description}</b></p>' \
+                      f'<a href="{site_url}/question_list/{q_id}">Редактировать вопрос</a>'
+            email_msg = {'subject': subject, 'message': message, 'to': to}
+            common.send_email(request, email_msg)
 
-    return HttpResponse(request.POST)
+            return HttpResponse(request.POST)
+
+        else:
+            form = QuestionIssueMess()
+            context = {'form': form, 'question_id': id}
+            return render(request, 'q_error_mess.html', context=context)
+
+    else:
+        form = QuestionIssueMess()
+        context = {'form': form, 'question_id': id}
+        return render(request, 'q_error_mess.html', context=context)
 
 
 #  Функция кнопки возврата, с учётом результатов поиска или фильтрации

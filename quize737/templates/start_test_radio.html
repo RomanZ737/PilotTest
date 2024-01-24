@@ -4,104 +4,47 @@
 {% load tags %}
 {% load static %}
 
-    <fieldset>
-        <legend>
-         {% if q_num_left %}
-                <span class="q_num_count">Осталось {{q_num_left}}</span>
-            {% endif %}
-            <span style="color: black;"> | </span>
-            {% if q_instance.ac_type != 'ANY' %}
-                <span>Тип ВС: {{q_instance.ac_type}}</span>
-            {% else %}
-                <span>Все Типы ВС</span>
-            {% endif %}
-            <span style="color: black;"> | </span>
-                <span>{{q_instance.them_name}}</span>
-        </legend>
-        <div>
-            <form method='post' action='{% url "quize737:next_question" %}' id="question">
+<fieldset>
+    <legend>
+        {% if q_num_left %}
+        <span class="q_num_count">Осталось {{q_num_left}}</span>
+        {% endif %}
+        <span style="color: black;"> | </span>
+        {% if q_instance.ac_type != 'ANY' %}
+        <span>Тип ВС: {{q_instance.ac_type}}</span>
+        {% else %}
+        <span>Все Типы ВС</span>
+        {% endif %}
+        <span style="color: black;"> | </span>
+        <span>{{q_instance.them_name}}</span>
+    </legend>
+    <div>
+        <form method='post' action='{% url "quize737:next_question" %}' id="question">
 
-                <input type="hidden" name="tmp_test_id" value="{{tmp_test_id}}">
-                <input type="hidden" name="result_id" value="{{result_id}}">
-                <input type="hidden" name="question_id" value="{{question_id}}">
-
-                {% csrf_token %}
-                <label class="question"><b>{{question}}</b></label>
-                {% for option, value in option_dict.items|random_loop %}
-                    {% if value and value != 'None' %}
-                        <div class="radiobuttons">
-                            <input type="radio" name="user_answer" id="{{option}}" value="{{option}}" checked>
-                            <div class="option-value">
-                                <label for="{{option}}" class="option-value">{{value}}</label>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </form>
-            <div class="button_answer">
-                <input type="submit" value="Ответить" id="answer_btn" form="question">
-                <span id="wait" style="display: none;">Ответ принят, ожидайте...</span>
-            </div>
-        </div>
-    </fieldset>
-    <div class="report_issue" id="report_issue_block">
-        <form method="post" id="issue_form">
+            <input type="hidden" name="tmp_test_id" value="{{tmp_test_id}}">
+            <input type="hidden" name="result_id" value="{{result_id}}">
+            <input type="hidden" name="question_id" value="{{question_id}}">
             {% csrf_token %}
-            <input type="hidden" name="issue_q_id" id="issue_q_id" value="{{question_id}}">
-            <span style="color: black;"> | </span>
-            <a href="#" id="issue_send">Сообщить об ошибке</a>
-            <span style="color: black;"> | </span>
+            <label class="question"><b>{{question}}</b></label>
+            {% for option, value in option_dict.items|random_loop %}
+            {% if value and value != 'None' %}
+            <div class="radiobuttons">
+                <input type="radio" name="user_answer" id="{{option}}" value="{{option}}" checked>
+                <div class="option-value">
+                    <label for="{{option}}" class="option-value">{{value}}</label>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
         </form>
+        <div class="button_answer">
+            <input type="submit" value="Ответить" id="answer_btn" form="question">
+            <span id="wait" style="display: none;">Ответ принят, ожидайте...</span>
+        </div>
     </div>
+</fieldset>
 
-
-<script src="{% static 'js/start_test_radio/answer_accepted.js' %}" type="text/javascript"></script>
-<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
-
-<script type="text/javascript">
-    $('#issue_form').on('click','#issue_send',function(e){
-           let issue_form = document.getElementById("report_issue_block");
-           issue_form.style.display = 'none';
-        e.preventDefault();
-        $.ajax({
-            type:'POST',
-            url:'{% url "quize737:issue_mess" %}',
-            data:
-            {
-                issue_q_id:$("#issue_q_id").val(),
-                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-            },
-            success:function(){
-                  alert('Сообщение отправлено. Спасибо!');
-                    }
-            })
-        });
-</script>
-
-
-<script>
-window.onload = function () {
-    if (typeof history.pushState === "function") {
-        history.pushState("jibberish", null, null);
-        window.onpopstate = function () {
-            history.pushState('newjibberish', null, null);
-        };
-    }
-    else {
-        var ignoreHashChange = true;
-        window.onhashchange = function () {
-            if (!ignoreHashChange) {
-                ignoreHashChange = true;
-                window.location.hash = Math.random();
-            }
-            else {
-                ignoreHashChange = false;
-            }
-        };
-    }
-};
-</script>
-
+{% include "test_common.html" %}
 
 {% endblock %}
 

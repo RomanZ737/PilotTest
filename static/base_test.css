@@ -290,3 +290,36 @@ div.block_light_up {  /* блок всей строки данных в табл
 div.block_light_up:hover {  /* блок всей строки данных в таблице */
     background-color: #4f93ce;
 }
+
+
+div.modal-dialog {
+    position: absolute;
+    display: block;
+    left: 33%;
+    width: 520px;
+    top: 22%;
+    }
+
+
+#admin_mess_form {
+    background-color: rgb(62, 62, 62);
+}
+
+
+div.modal_form-static_sign {
+    position:relative;
+    display: block;
+    margin-top: 30px;
+}
+
+div.modal_form-dynamic_sign {
+    position:relative;
+    display: block;
+}
+
+div.modal_form_button_block {
+    position:relative;
+    display: block;
+    /* right: 10% */
+    margin-top: 30px;
+}

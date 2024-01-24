@@ -1,0 +1,29 @@
+{% load static %}
+<html>
+    <head>
+<!--https://blog.benoitblanchon.fr/django-htmx-modal-form/-->
+    </head>
+    <body>
+        <div class="modal-form">
+            <fieldset id="admin_mess_form">
+                <form hx-get="{{ request.path }}">
+                    <input type="hidden" name="issue_q_id" id="issue_q_id" value="{{question_id}}">
+                    <div class="block_none_light_up">
+                        <div class="modal_form-static_sign">
+                            <span class="mark_up">Краткое описание:</span>
+                        </div>
+                        <div class="modal_form-dynamic_sign">
+                            {{form.message}}
+                        </div>
+                        <div class="modal_form_button_block">
+                            <input type="submit" value="Отправить">
+                            <span>|</span>
+                            <input type="reset" data-bs-dismiss="modal" value="Закрыть">
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+    </body>
+
+</html>

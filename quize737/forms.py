@@ -83,7 +83,6 @@ class NewTestFormName(forms.Form):
 
 # Форма для вопросов создаваемого теста
 class NewTestFormQuestions(forms.ModelForm):
-
     theme = forms.ChoiceField()
 
     class Meta:
@@ -103,7 +102,6 @@ class MyNewTestFormQuestions(NewTestFormQuestions):
         super(MyNewTestFormQuestions, self).__init__(*args, **kwargs)
         self.fields['theme'].widget = forms.Select(attrs={'class': 'select_them'})
         self.fields['theme'].choices = self.thems_selection
-
 
 
 #  Форма для загрузки файла
@@ -135,5 +133,13 @@ class NewThemeForm(forms.ModelForm):
 
 #  форма сообщения администратору (в модальном окне)
 class AdminMessForm(forms.Form):
-    subject = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'style': 'font-size: 18'}), help_text="Тема сообщения")
+    subject = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'style': 'font-size: 18'}),
+                              help_text="Тема сообщения")
     message = forms.CharField(widget=forms.Textarea(attrs={'rows': 7, 'style': 'font-size: 18'}))
+
+
+#  форма сообщения об ошибке в вопросе (в модальном окне)
+class QuestionIssueMess(forms.Form):
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 4, 'style': 'font-size: 18',
+                                                           'placeholder': 'Желательно, но не обязательно...'}),
+                              required=False)
