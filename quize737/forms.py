@@ -23,7 +23,7 @@ class NewQuestionSetForm(forms.ModelForm):
         model = QuestionSet
         fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6',
                   'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
-                  'q_weight', 'answer', 'answers', 'ac_type']
+                  'q_weight', 'answer', 'answers', 'ac_type', 'is_active', 'is_for_center', 'is_timelimited']
 
         widgets = {
             'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
@@ -53,7 +53,7 @@ class QuestionSetForm(forms.ModelForm):
         model = QuestionSet
         fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6',
                   'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
-                  'q_weight', 'answer', 'answers', 'ac_type']
+                  'q_weight', 'answer', 'answers', 'ac_type', 'is_active', 'is_for_center', 'is_timelimited']
         widgets = {
             'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0})
         }

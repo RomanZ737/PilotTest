@@ -31,7 +31,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="filter-form">
+            <div class="filter-form-questions">
                 <div class="filter_related_questions">
                     <form id="theme_filter" action="{% url 'quize737:question_list' %}" method="get">
                     <select name="filter" title="Тема вопроса">
@@ -173,6 +173,7 @@
             document.open();
             document.write(content);
             document.close();
+
             });
         };
 

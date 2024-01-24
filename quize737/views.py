@@ -1190,18 +1190,40 @@ def question_list_details(request, id):
             else:
                 return redirect('quize737:question_list')
         else:
-            context = {'question_form': question_form, 'q_id': id}
+
+            context = {'question_form': question_form, 'q_id': id, 'q_object': a}
             return render(request, 'question_list_details.html', context=context)
 
+    elif 'q_switch_id' in request.GET:
+        form = request.GET
+        print('FROM:', form)
+        q_object = QuestionSet.objects.get(id=id)
+        if q_object.is_active:
+            q_object.is_active = False
+        else:
+            q_object.is_active = True
+        q_object.save()
+        q_object = QuestionSet.objects.get(id=id)
+        question_form = QuestionSetForm(request.GET)
+        # Сохраняем ссылку, с которой пришёл пользователь
+        previous_url = request.GET.get('previous_url')
+        context = {'question_form': question_form, 'q_id': id,
+                   'previous_url': previous_url, 'q_object': q_object}
+        return render(request, 'question_list_details.html', context=context)
+
+
     else:
+        q_object = QuestionSet.objects.get(id=id)
         result = QuestionSet.objects.filter(id=id).values('them_name', 'question', 'option_1', 'option_2', 'option_3',
                                                           'option_4', 'option_5', 'option_6', 'option_7', 'option_8',
                                                           'option_9', 'option_10', 'q_kind', 'q_weight', 'answer',
-                                                          'answers', 'id', 'ac_type')
+                                                          'answers', 'id', 'ac_type', 'is_active', 'is_for_center',
+                                                          'is_timelimited')
         question_form = QuestionSetForm(result[0])
         # Сохраняем ссылку, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-        context = {'question_form': question_form, 'q_id': result[0]['id'], 'previous_url': previous_url}
+        context = {'question_form': question_form, 'q_id': result[0]['id'],
+                   'previous_url': previous_url, 'q_object': q_object}
         return render(request, 'question_list_details.html', context=context)
 
 

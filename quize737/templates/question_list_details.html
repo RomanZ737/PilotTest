@@ -2,26 +2,13 @@
 
 {% extends "main_base.html" %}
 {% load tags %}
+{% load static %}
 {% block content %}
 
 <div class="left_side">
 <fieldset>
         <legend>
-            <a href="{% url 'quize737:question_list' %}">СПИСОК ВОПРОСОВ</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:new_question' %}">Добавить вопрос</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:theme_editor' %}">Список Тем</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:new_theme' %}">Добавить Тему</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
-            {% if request.user|has_group:'krs' or user.is_superuser %}
-                <span style="color: black;"> | </span>
-                <a href="{% url 'quize737:download_questions_bay' %}">Скачать базу</a>
-            {% endif %}
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
+            {% include "sub_menu_questions_db.html" with page=request.path %}
         </legend>
     <div class="block-list">
         <form id="question_data" method='post'>
@@ -30,6 +17,26 @@
             <p>{{error}}</p>
             {% endfor %}
             <input type="hidden" name="previous_url" value="{{ previous_url }}">
+            <input type="hidden" name="is_active" value="{{ q_object.is_active }}">
+            {% if q_object.is_active %}
+                <div id='q_status' class="q_active_link_butt">
+                    <a href="#" id="{{q_id}}" onclick="inActive(this.id)">
+                        ДЕАКТИВИРОВАТЬ ВОПРОС
+                    </a>
+                </div>
+            <hr/>
+            {% else %}
+                <div class="question-line_inactive">
+                    ВОПРОС НЕ АКТИВЕН
+                </div>
+                <div class="q_active_link_butt">
+                    <a href="#" id="{{q_id}}" onclick="inActive(this.id)">
+                        АКТИВИРОВАТЬ ВОПРОС
+                    </a>
+                </div>
+            <hr/>
+            {% endif %}
+
             <div class="block_none_light_up">
                 <div style="display: inline-block;">
                     {{question_form.them_name.label}}: {{question_form.them_name}}
@@ -166,7 +173,18 @@
 <!--        <br>-->
 <!--        <input type="submit" value="Вернуться" onClick="javascript:history.go(-1);">-->
     </div>
+    {% if not q_object.is_active %}
 
+        <hr/>
+        <div class="q_active_link_butt">
+            <a href="#" id="{{q_id}}" onclick="inActive(this.id)">
+                        АКТИВИРОВАТЬ ВОПРОС
+            </a>
+        </div>
+        <div class="question-line_inactive">
+                    ВОПРОС НЕ АКТИВЕН
+        </div>
+    {% endif %}
 </fieldset>
 </div>
 
@@ -174,7 +192,38 @@
 
 <p id="demo"></p>
 
-<script type="text/javascript">
+<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
+
+<script>
+// Активируем/Деактивируем вопрос по нажатию на иконку
+    //преобразуем данные формы в JSON
+    function getFormData($form){
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+    $.map(unindexed_array, function(n, i){
+
+        indexed_array[n['name']] = n['value'];
+
+    });
+    //console.log(indexed_array);
+    return indexed_array;
+}
+    //Коенкретно сдесь активируем/деактивируем вопрос
+    function inActive(clicked_id) {
+        //console.log('ID элемента: ' + clicked_id);
+        var $form = $("#question_data");
+        var data = getFormData($form);
+        data['q_switch_id'] = clicked_id;
+        $.get("{% url 'quize737:question_list_details' q_id %}", data, function(content){
+            console.log(content);
+            document.open();
+            document.write(content);
+            document.close();
+            //$('html').html(content);
+            //document.innerHTML = content;
+            });
+        };
+
 
 //Скрипт меняет размер поля вопроса под фактическое количество символов
 var q_text_Length = document.getElementById("question").value.length;

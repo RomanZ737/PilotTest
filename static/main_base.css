@@ -425,7 +425,13 @@ div.search-form-q_base {
 div.filter-form {   /* блок формы фильтра */
     position: relative;
     display: inline-block;
-    width: 834px;
+    width: 734px;
+}
+
+div.filter-form-questions {   /* блок формы фильтра */
+    position: relative;
+    display: inline-block;
+    width: 835px;
 }
 
 div.list-test_name {    /* блок названия теста в таблице */
@@ -1066,4 +1072,22 @@ div.list-question_inactive {
 .img_icon:hover {
     transform: translateY(-1px);
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+}
+
+div.question-line_inactive {
+    width: 100%;
+    background-color: #82c1b7;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #af0404;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+div.q_active_link_butt {
+    width: 100%;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 10px;
 }
