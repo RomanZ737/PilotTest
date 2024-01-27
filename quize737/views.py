@@ -2527,9 +2527,7 @@ def user_detales(request, id):
                                                          test_id=test['test_name'].id,
                                                          test_name=test["test_name"],
                                                          test_date_due=test['date_before'],
-                                                         user_done=f'{request.user.profile.family_name}'
-                                                                   f'{request.user.profile.first_name[0]}.'
-                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                         user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                          )
                             logger_user_action.warning(f'Пользователю: '
                                                        f'<b>{user_object.profile.family_name} '
