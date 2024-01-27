@@ -2237,9 +2237,7 @@ def edit_user(request, id):
 
         UserChangeLog.objects.create(user_changed=user_obj,
                                      description="Изм. данных",
-                                     user_done=f'{request.user.profile.family_name}'
-                                               f'{request.user.profile.first_name[0]}.'
-                                               f'{request.user.profile.middle_name[0]}.'
+                                     user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                      )
 
         # Проверяем должность (квалификацию), при необходимости обновляем должность и группу
@@ -2379,9 +2377,7 @@ def user_detales(request, id):
                                                  description="Удалён Тест",
                                                  test_id=test['test_name'].id,
                                                  test_name=test["test_name"],
-                                                 user_done=f'{request.user.profile.family_name}'
-                                                           f'{request.user.profile.first_name[0]}.'
-                                                           f'{request.user.profile.middle_name[0]}.'
+                                                 user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                  )
 
                     try:  # Ищем и удаляем начатые, но не законченные тесты (сам сформированный временный тест с вопросами)
@@ -2417,9 +2413,7 @@ def user_detales(request, id):
                                                                      test_name=test["test_name"],
                                                                      old_num_try=instance.num_try,
                                                                      new_num_try=int(test["num_try"]),
-                                                                     user_done=f'{request.user.profile.family_name}'
-                                                                               f'{request.user.profile.first_name[0]}.'
-                                                                               f'{request.user.profile.middle_name[0]}.'
+                                                                     user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                                      )
                                         # Записываем журнал, для просмотра пользователем
                                         UserChangeLog.objects.create(user_changed=user_object,
@@ -2428,9 +2422,7 @@ def user_detales(request, id):
                                                                      test_name=test["test_name"],
                                                                      old_date=instance.date_before,
                                                                      new_date=test["date_before"],
-                                                                     user_done=f'{request.user.profile.family_name}'
-                                                                               f'{request.user.profile.first_name[0]}.'
-                                                                               f'{request.user.profile.middle_name[0]}.'
+                                                                     user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                                      )
 
                                     elif int(instance.num_try) != int(test['num_try']) or instance.date_before != test[
@@ -2445,9 +2437,7 @@ def user_detales(request, id):
                                                                          test_name=test["test_name"],
                                                                          old_num_try=instance.num_try,
                                                                          new_num_try=int(test["num_try"]),
-                                                                         user_done=f'{request.user.profile.family_name}'
-                                                                                   f'{request.user.profile.first_name[0]}.'
-                                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                                         user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                                          )
                                         else:
                                             text = f'Выполнить до было: {instance.date_before.strftime("%d.%m.%Y")}<br>\n' \
@@ -2458,9 +2448,7 @@ def user_detales(request, id):
                                                                          test_name=test["test_name"],
                                                                          old_date=instance.date_before,
                                                                          new_date=test["date_before"],
-                                                                         user_done=f'{request.user.profile.family_name}'
-                                                                                   f'{request.user.profile.first_name[0]}.'
-                                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                                         user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                                          )
                                     return text
 
