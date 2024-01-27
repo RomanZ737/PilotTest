@@ -2631,9 +2631,7 @@ def new_user(request):
                                                f'{request.user.profile.middle_name[0]}.')
                     UserChangeLog.objects.create(user_changed=new_user,
                                                  description="Добавлен Пилот",
-                                                 user_done=f'{request.user.profile.family_name}'
-                                                           f'{request.user.profile.first_name[0]}.'
-                                                           f'{request.user.profile.middle_name[0]}.'
+                                                 user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                  )
                     return redirect('quize737:user_list')
 
@@ -2715,9 +2713,7 @@ def del_user(request, id):
                                f'{request.user.profile.middle_name[0]}.')
     UserChangeLog.objects.create(user_changed=user_object,
                                  description="Удалён Пилот",
-                                 user_done=f'{request.user.profile.family_name}'
-                                           f'{request.user.profile.first_name[0]}.'
-                                           f'{request.user.profile.middle_name[0]}.'
+                                 user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                  )
 
     user_object.is_active = False
