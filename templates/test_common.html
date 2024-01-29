@@ -25,7 +25,7 @@
             htmx.on("htmx:beforeSwap", (e) => {
 
             // Empty response targeting #dialog => hide the modal
-            if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+            if (e.detail.target.id == "dialog" && e.detail.xhr.status == 206) {
             modal.hide()
             e.detail.shouldSwap = false
             alert('Сообщение отправлено!')
