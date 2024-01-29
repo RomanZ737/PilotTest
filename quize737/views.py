@@ -735,6 +735,7 @@ def next_question(request):
                         #  Формируем список ответов в результатах теста
                         for question in answers:
                             question_block = {}
+                            question_block['id'] = question.question.id
                             question_block['question'] = question.question.question
                             question_block['conclusion'] = question.conclusion
                             #  Если вопрос имеет один ответ
@@ -2945,7 +2946,7 @@ def issue_mess(request, id):
             email_msg = {'subject': subject, 'message': message, 'to': to}
             common.send_email(request, email_msg)
 
-            return HttpResponse(request.POST)
+            return HttpResponse(status=206, headers={'id': id}, content={'test': 'ОТВЕТ'})
 
         else:
             form = QuestionIssueMess()

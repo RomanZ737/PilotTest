@@ -1,5 +1,6 @@
 {% extends "base_test.html" %}
-
+{% load tags %}
+{% load static %}
 {% block content %}
 <fieldset>
     <legend>Результат теста</legend>
@@ -78,7 +79,6 @@
                         {% endif %}
 
                         <div class="result_answers_question">{{question.question}}</div>
-
                         {% for answer in question.answers %}
                             {% if answer.valid == True %}
                                 <div class="result_answers_correct">{{answer.option}}</div>
@@ -90,12 +90,19 @@
                         <div class="result_answers_question">Ответ Тестируемого:</div>
                         {% for user_answer in question.user_answer%}
                             <div class="result_answers_user_answer">{{user_answer}}</div>
+
                         {% endfor %}
 
-                        </fieldset>
 
+
+                        <div class="report_issue_results" id="report_issue_block_{{question.id}}">
+                            <span style="color: black;"> | </span>
+                            <a href="#" hx-get="{% url 'quize737:issue_mess' question.id %}" hx-target="#dialog">Сообщить об ошибке</a>
+                            <span style="color: black;"> | </span>
+                        </div>
+
+                    </fieldset>
                     {% endfor %}
-
 
             </div>
 
@@ -107,6 +114,49 @@
         </fieldset>
 
 
+<div id="modal" class="modal fade">
+        <div id="dialog" class="modal-dialog" hx-target="this"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
+
+
+<script>
+           const modal = new bootstrap.Modal(document.getElementById("modal"))
+
+            htmx.on("htmx:afterSwap", (e) => {
+            // Response targeting #dialog => show the modal
+
+            if (e.detail.target.id == "dialog") {
+               modal.show()
+            }
+            })
+
+            htmx.on("htmx:beforeSwap", (e) => {
+
+            // Empty response targeting #dialog => hide the modal
+            if (e.detail.target.id == "dialog" && e.detail.xhr.status == 206) {
+            modal.hide()
+
+            //console.log("Responce_5: " + e.detail.xhr.responseXML);
+            //console.log("Responce_6: " + e.detail.xhr.getResponseHeader('id'));
+
+            e.detail.shouldSwap = false
+            alert('Сообщение отправлено!');
+
+            let q_id = e.detail.xhr.getResponseHeader('id')
+            let issue_form = document.getElementById("report_issue_block_" + q_id);
+            issue_form.style.display = 'none';
+            }
+            })
+            htmx.on("hidden.bs.modal", () => {
+
+
+            document.getElementById("dialog").innerHTML = ""
+            })
+
+</script>
 
 <script>
     let ans_block = document.getElementById("answers");

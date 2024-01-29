@@ -280,6 +280,12 @@ div.report_issue {
     margin: 10px;
 }
 
+div.report_issue_results {
+
+    margin: 10px;
+    float: right;
+}
+
 
 div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
@@ -292,12 +298,20 @@ div.block_light_up:hover {  /* блок всей строки данных в т
 }
 
 
-div.modal-dialog {
+.modal-wrap {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+}
+
+div.modal-form {
     position: absolute;
     display: block;
-    left: 33%;
+    left: 50%;
     width: 520px;
-    top: 22%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     }
 
 

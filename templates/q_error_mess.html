@@ -4,6 +4,7 @@
 <!--https://blog.benoitblanchon.fr/django-htmx-modal-form/-->
     </head>
     <body>
+    <div class="modal-wrap">
         <div class="modal-form">
             <fieldset id="admin_mess_form">
                 <form hx-get="{{ request.path }}">
@@ -24,6 +25,6 @@
                 </form>
             </fieldset>
         </div>
+    </div>
     </body>
-
 </html>
