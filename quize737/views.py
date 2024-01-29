@@ -2941,7 +2941,7 @@ def issue_mess(request, id):
                       f'<p style="font-size: 15px;"><b>Сообщил об ошибке в вопросе:</b></p>' \
                       f'<p style="font-size: 15px;"><b>{q_instance.question}</b></p>' \
                       f'<p style="font-size: 15px;"><b>Сообщение пользователя:</b></p>' \
-                      f'<p style="font-size: 15px;"><b>{description}</b></p>' \
+                      f'<p style="font-size: 15px;">{description}</p>' \
                       f'<a href="{site_url}/question_list/{q_id}">Редактировать вопрос</a>'
             email_msg = {'subject': subject, 'message': message, 'to': to}
             common.send_email(request, email_msg)
