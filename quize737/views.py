@@ -2956,7 +2956,10 @@ def all_img_for_q_upload(request, id):
                 filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/a_img.*")
             if filelist:
                 for file in filelist:
-                    os.remove(file)
+                    try:
+                        os.remove(file)
+                    except Exception:
+                        pass
             # file = request.FILES['comment_img'].name.split('.')[0]
 
             # file = request.FILES['question_img']
