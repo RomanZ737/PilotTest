@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import glob
 import os
 import random
 import io
@@ -9,6 +10,7 @@ import sys
 import logging
 import common
 
+from django.core.files.storage import FileSystemStorage
 from itertools import chain
 from django.utils.datastructures import MultiValueDictKeyError
 from django.http import HttpResponseRedirect
@@ -33,7 +35,7 @@ from dbLogs.models import UserChangeLog
 from django.contrib.auth.decorators import login_required, user_passes_test
 import datetime
 from .forms import QuestionSetForm, NewQuestionSetForm, NewTestFormName, NewTestFormQuestions, FileUploadForm, \
-    NewThemeForm, MyNewTestFormQuestions, AdminMessForm, QuestionIssueMess
+    NewThemeForm, MyNewTestFormQuestions, AdminMessForm, QuestionIssueMess, IMGform
 from users.forms import TestsForUser, GroupForm, EditUserForm, ProfileForm, UserRegisterForm, EditGroupForm, \
     EditProfileForm
 from django.http import HttpResponse
@@ -189,12 +191,15 @@ def start(request, id=None):
                             if theme.name != 'Все темы':
                                 quiz_set = QuestionSet.objects.filter(Q(them_name=theme.name), (
                                         Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')), is_active=True)
-                                if quiz_set.count() < int(q_set['q_num']):  # если в сете не оказалось достаточно вопросов по соответствующей теме, то делаем случайную выборку по недостающему числу вопросов
+                                if quiz_set.count() < int(q_set[
+                                                              'q_num']):  # если в сете не оказалось достаточно вопросов по соответствующей теме, то делаем случайную выборку по недостающему числу вопросов
                                     add_num_q = int(q_set['q_num']) - quiz_set.count()
-                                    add_set = QuestionSet.objects.filter(Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY'),
+                                    add_set = QuestionSet.objects.filter(
+                                        Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY'),
                                         is_active=True).order_by('?')[:add_num_q]
-                                    quiz_set = list(chain(quiz_set, add_set)) # Соединяем два QuerySet
-                                quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
+                                    quiz_set = list(chain(quiz_set, add_set))  # Соединяем два QuerySet
+                                quiz_set = random.sample(list(quiz_set), int(
+                                    q_set['q_num']))  # Выбираем случайные вопросы, в количестве определённом в тесте
                                 all_theme_set.append(quiz_set)  # Добавляем выбранные вопросы в список
                                 # Считаем количество вопросов
                                 total_q_number += int(q_set['q_num'])
@@ -204,14 +209,15 @@ def start(request, id=None):
                         quiz_set = QuestionSet.objects.filter(Q(them_name=q_set['theme']),
                                                               (Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')),
                                                               is_active=True)
-                        if quiz_set.count() < int(q_set['q_num']): # если в сете не оказалось достаточно вопросов по соответствующей теме, (например после формирования теста в конструкторе тесто база вопросов подверглась редактированию)то делаем случайную выборку по недостающему числу вопросов
+                        if quiz_set.count() < int(q_set[
+                                                      'q_num']):  # если в сете не оказалось достаточно вопросов по соответствующей теме, (например после формирования теста в конструкторе тесто база вопросов подверглась редактированию)то делаем случайную выборку по недостающему числу вопросов
 
                             add_num_q = int(q_set['q_num']) - quiz_set.count()
 
                             add_set = QuestionSet.objects.filter(Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY'),
                                                                  is_active=True).order_by('?')[:add_num_q]
 
-                            quiz_set = list(chain(quiz_set, add_set)) # Соединяем два QuerySet
+                            quiz_set = list(chain(quiz_set, add_set))  # Соединяем два QuerySet
                         quiz_set = random.sample(list(quiz_set), int(q_set['q_num']))
                         all_theme_set.append(quiz_set)
                         total_q_number += int(q_set['q_num'])
@@ -1119,8 +1125,6 @@ def question_list(request):
                 else:
                     them_q_list = them_q_list.filter(is_active=False)
 
-            print('filter[3]', filter_input[3])
-
             if filter_input[3] != 'Все':  # Фильтруем вопросы АУЦ
                 if filter_input[3] == 'АУЦ NWS':
                     them_q_list = them_q_list.filter(is_for_center=True)
@@ -1159,22 +1163,29 @@ def question_list(request):
 @group_required(('KRS', 'Редактор'))
 def new_question(request):
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
+
     if request.method == 'POST':
-        question_form = NewQuestionSetForm(request.POST)  # Для форм основанных на модели объекта
+        question_form = NewQuestionSetForm(request.POST, request.FILES)  # Для форм основанных на модели объекта
         if question_form.is_valid():
             logger_user_action.warning(f'<b>Добавлен вопрос: </b>{request.POST.get("question")}\n\n'
                                        f'<b>User:</b> {request.user.profile.family_name}'
                                        f' {request.user.profile.first_name[0]}.'
                                        f'{request.user.profile.middle_name[0]}.')
             question_form.save()
+            # Очищаем папку с временными файлами
+            dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            filelist = glob.glob(f"{dir_path}/media/images/tmp/*.*")
+            if filelist:
+                for file in filelist:
+                    os.remove(file)
             return redirect('quize737:question_list')
         else:
-            context = {'question_form': question_form}
+            context = {'question_form': question_form, 'q_id': 000}
             return render(request, 'new_question.html', context=context)
 
     else:
         question_form = NewQuestionSetForm()
-        context = {'question_form': question_form}
+        context = {'question_form': question_form, 'q_id': 000}
         return render(request, 'new_question.html', context=context)
 
 
@@ -1228,7 +1239,7 @@ def question_list_details(request, id):
                                                           'option_4', 'option_5', 'option_6', 'option_7', 'option_8',
                                                           'option_9', 'option_10', 'q_kind', 'q_weight', 'answer',
                                                           'answers', 'id', 'ac_type', 'is_active', 'is_for_center',
-                                                          'is_timelimited')
+                                                          'is_timelimited', 'comment_text')
         question_form = QuestionSetForm(result[0])
         # Сохраняем ссылку, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
@@ -2295,9 +2306,7 @@ def edit_user(request, id):
         if form_user.is_valid() and form_profile.is_valid():
             form_user.save()
             # form_profile.save()
-            # print('Name:', form_profile.cleaned_data['first_name'])
-            # print('Family Name:', form_profile.cleaned_data['family_name'])
-            # print('username: ', form_user.cleaned_data['username'])
+
 
             # user_obj.username = form_user.cleaned_data['username']
             # user_obj.email = form_user.cleaned_data['email']
@@ -2360,8 +2369,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(request.POST, request.FILES)
         if tests_for_user_form.is_valid():
             for test in tests_for_user_form.cleaned_data:
-                # print('TEST:', test)
-                # print('TEST_OBJ:', test['test_name'].id)
+
                 #  Удаляем все объекты
                 if test['DELETE']:
                     UserTests.objects.filter(user=user_object,
@@ -2582,7 +2590,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-        # print('previous_url_initial:', previous_url)
+
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)
@@ -2595,7 +2603,7 @@ def new_user(request):
     form_user = UserRegisterForm()
     form_profile = ProfileForm()
     if request.method == 'POST':
-        print('POST:', request.POST)
+
         try:  # Проверяем существование пользователя, если существует, то активируем
             user_obj = User.objects.get(username=request.POST.get('username'))
             if user_obj.is_active:  # Если пользователь существует и активен
@@ -2753,7 +2761,7 @@ def file_upload(request):
                 filename = force_str(f).strip().replace(' ', '_')
                 filename = force_str(filename).strip().replace('(', '')
                 filename = force_str(filename).strip().replace(')', '')
-                # print('filename', filename)
+
                 try:
                     with open(f"{dir_path}/media/documents/{filename}", newline='',
                               encoding='utf-8') as csvfile:
@@ -2833,7 +2841,7 @@ def file_upload(request):
                                             if question[1]:
                                                 questions_created += 1
                                         # else:
-                                        #     print('Вопрос существует')
+
                                         # Подсчитываем созданные вопросы
 
 
@@ -2893,6 +2901,84 @@ def file_upload(request):
         return render(request, 'file_upload.html', context=context)
 
 
+@login_required
+@group_required(('KRS', 'Редактор'))
+#  Загрузка картинок к вопросам
+def all_img_for_q_upload(request, id):
+
+    q_instance = ''
+    try:
+        q_instance = QuestionSet.objects.get(id=id)
+    except ObjectDoesNotExist:
+        pass
+
+    if 'delIMG' in request.POST: # Запрос на удаление картинки
+        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        del_value = request.POST.get('delIMG')
+        if del_value == 'DelQIMG': # Если надо удалить картинку вопроса
+            # Удаляем файл
+            filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/q_img.*")
+            for file in filelist:
+                os.remove(file)
+            # Удаляем запись в объекте вопроса
+            q_instance.question_img = None
+            q_instance.save()
+            return HttpResponse(status=200)
+        else: # Если надо удалить картинку ответа
+            # Удаляем файл
+            filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/a_img.*")
+            for file in filelist:
+                os.remove(file)
+            # Удаляем запись в объекте вопроса
+            q_instance.comment_img = None
+            q_instance.save()
+            return HttpResponse(status=200)
+
+    elif 'new_q' in request.POST:  # Если запрос со страницы с новым вопросом
+        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        if 'comment_img' in request.FILES:
+            file = request.FILES['comment_img']
+        else:
+            file = request.FILES['question_img']
+        fs = FileSystemStorage(location=f"{dir_path}/media/images/tmp", base_url="/media/images/tmp")
+        file = fs.save(file.name, file)
+        fileurl = fs.url(file)
+        return HttpResponse(status=200, content={fileurl})
+    else:
+        form = IMGform(request.POST, request.FILES, instance=q_instance)
+        if form.is_valid():
+            # Проверяем существует ли файл
+            dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            filelist = []
+            if 'question_img' in request.FILES:
+                filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/q_img.*")
+            else:
+                filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/a_img.*")
+            if filelist:
+                for file in filelist:
+                    os.remove(file)
+            # file = request.FILES['comment_img'].name.split('.')[0]
+
+            # file = request.FILES['question_img']
+            # ext = file.name.split('.')[-1]
+            # q_instance = QuestionSet.objcts.get(id=id)
+            # q_instance.question_img = file(f'q_img.{ext}')
+
+            form.save()
+            if 'question_img' in request.FILES:  # Если это картинка для вопроса
+
+                return HttpResponse(status=200, headers={'id': id}, content={q_instance.question_img.url})
+            else:  # Если это картинка для ответа
+                return HttpResponse(status=200, headers={'id': id}, content={q_instance.comment_img.url})
+        else:
+
+            err_list = ''
+            for error in form.errors.get_json_data().values():
+                err_list = err_list + f'\n{error[0]["message"]}'
+
+            return HttpResponse(status=500, content={err_list})
+
+
 # Скачивание формы для заполнения вопросов
 @login_required
 @group_required(('KRS', 'Редактор'))
@@ -2916,14 +3002,14 @@ def download_questions_bay(request):
 @login_required
 def issue_mess(request, id):
     if 'issue_q_id' in request.GET:
-    #if request.method == "POST":
-        #form = QuestionIssueMess(request.POST)
+        # if request.method == "POST":
+        # form = QuestionIssueMess(request.POST)
         form = QuestionIssueMess(request.GET)
         description = request.GET.get('message')
-        #description = request.POST.get('message')
+        # description = request.POST.get('message')
         if form.is_valid():
             q_id = int(request.GET.get('issue_q_id'))
-            #q_id = int(request.POST.get('issue_q_id'))
+            # q_id = int(request.POST.get('issue_q_id'))
             site_url = config('SITE_URL', default='')
             q_instance = QuestionSet.objects.get(id=q_id)
             q_instance.is_active = False  # Деактивируем вопрос
@@ -3056,9 +3142,7 @@ def selected_users_test(request):
                                                          test_id=test['test_name'].id,
                                                          test_name=test["test_name"],
                                                          test_date_due=test['date_before'],
-                                                         user_done=f'{request.user.profile.family_name}'
-                                                                   f'{request.user.profile.first_name[0]}.'
-                                                                   f'{request.user.profile.middle_name[0]}.'
+                                                         user_done=f'{request.user.profile.family_name} {request.user.profile.first_name[0]}.{request.user.profile.middle_name[0]}.'
                                                          )
 
                             logger_user_action.warning(f'Пользователю: '

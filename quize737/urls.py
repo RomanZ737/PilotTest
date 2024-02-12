@@ -54,4 +54,5 @@ urlpatterns = [
     path('selected_users_test/', views.selected_users_test, name='selected_users_test'),
     path('selected_users_new_group/', views.selected_users_new_group, name='selected_users_new_group'),
     path('selected_users_add_to_group/', views.selected_users_add_to_group, name='selected_users_add_to_group'),
+    path('all_img_for_q_upload/<int:id>', views.all_img_for_q_upload, name='all_img_for_q_upload'),
     ]

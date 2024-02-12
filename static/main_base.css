@@ -971,7 +971,7 @@ div.new_group_field {
 
 div.new_question-static_sign {
     display: inline-block;
-    width: 100px;
+    width: 147px;
     vertical-align: top;
 }
 
@@ -1090,4 +1090,34 @@ div.q_active_link_butt {
     font-size: 20px;
     text-align: center;
     margin-bottom: 10px;
+}
+
+div.q_edit_img_block {
+  display: block;
+  text-align: center;
+}
+
+img.q_edit_img_src {
+    max-height: 200px;
+    transition: transform 0.25s ease;
+    cursor: zoom-in;
+}
+
+/*input[type=checkbox] {
+  display: none;
+} */
+
+input[type=checkbox]:checked ~ label > img {
+  transform: scale(2);
+  cursor: zoom-out;
+}
+
+div.q_edit_comment {
+    padding-top: 25px;
+}
+
+div.q_edit_comment_statick_sign {
+    display: inline-block;
+    height: 100%;
+    vertical-align: top;
 }

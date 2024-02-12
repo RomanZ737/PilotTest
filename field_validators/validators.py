@@ -8,3 +8,12 @@ def validate_not_zero(value):
             _('Количество попыток не может равняться 0'),
             params={'value': value},
         )
+
+
+# Проверка максимального размера загружаемого файла
+def file_size(value):
+    filesize = value.size
+    if filesize > 2097152:
+        raise ValidationError('Превышен максимальный размер файла 2MB')
+    else:
+        return value

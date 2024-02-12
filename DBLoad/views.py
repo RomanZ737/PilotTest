@@ -18,13 +18,14 @@ def alter_questions(request):
 # Добавляем дату сдачи в результаты и количество попыток
 @login_required
 def alter_results(request):
-    all_results = QuizeResults.objects.all()
-    for result in all_results:
-        result.date_end = result.timestamp
-        if result.conclusion:
-            result.try_spent = 1
-        else:
-            result.try_spent = 3
-        result.total_num_try = 3
-        result.save()
+    # QuestionSet.objects.update(is_for_center=False, is_timelimited=False)
+    # all_results = QuizeResults.objects.all()
+    # for result in all_results:
+    #     result.date_end = result.timestamp
+    #     if result.conclusion:
+    #         result.try_spent = 1
+    #     else:
+    #         result.try_spent = 3
+    #     result.total_num_try = 3
+    #     result.save()
     return redirect('quize737:start')

@@ -1,7 +1,7 @@
 from .models import QuestionSet, TestConstructor, TestQuestionsBay, Thems
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, Textarea, NumberInput, ChoiceField
+from django.forms import ModelForm, Textarea, NumberInput, ChoiceField, TextInput
 
 
 # Валидатор для формы QuestionSetForm - проверят уникальность вопроса
@@ -9,6 +9,15 @@ def similar_question(value):
     questions = QuestionSet.objects.filter(question=value)
     if len(questions) > 0:
         raise ValidationError('Такой вопрос уже есть в базе')
+
+
+class IMGform(forms.ModelForm):
+    class Meta:
+        model = QuestionSet
+        fields = ['question_img', 'comment_img']
+        widgets = {'comment_text': forms.Textarea(attrs={'cols': 80, 'rows': 10})}
+        error_messages = {'question_img': {'invalid_image': "Не верный формат файла"},
+                          'comment_img': {'invalid_image': "Не верный формат файла"}}
 
 
 # Класс для объектов создания вопроса
@@ -21,9 +30,10 @@ class NewQuestionSetForm(forms.ModelForm):
 
     class Meta:
         model = QuestionSet
-        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6',
-                  'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
-                  'q_weight', 'answer', 'answers', 'ac_type', 'is_active', 'is_for_center', 'is_timelimited']
+        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4',
+                  'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10',
+                  'q_kind', 'q_weight', 'answer', 'answers', 'ac_type',
+                  'is_for_center', 'is_timelimited', 'question_img', 'comment_img', 'comment_text']
 
         widgets = {
             'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
@@ -37,7 +47,10 @@ class NewQuestionSetForm(forms.ModelForm):
             'option_7': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_8': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_9': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
-            'option_10': forms.Textarea(attrs={'cols': 100, 'rows': 1})
+            'option_10': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+            'comment_text': forms.Textarea(attrs={'cols': 80, 'rows': 5}),
+            'answer': forms.NumberInput(attrs={'size': '4', 'step': 1, 'max': 10, 'min': 1}),
+            'answers': forms.TextInput(attrs={"placeholder": "ex. 1,2,3,4..."})
         }
 
 
@@ -51,11 +64,14 @@ class QuestionSetForm(forms.ModelForm):
 
     class Meta:
         model = QuestionSet
-        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'option_6',
-                  'option_7', 'option_8', 'option_9', 'option_10', 'q_kind',
-                  'q_weight', 'answer', 'answers', 'ac_type', 'is_active', 'is_for_center', 'is_timelimited']
+        fields = ['them_name', 'question', 'option_1', 'option_2', 'option_3', 'option_4',
+                  'option_5', 'option_6', 'option_7', 'option_8', 'option_9', 'option_10',
+                  'q_kind', 'q_weight', 'answer', 'answers', 'ac_type', 'is_active',
+                  'is_for_center', 'is_timelimited', 'question_img', 'comment_img', 'comment_text']
         widgets = {
-            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0})
+            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
+            'answer': forms.NumberInput(attrs={'size': '4', 'step': 1, 'max': 10, 'min': 1}),
+            'comment_text': forms.Textarea(attrs={'cols': 80, 'rows': 5}),
         }
 
 

@@ -13,7 +13,7 @@
     <div class="block-list">
         <form id="question_data" method='post'>
             {% csrf_token %}
-            {% for error in question_form.errors.items %}
+            {% for error in question_form.errors.values %}
             <p>{{error}}</p>
             {% endfor %}
             <input type="hidden" name="previous_url" value="{{ previous_url }}">
@@ -63,8 +63,42 @@
                 </div>
             </div>
 
-            <hr/>
+                <div style="padding-bottom: 10px;">Картинка к вопросу:</div>
+                {% if q_object.question_img %}
+                <div class="q_edit_img_block" id='q_img_display'>
+                    <input type="checkbox" style="display:none;" id="zoomCheck_q">
+                    <label for="zoomCheck_q">
+                     <img class='q_edit_img_src' id='q_img_src' src="{{q_object.question_img.url}}">
+                    </label>
+                </div>
+                {% else %}
+                <div class="q_edit_img_block" id='q_img_display' style="display:none;">
+                    <input type="checkbox" style="display:none;" id="zoomCheck">
+                    <label for="zoomCheck">
+                    <img class='q_edit_img_src' id='q_img_src' src="#">
+                    </label>
+                 {% endif %}
+            </div>
+            <div>
+                <div id='q_img_error' style="display:none;"></div>
+            </div>
 
+            <div>{{question_form.question_img}}
+
+<!--                <a href="#" id="loadQIMG">Загрузить</a>-->
+
+                {% if q_object.question_img %}
+                    <span id="DelQIMGField">|
+                        <a href="#" id="DelQIMG" onclick="if(confirm('Удалить изображение к вопросу?')) delIMG(this.id);">Удалить</a>
+                    </span>
+                {% else %}
+                <span style="display: none;" id="DelQIMGField">|
+                    <a href="#" id="DelQIMG" onclick="if(confirm('Удалить изображение к вопросу?')) delIMG(this.id);">Удалить</a>
+                </span>
+                {% endif %}
+            </div>
+            <span class="comment">Максимальный размер файла 2MB</span>
+            <hr/>
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_1.label}}:</span>
@@ -73,7 +107,6 @@
                     <span><textarea style="font-size: 15px;" id="option_1" name="option_1" oninput="autoGrow()">{{question_form.option_1.value}}</textarea></span>
                 </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_2.label}}:</span>
@@ -82,7 +115,6 @@
                    <span><textarea style="font-size: 15px;" id="option_2" name="option_2" oninput="autoGrow()">{{question_form.option_2.value}}</textarea></span>
                 </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_3.label}}:</span>
@@ -107,7 +139,6 @@
                     <span><textarea style="font-size: 15px;" id="option_5" name="option_5" oninput="autoGrow()">{{question_form.option_5.value}}</textarea></span>
                  </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_6.label}}:</span>
@@ -116,7 +147,6 @@
                     <span><textarea style="font-size: 15px;" id="option_6" name="option_6" oninput="autoGrow()">{{question_form.option_6.value}}</textarea></span>
                 </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_7.label}}:</span>
@@ -125,7 +155,6 @@
                     <span><textarea style="font-size: 15px;" id="option_7" name="option_7" oninput="autoGrow()">{{question_form.option_7.value}}</textarea></span>
                 </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_8.label}}:</span>
@@ -134,7 +163,6 @@
                    <span><textarea style="font-size: 15px;" id="option_8" name="option_8" oninput="autoGrow()">{{question_form.option_8.value}}</textarea></span>
                 </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_9.label}}:</span>
@@ -143,7 +171,6 @@
                     <span><textarea style="font-size: 15px;" id="option_9" name="option_9" oninput="autoGrow()">{{question_form.option_9.value}}</textarea></span>
                 </div>
             </div>
-
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
                     <span>{{question_form.option_10.label}}:</span>
@@ -152,15 +179,60 @@
                     <span><textarea style="font-size: 15px;" id="option_10" name="option_10" oninput="autoGrow()">{{question_form.option_10.value}}</textarea></span>
                 </div>
             </div>
-
             <hr/>
 
                 <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
                 <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
-                <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="0" max="5" value="{{question_form.answer.value}}"></p>
-                <p id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="{{question_form.answers.value}}"></p>
+                <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="1" max="10" step="1" value="{{question_form.answer.value}}"></p>
+                <p id="answers">{{question_form.answers.label}}: {{question_form.answers}}
+<!--                    <input name="answers" type="text" value="{{question_form.answers.value}}"></p>-->
 
+            <hr/>
+            <div style="padding-bottom: 10px;">Картинка к ответу:</div>
+                {% if q_object.comment_img %}
+                <div class="q_edit_img_block" id='a_img_display'>
+                    <input type="checkbox" style="display:none;" id="zoomCheck">
+                    <label for="zoomCheck">
+                     <img class='q_edit_img_src' id='a_img_src' src="{{q_object.comment_img.url}}" style="max-height:200px">
+                    </label>
+                </div>
+                {% else %}
+                <div class="q_edit_img_block" id='a_img_display' style="display:none;">
+                    <input type="checkbox" style="display: none;" id="zoomCheck_a">
+                    <label for="zoomCheck_a">
+                    <img class='q_edit_img_src' id='a_img_src' src="#">
+                    </label>
+                </div>
+                 {% endif %}
+
+            <div>
+                <div id='a_img_error' style="display:none;"></div>
+            </div>
+
+            <div>{{question_form.comment_img}}
+<!--                <a href="#" id="loadAIMG">Загрузить</a>-->
+
+                {% if q_object.comment_img %}
+                    <span id="DelAIMGField">|
+                        <a href="#" id="DelAIMG" onclick="if(confirm('Удалить изображение к вопросу?')) delIMG(this.id);">Удалить</a>
+                    </span>
+                {% else %}
+                <span style="display: none;" id="DelAIMGField">|
+                    <a href="#" id="DelAIMG" onclick="if(confirm('Удалить изображение к вопросу?')) delIMG(this.id);">Удалить</a>
+                </span>
+                {% endif %}
+            </div>
+            <span class="comment">Максимальный размер файла 2MB</span>
+            <div class="q_edit_comment">
+                <div class="q_edit_comment_statick_sign">
+                    {{question_form.comment_text.label}}:
+                </div>
+                <div style="display: inline-block;">
+                 <span oninput="autoGrow()">{{question_form.comment_text}}</span>
+                </div>
+            </div>
         </form>
+        <hr/>
 
         <form method="post" action="{% url 'quize737:question_del' q_id %}" id="del_question_form">
             {% csrf_token %}
@@ -191,6 +263,8 @@
                     ВОПРОС НЕ АКТИВЕН
         </div>
     {% endif %}
+
+
 </fieldset>
 </div>
 
@@ -199,6 +273,130 @@
 <p id="demo"></p>
 
 <script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
+
+<script>
+    //Обрабатываем удаление картинки
+    function delIMG(event) {
+        var data = {delIMG: event}
+        console.log('DATA:' + data);
+        var url = "{% url 'quize737:all_img_for_q_upload' q_id %}";
+         $.ajax({
+            type: 'post',
+            headers: {'X-CSRFToken': '{{csrf_token}}' },
+            url: url,
+            dataType: 'html',
+            data: data,
+            //processData: false,
+            //contentType: false,
+            success: function (content) {
+                      // Success callback function
+                      console.log('Event:' + event);
+                      if (event == 'DelAIMG') {
+                        $("#id_comment_img").val(null);  //очищаем форму загрузки картинки
+                        $("#a_img_display").attr('style', 'display: none;'); //Скрываем поле с картинкой
+                        $("#DelAIMGField").attr('style', 'display: none;'); //Скрываем поле с кнопкой удалить
+                      } else {
+                        $("#id_question_img").val(null);  //очищаем форму загрузки картинки
+                        $("#q_img_display").attr('style', 'display: none;'); //Скрываем поле с картинкой
+                        $("#DelQIMGField").attr('style', 'display: none;'); //Скрываем поле с кнопкой удалить
+                      }
+
+            },
+         });
+
+    };
+
+</script>
+
+<script>
+    //Загрузка картинки ответа
+    //$('#loadAIMG').click(function(event) {
+    $('#id_comment_img').change(function(event) {
+        event.preventDefault();
+        if ($("#id_comment_img").val() != '') {
+            var file = $('#id_comment_img').prop('files');
+            var data = new FormData();
+            data.append('comment_img', file[0]);
+            var url = "{% url 'quize737:all_img_for_q_upload' q_id %}";
+            //console.log('ACTION:' + url);
+            //console.log('DATA:' + file[0]);
+
+            $.ajax({
+                type: 'POST',
+                headers: {'X-CSRFToken': '{{csrf_token}}' },
+                url: url,
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (content) {
+                          // Success callback function
+                          //console.log('DATA:' + content);
+                          $("#id_comment_img").val(null);  //Обнуляем форму загрузки
+                          $("#a_img_display").attr('style', 'display: block;'); //Показываем поле с картинкой
+                          $("#a_img_src").attr('src', content);  //Выгружаем ссылку на картинку
+                          $("#DelAIMGField").attr('style', 'display: block;'); //Показываем кнопку удалить
+                          location.reload();
+                        },
+                error: function (xhr, ajaxOptions, thrownError) {
+                          // error callback function
+                          //console.log('DATA:' + xhr.responseText);
+                          //console.log('DATA:' + thrownError);
+                          $("#id_question_img").val(null);
+                          $("#a_img_error").attr('style', 'display: block;');
+                          $("#a_img_error").html(xhr.responseText);
+                        },
+            });
+        } else {
+            alert('Картинка не выбрана')
+        };
+    });
+
+    //Загрузка картинки вопроса
+    //$('#loadQIMG').click(function(event) {
+    $('#id_question_img').change(function(event) {
+        event.preventDefault();
+
+        console.log('Нажали кнопку');
+        if ($("#id_question_img").val() != '') {
+            var file = $('#id_question_img').prop('files');
+            console.log('Файл присутствует в форме');
+            var data = new FormData();
+            data.append('question_img', file[0]);
+            var url = "{% url 'quize737:all_img_for_q_upload' q_id %}";
+            //console.log('ACTION:' + url);
+            //console.log('DATA:' + file[0]);
+
+            $.ajax({
+                type: 'POST',
+                headers: {'X-CSRFToken': '{{csrf_token}}' },
+                url: url,
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (content) {
+                          // Success callback function
+                          //console.log('DATA:' + content);
+                          $("#id_question_img").val(null); //Обнуляем форму загрузки
+                          $("#q_img_display").attr('style', 'display: block;');  //Показываем поле с картинкой
+                          $("#q_img_src").attr('src', content); //Выгружаем ссылку на картинку
+                          $("#DelQIMGField").attr('style', 'display: block;'); //Показываем кнопку удалить
+                          location.reload();
+                        },
+                error: function (xhr, ajaxOptions, thrownError) {
+                          // error callback function
+                          //console.log('DATA:' + xhr.responseText);
+                          //console.log('DATA:' + thrownError);
+                          $("#id_question_img").val(null);
+                          $("#q_img_error").attr('style', 'display: block;');
+                          $("#q_img_error").html(xhr.responseText);
+                        },
+            });
+        } else {
+            alert('Картинка не выбрана')
+        };
+    });
+
+</script>
 
 <script>
 // Активируем/Деактивируем вопрос по нажатию на иконку
@@ -221,7 +419,7 @@
         var data = getFormData($form);
         data['q_switch_id'] = clicked_id;
         $.get("{% url 'quize737:question_list_details' q_id %}", data, function(content){
-            console.log(content);
+            //console.log(content);
             document.open();
             document.write(content);
             document.close();
@@ -231,105 +429,26 @@
         };
 
 
-//Скрипт меняет размер поля вопроса под фактическое количество символов
-var q_text_Length = document.getElementById("question").value.length;
-var q_rows_length = 1
-if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
-                              q_text_Length = 100 };
-var q_field = document.getElementById("question");
-q_field.setAttribute("cols", q_text_Length);
-q_field.setAttribute("rows", q_rows_length);
-//----------------------------------------------------
-var option_1_text_Length = document.getElementById("option_1").value.length;
-var option_1_rows_length = 1
-if ( option_1_text_Length > 100 ) { option_1_rows_length = Math.ceil(option_1_text_Length/100);
-                              option_1_text_Length = 100 };
-var option_1_field = document.getElementById("option_1");
-option_1_field.setAttribute("cols", option_1_text_Length);
-option_1_field.setAttribute("rows", option_1_rows_length);
+</script>
 
-//----------------------------------------------------
-var option_2_text_Length = document.getElementById("option_2").value.length;
-var option_2_rows_length = 1
-if ( option_2_text_Length > 100 ) { option_2_rows_length = Math.ceil(option_2_text_Length/100);
-                              option_2_text_Length = 100 };
-var option_2_field = document.getElementById("option_2");
-option_2_field.setAttribute("cols", option_2_text_Length);
-option_2_field.setAttribute("rows", option_2_rows_length);
+<script>
+//Подгоняем текстовые поля под размер текста
+    let Textarea = document.querySelectorAll("textarea");
+    for (i of Textarea) {
+        var q_text_Length = i.value.length;
+        var q_rows_length = 1
+        if (q_text_Length != 0) {
+            if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
+                                  q_text_Length = 100 };
+                //var q_field = document.getElementById("question");
+                i.setAttribute("cols", q_text_Length);
+                i.setAttribute("rows", q_rows_length);
+            };
+        };
 
-//----------------------------------------------------
-var option_3_text_Length = document.getElementById("option_3").value.length;
-var option_3_rows_length = 1
-if ( option_3_text_Length > 100 ) { option_3_rows_length = Math.ceil(option_3_text_Length/100);
-                              option_3_text_Length = 100 };
-var option_3_field = document.getElementById("option_3");
-option_3_field.setAttribute("cols", option_3_text_Length);
-option_3_field.setAttribute("rows", option_3_rows_length);
+</script>
 
-//----------------------------------------------------
-var option_4_text_Length = document.getElementById("option_4").value.length;
-var option_4_rows_length = 1
-if ( option_4_text_Length > 100 ) { option_4_rows_length = Math.ceil(option_4_text_Length/100);
-                              option_4_text_Length = 100 };
-var option_4_field = document.getElementById("option_4");
-option_4_field.setAttribute("cols", option_4_text_Length);
-option_4_field.setAttribute("rows", option_4_rows_length);
-
-//----------------------------------------------------
-var option_5_text_Length = document.getElementById("option_5").value.length;
-var option_5_rows_length = 1
-if ( option_5_text_Length > 100 ) { option_5_rows_length = Math.ceil(option_5_text_Length/100);
-                              option_5_text_Length = 100 };
-var option_5_field = document.getElementById("option_5");
-option_5_field.setAttribute("cols", option_5_text_Length);
-option_5_field.setAttribute("rows", option_5_rows_length);
-
-//----------------------------------------------------
-var option_6_text_Length = document.getElementById("option_6").value.length;
-var option_6_rows_length = 1
-if ( option_6_text_Length > 100 ) { option_6_rows_length = Math.ceil(option_6_text_Length/100);
-                              option_6_text_Length = 100 };
-var option_6_field = document.getElementById("option_6");
-option_6_field.setAttribute("cols", option_6_text_Length);
-option_6_field.setAttribute("rows", option_6_rows_length);
-
-//----------------------------------------------------
-var option_7_text_Length = document.getElementById("option_7").value.length;
-var option_7_rows_length = 1
-if ( option_7_text_Length > 100 ) { option_7_rows_length = Math.ceil(option_7_text_Length/100);
-                              option_7_text_Length = 100 };
-var option_7_field = document.getElementById("option_7");
-option_7_field.setAttribute("cols", option_7_text_Length);
-option_7_field.setAttribute("rows", option_7_rows_length);
-
-//----------------------------------------------------
-var option_8_text_Length = document.getElementById("option_8").value.length;
-var option_8_rows_length = 1
-if ( option_8_text_Length > 100 ) { option_8_rows_length = Math.ceil(option_8_text_Length/100);
-                              option_8_text_Length = 100 };
-var option_8_field = document.getElementById("option_8");
-option_8_field.setAttribute("cols", option_8_text_Length);
-option_8_field.setAttribute("rows", option_8_rows_length);
-
-//----------------------------------------------------
-var option_9_text_Length = document.getElementById("option_9").value.length;
-var option_9_rows_length = 1
-if ( option_9_text_Length > 100 ) { option_9_rows_length = Math.ceil(option_9_text_Length/100);
-                              option_9_text_Length = 100 };
-var option_9_field = document.getElementById("option_9");
-option_9_field.setAttribute("cols", option_9_text_Length);
-option_9_field.setAttribute("rows", option_9_rows_length);
-
-//----------------------------------------------------
-var option_10_text_Length = document.getElementById("option_10").value.length;
-var option_10_rows_length = 1
-if ( option_10_text_Length > 100 ) { option_10_rows_length = Math.ceil(option_10_text_Length/100);
-                              option_10_text_Length = 100 };
-var option_10_field = document.getElementById("option_10");
-option_10_field.setAttribute("cols", option_10_text_Length);
-option_10_field.setAttribute("rows", option_10_rows_length);
-
-
+<script>
 
 //Скрипт определяет изначальную видимость полей, в зависимости от вида вопроса
 var checkBox = document.getElementById("q_kind");

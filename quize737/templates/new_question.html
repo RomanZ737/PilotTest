@@ -2,30 +2,17 @@
 
 {% extends "main_base.html" %}
 {% load tags %}
+{% load static %}
 {% block content %}
 
 
 <fieldset>
     <legend>
-            <a href="{% url 'quize737:question_list' %}">Список вопросов</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:new_question' %}">ДОБАВИТЬ ВОПРОС</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:theme_editor' %}">Список Тем</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:new_theme' %}">Добавить Тему</a>
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:file_upload' %}">Загрузить файл</a>
-            {% if request.user|has_group:'krs' or user.is_superuser %}
-                <span style="color: black;"> | </span>
-                <a href="{% url 'quize737:download_questions_bay' %}">Скачать базу</a>
-            {% endif %}
-            <span style="color: black;"> | </span>
-            <a href="{% url 'quize737:question_form_file_download' %}">Скачать Форму Вопросов</a>
+        {% include "sub_menu_questions_db.html" with page=request.path %}
     </legend>
 
     <div class="block-list">
-        <form id="question_data" method='post'>
+        <form id="question_data" method='post' enctype="multipart/form-data">
             {% csrf_token %}
             {% for error in question_form.errors.values %}
             <p>{{error}}</p>
@@ -37,6 +24,10 @@
                 <div style="display: inline-block;">
                     <span id="ac_type">{{question_form.ac_type.label}}: {{question_form.ac_type}}</span>
                 </div>
+                 <div style="display: inline-block;">
+                        <span>{{question_form.is_for_center}} Для АУЦ NWS</span>
+                        <span> {{question_form.is_timelimited}} Ограничение по времени</span>
+                 </div>
             </div>
 
             <hr/>
@@ -49,7 +40,28 @@
                     <span oninput="autoGrow()">{{question_form.question}}</span>
                 </div>
             </div>
+            <div style="padding-bottom: 10px;">Картинка к вопросу:</div>
+             <div>
+                <div id='q_img_error' style="display:none;"></div>
+            </div>
+            <div class="q_edit_img_block" id='q_img_display' style="display:none;">
+                <input type="checkbox" style="display:none;" id="zoomCheck_q">
+                    <label for="zoomCheck_q">
+                        <img id='q_img_src' class='q_edit_img_src' src="#">
+                    </label>
+            </div>
+            <div style="display: inline-block;">{{question_form.question_img}}
 
+<!--                <a href="#" id="loadQIMG">Загрузить</a>-->
+            </div>
+            <div style="display: inline-block;">
+            <span style="display: none;" id="DelQIMGField">|
+                <a href="#" id="DelQIMG" onclick="if(confirm('Удалить изображение к вопросу?')) delIMG(this.id);">Удалить</a>
+            </span>
+            </div>
+            <div>
+                <span class="comment">Максимальный размер файла 2MB</span>
+            </div>
             <hr/>
 
             <div class="block_none_light_up">
@@ -143,7 +155,35 @@
             </div>
 
             <hr/>
+            <div style="padding-bottom: 10px;">Картинка к ответу:</div>
+            <div class="q_edit_img_block" id='a_img_display' style="display:none;">
+                <input type="checkbox" style="display:none;" id="zoomCheck_a">
+                    <label for="zoomCheck_a">
+                        <img class='q_edit_img_src' id='a_img_src' src="#">
+                    </label>
+                </div>
+                 <div>
+                <div id='a_img_error' style="display:none;"></div>
+            </div>
 
+            <div style="display: inline-block;">{{question_form.comment_img}}
+<!--                <a href="#" id="loadAIMG">Загрузить</a>-->
+            </div>
+            <div style="display: inline-block;">
+            <span style="display: none;" id="DelAIMGField">|
+                    <a href="#" id="DelAIMG" onclick="if(confirm('Удалить изображение к вопросу?')) delIMG(this.id);">Удалить</a>
+            </span>
+            </div>
+            <div style="padding-bottom: 10px;">
+                <span class="comment">Максимальный размер файла 2MB</span>
+            </div>
+                <div class="new_question-static_sign">
+                    <span>{{question_form.comment_text.label}}:</span>
+                </div>
+                 <div class="new_question-input_field">
+                    <span oninput="autoGrow()">{{question_form.comment_text}}</span>
+                </div>
+            <hr/>
             <div class="block_none_light_up">
                 {{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()">
             </div>
@@ -157,7 +197,8 @@
             </div>
 
             <div class="block_none_light_up">
-                <span id="answers">{{question_form.answers.label}}: <input name="answers" type="text" value="ex. 1,2,3,4..."></span>
+                <span id="answers">{{question_form.answers.label}}: {{question_form.answers}}</span>
+<!--                    <input name="answers" type="text" placeholder="ex. 1,2,3,4..."></span>-->
             </div>
 
             <br>
@@ -170,17 +211,117 @@
 
 <p id="demo"></p>
 
-<script type="text/javascript">
+<script src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
 
-//Скрипт меняет размер поля вопроса под фактическое количество символов
-//var q_text_Length = "{{question_form.question.value}}".length;
-//var q_rows_length = 1
-//if ( q_text_Length > 100 ) { q_rows_length = Math.ceil(q_text_Length/100);
-//                              q_text_Length = 100 };
-//var q_field = document.getElementById("question");
-//q_field.setAttribute("cols", q_text_Length);
-//q_field.setAttribute("rows", q_rows_length);
+<script>
+    //Кнопка удалить изображение
+    function delIMG(event) {
+        if (event == 'DelAIMG') {
+            $("#id_comment_img").val(null);  //Обнуляем форму загрузки
+            $("#DelAIMGField").attr('style', 'display: none;'); //Убираем кнопку удалить
+            $("#a_img_display").attr('style', 'display: none;');  //Убираем картинку
+        } else {
+            $("#id_question_img").val(null);  //Обнуляем форму загрузки
+            $("#DelQIMGField").attr('style', 'display: none;'); //Убираем кнопку удалить
+            $("#q_img_display").attr('style', 'display: none;');  //Убираем картинку
+        };
+    }
 
+</script>
+
+<script>
+    //Загрузка картинки ответа
+    //$('#loadAIMG').click(function(event) {
+    $('#id_comment_img').change(function(event) {
+        event.preventDefault();
+        if ($("#id_comment_img").val() != '') {
+            var file = $('#id_comment_img').prop('files');
+            var data = new FormData();
+            data.append('comment_img', file[0]);
+            data.append('new_q', 'new_question')
+            var url = "{% url 'quize737:all_img_for_q_upload' q_id %}";
+            //console.log('ACTION:' + url);
+            //console.log('DATA:' + file[0]);
+
+            $.ajax({
+                type: 'POST',
+                headers: {'X-CSRFToken': '{{csrf_token}}' },
+                url: url,
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (content) {
+                          // Success callback function
+                          //console.log('DATA:' + content);
+                          //$("#id_comment_img").val(null);  //Обнуляем форму загрузки
+                          $("#a_img_src").attr('src', content);  //Выгружаем ссылку на картинку
+                          $("#a_img_display").attr('style', 'display: block;'); //Показываем поле с картинкой
+                          $("#DelAIMGField").attr('style', 'display: block;'); //Показываем кнопку удалить
+                          //location.reload();
+                        },
+                error: function (xhr, ajaxOptions, thrownError) {
+                          // error callback function
+                          //console.log('DATA:' + xhr.responseText);
+                          //console.log('DATA:' + thrownError);
+                          $("#id_question_img").val(null);
+                          $("#a_img_error").attr('style', 'display: block;');
+                          $("#a_img_error").html(xhr.responseText);
+                        },
+            });
+        } else {
+            alert('Картинка не выбрана')
+        };
+    });
+
+    //Загрузка картинки вопроса
+    //$('#loadQIMG').click(function(event) {
+    $('#id_question_img').change(function(event) {
+        event.preventDefault();
+
+        console.log('Нажали кнопку');
+        if ($("#id_question_img").val() != '') {
+            var file = $('#id_question_img').prop('files');
+            console.log('Файл присутствует в форме');
+            var data = new FormData();
+            data.append('question_img', file[0]);
+            data.append('new_q', 'new_question')
+            var url = "{% url 'quize737:all_img_for_q_upload' q_id %}";
+            //console.log('ACTION:' + url);
+            //console.log('DATA:' + file[0]);
+
+            $.ajax({
+                type: 'POST',
+                headers: {'X-CSRFToken': '{{csrf_token}}' },
+                url: url,
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (content) {
+                          // Success callback function
+                          //console.log('DATA:' + content);
+                          //$("#id_question_img").val(null); //Обнуляем форму загрузки
+                          $("#q_img_src").attr('src', content); //Выгружаем ссылку на картинку
+                          $("#q_img_display").attr('style', 'display: block;');  //Показываем поле с картинкой
+                          $("#DelQIMGField").attr('style', 'display: block;'); //Показываем кнопку удалить
+                          //location.reload();
+                        },
+                error: function (xhr, ajaxOptions, thrownError) {
+                          // error callback function
+                          //console.log('DATA:' + xhr.responseText);
+                          //console.log('DATA:' + thrownError);
+                          $("#id_question_img").val(null);
+                          $("#q_img_error").attr('style', 'display: block;');
+                          $("#q_img_error").html(xhr.responseText);
+                        },
+            });
+        } else {
+            alert('Картинка не выбрана')
+        };
+    });
+
+</script>
+
+<script>
 //Скрипт определяет изначальную видимость полей, в зависимости от вида вопроса
 var checkBox = document.getElementById("q_kind");
 var answer_field = document.getElementById("answer");

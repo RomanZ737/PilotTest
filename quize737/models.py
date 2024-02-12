@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 import pytz
 from django.utils.timezone import now
 from choices import ACTypeQ
+from field_validators.validators import file_size
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 # Модель тем вопросов
@@ -18,11 +21,32 @@ class Thems(models.Model):
         return f'{self.name}'  # , id: {self.id}'
 
 
+def q_img_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'images/{instance.them_name.id}/{instance.id}/q_img.{ext}'
+
+
+def a_img_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'images/{instance.them_name.id}/{instance.id}/a_img.{ext}'
+
+
 # Вся база вопросов по всем темам
 class QuestionSet(models.Model):
+
+    def clean(self): # Валидатор поля ПРАВИЛЬНОГО ответа на вопрос
+        if self.answer is None and self.answers is None:
+            raise ValidationError('Поле ответа не может быть пустым')
+        if self.answer is None and self.answers == 'None':
+            raise ValidationError('Поле ответа не может быть пустым')
+        if self.answer is None and self.answers == 'ex. 1,2,3,4...':
+            raise ValidationError('Поле ПРАВИЛЬНОГО ответа не может быть пустым')
+
     # Имя темы связано с классом Them
     them_name = models.ForeignKey(Thems, on_delete=models.CASCADE, max_length=500, verbose_name='Тема Вопроса')
     question = models.TextField(verbose_name='Вопрос')
+    question_img = models.ImageField(upload_to=q_img_path, verbose_name='Картина к вопросу',
+                                     validators=[file_size], blank=True, null=True)
     option_1 = models.TextField(verbose_name='Вариант 1')
     option_2 = models.TextField(verbose_name='Вариант 2')
     option_3 = models.TextField(verbose_name='Вариант 3', blank=True, null=True)
@@ -33,6 +57,9 @@ class QuestionSet(models.Model):
     option_8 = models.TextField(verbose_name='Вариант 8', blank=True, null=True)
     option_9 = models.TextField(verbose_name='Вариант 9', blank=True, null=True)
     option_10 = models.TextField(verbose_name='Вариант 10', blank=True, null=True)
+    comment_img = models.ImageField(upload_to=a_img_path, verbose_name='Картинка пояснения к ответу',
+                                    validators=[file_size], blank=True, null=True)
+    comment_text = models.TextField(verbose_name='Текст пояснения к ответу', blank=True, null=True)
     q_kind = models.BooleanField(verbose_name='Несколько правильных ответов', default=False,
                                  help_text='Если вопрос подразумевает несколько правильных ответов')
     q_weight = models.FloatField(verbose_name='"Вес вопроса"', default=0.0,
@@ -68,7 +95,8 @@ class QuizeSet(models.Model):
                                   help_text='Имя Теста + кол-во вопросов (без пробелов)')
     user_under_test = models.CharField(max_length=255, verbose_name='Имя пользователя',
                                        help_text='Имя пользователя, который проходит тест')
-    timestamp = models.DateTimeField(verbose_name='Время и дата теста', default=now)  #datetime.now(pytz.timezone('Europe/Moscow')).strftime('%d.%m.%Y %H:%M:%S')
+    timestamp = models.DateTimeField(verbose_name='Время и дата теста',
+                                     default=now)  # datetime.now(pytz.timezone('Europe/Moscow')).strftime('%d.%m.%Y %H:%M:%S')
     questions_ids = models.TextField(verbose_name='Номера вопросов', null=True,
                                      help_text='Сквозные Номера вопросов в базе данных вопросов, сгенерированные пользователю')
     q_sequence_num = models.IntegerField(default=0,
@@ -126,6 +154,8 @@ class TestConstructor(models.Model):
     email_to_send = models.TextField(verbose_name='email адреса для рассылки результатов', null=True)
     is_active = models.BooleanField(verbose_name='Активен тест или нет', default=True,
                                     help_text='Если тест не активен, то он перемещается в архив')
+    comment = models.CharField(max_length=255, verbose_name='Комментарий', null=True,
+                               help_text='Произвольный комментарий к тесту')
 
     def __str__(self):
         return f'{self.name}'
@@ -159,7 +189,8 @@ class AnswersResults(models.Model):
     results = models.ForeignKey(QuizeResults, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',
                                 help_text='Объект с результатами теста конкретного пользователя')
     question = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, max_length=500, verbose_name='Результаты теста',
-                                 help_text='Объект с результатами теста конкретного пользователя', default='Question Deleted')
+                                 help_text='Объект с результатами теста конкретного пользователя',
+                                 default='Question Deleted')
     user_answer = models.CharField(max_length=255, verbose_name='Ответ пользователя',
                                    help_text='Ответ пользователя на вопрос')
     conclusion = models.BooleanField(verbose_name='Результат ответа', null=True,
