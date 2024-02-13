@@ -357,29 +357,5 @@ div.modal_form_button_block {
     text-align: center;
 }
 
-div.q_img_block {
-  display: block;
-  text-align: center;
-}
-
-div.q_img_src {
-    max-height: 200px;
-    /* transition: transform 0.25s ease; */
-    transition: .3s ease;
-    cursor: zoom-in;
-    overflow: hidden;
-}
-
-input[type=checkbox]:checked ~ label > img {
-  /*transform: scale(2); */
-  transition: .3s ease;
-  cursor: zoom-out;
-  max-height: 400px;
-  /* max-width: 97%; */
-  width: auto;
-  height: auto;
-  /*margin: 0 auto; */
-  /* overflow: hidden; */
-}
 
 
