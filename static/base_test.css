@@ -81,6 +81,20 @@ div.option-value {
     font-size: 25px;
 }
 
+div.q_comment {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    vertical-align: middle;
+    text-align: justify;
+    text-justify: inter-word;
+    padding: 5px;
+    color: rgb(209, 209,209);
+    font-size: 15px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
 
 div.button_answer {
     position: relative;
@@ -286,6 +300,10 @@ div.report_issue_results {
     float: right;
 }
 
+div.show_comment {
+    margin: 10px;
+    float: left;
+}
 
 div.block_light_up {  /* блок всей строки данных в таблице */
     padding: 0px;
@@ -336,6 +354,7 @@ div.modal_form_button_block {
     display: block;
     /* right: 10% */
     margin-top: 30px;
+    text-align: center;
 }
 
 div.q_img_block {
@@ -355,11 +374,13 @@ input[type=checkbox]:checked ~ label > img {
   /*transform: scale(2); */
   transition: .3s ease;
   cursor: zoom-out;
-  max-height: 550px;
-  max-width: 97%;
+  max-height: 400px;
+  /* max-width: 97%; */
   width: auto;
   height: auto;
   /*width: auto; */
-  margin: 0 auto;
+  /*margin: 0 auto; */
   /* overflow: hidden; */
 }
+
+

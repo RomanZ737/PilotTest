@@ -50,6 +50,7 @@ urlpatterns = [
     path('pilotload/', PLView.pilotload, name='pilotload'),
     path('download_questions_bay/', views.download_questions_bay, name='download_questions_bay'),
     path('issue_mess/<int:id>', views.issue_mess, name='issue_mess'),
+    path('show_comment/<int:id>', views.show_comment, name='show_comment'),
     path('mess_to_admin/', views.mess_to_admin, name='mess_to_admin'),
     path('selected_users_test/', views.selected_users_test, name='selected_users_test'),
     path('selected_users_new_group/', views.selected_users_new_group, name='selected_users_new_group'),

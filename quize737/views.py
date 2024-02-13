@@ -742,6 +742,8 @@ def next_question(request):
                         for question in answers:
                             question_block = {}
                             question_block['id'] = question.question.id
+                            question_block['comment_img'] = question.question.comment_img
+                            question_block['comment_text'] = question.question.comment_text
                             question_block['question'] = question.question.question
                             question_block['conclusion'] = question.conclusion
                             #  Если вопрос имеет один ответ
@@ -2307,7 +2309,6 @@ def edit_user(request, id):
             form_user.save()
             # form_profile.save()
 
-
             # user_obj.username = form_user.cleaned_data['username']
             # user_obj.email = form_user.cleaned_data['email']
             user_obj.first_name = form_profile.cleaned_data['first_name']
@@ -2905,17 +2906,16 @@ def file_upload(request):
 @group_required(('KRS', 'Редактор'))
 #  Загрузка картинок к вопросам
 def all_img_for_q_upload(request, id):
-
     q_instance = ''
     try:
         q_instance = QuestionSet.objects.get(id=id)
     except ObjectDoesNotExist:
         pass
 
-    if 'delIMG' in request.POST: # Запрос на удаление картинки
+    if 'delIMG' in request.POST:  # Запрос на удаление картинки
         dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         del_value = request.POST.get('delIMG')
-        if del_value == 'DelQIMG': # Если надо удалить картинку вопроса
+        if del_value == 'DelQIMG':  # Если надо удалить картинку вопроса
             # Удаляем файл
             filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/q_img.*")
             for file in filelist:
@@ -2924,7 +2924,7 @@ def all_img_for_q_upload(request, id):
             q_instance.question_img = None
             q_instance.save()
             return HttpResponse(status=200)
-        else: # Если надо удалить картинку ответа
+        else:  # Если надо удалить картинку ответа
             # Удаляем файл
             filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/a_img.*")
             for file in filelist:
@@ -3046,6 +3046,14 @@ def issue_mess(request, id):
         form = QuestionIssueMess()
         context = {'form': form, 'question_id': id}
         return render(request, 'q_error_mess.html', context=context)
+
+
+# Комментарий/пояснение под ответом на вопрос, при просмотре ответов
+@login_required
+def show_comment(request, id):
+    q_instance = QuestionSet.objects.get(id=id)
+    context = {'q_instance': q_instance}
+    return render(request, 'show_comment.html', context=context)
 
 
 #  Функция кнопки возврата, с учётом результатов поиска или фильтрации
