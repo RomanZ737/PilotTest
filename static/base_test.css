@@ -378,7 +378,6 @@ input[type=checkbox]:checked ~ label > img {
   /* max-width: 97%; */
   width: auto;
   height: auto;
-  /*width: auto; */
   /*margin: 0 auto; */
   /* overflow: hidden; */
 }
