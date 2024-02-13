@@ -1169,13 +1169,24 @@ def new_question(request):
     if request.method == 'POST':
         question_form = NewQuestionSetForm(request.POST, request.FILES)  # Для форм основанных на модели объекта
         if question_form.is_valid():
+            dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             logger_user_action.warning(f'<b>Добавлен вопрос: </b>{request.POST.get("question")}\n\n'
                                        f'<b>User:</b> {request.user.profile.family_name}'
                                        f' {request.user.profile.first_name[0]}.'
                                        f'{request.user.profile.middle_name[0]}.')
-            question_form.save()
+            instance = question_form.save()
+            instance.question_img = question_form.cleaned_data['question_img']
+            instance.comment_img = question_form.cleaned_data['comment_img']
+            instance.save()
+            print('path: ', f"{dir_path}/media/images/{instance.them_name.id}/{instance.id}/None/*.*")
+            filelist = glob.glob(f"{dir_path}/media/images/{instance.them_name.id}/None/*.*")
+
+            if filelist:
+                for file in filelist:
+                    os.remove(file)
+            os.rmdir(f"{dir_path}/media/images/{instance.them_name.id}/None")
             # Очищаем папку с временными файлами
-            dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
             filelist = glob.glob(f"{dir_path}/media/images/tmp/*.*")
             if filelist:
                 for file in filelist:
