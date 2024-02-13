@@ -29,7 +29,7 @@
                 <label class="question"><b>{{question}}</b></label>
             </div>
             {% if q_instance.question_img %}
-                <div>
+                <div class="q_img_block">
                     <input type="checkbox" style="display:none;" id="zoomCheck_q">
                     <label for="zoomCheck_q">
                      <img id="q_img_src" class="q_img_src" src="{{q_instance.question_img.url}}">
