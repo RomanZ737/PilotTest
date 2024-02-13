@@ -362,7 +362,7 @@ div.q_img_block {
   text-align: center;
 }
 
-div.q_img_src {
+img.q_img_src {
     max-height: 200px;
     /* transition: transform 0.25s ease; */
     transition: .3s ease;
