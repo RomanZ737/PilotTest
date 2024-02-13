@@ -357,12 +357,12 @@ div.modal_form_button_block {
     text-align: center;
 }
 
-div.q_img_block {
+.q_img_block {
   display: block;
   text-align: center;
 }
 
-img.q_img_src {
+q_img_src {
     max-height: 200px;
     /* transition: transform 0.25s ease; */
     transition: .3s ease;
