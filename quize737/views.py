@@ -1184,13 +1184,19 @@ def new_question(request):
             if filelist:
                 for file in filelist:
                     os.remove(file)
-            os.rmdir(f"{dir_path}/media/images/{instance.them_name.id}/None")
+            try:
+                os.rmdir(f"{dir_path}/media/images/{instance.them_name.id}/None")
+            except Exception:
+                pass
             # Очищаем папку с временными файлами
 
             filelist = glob.glob(f"{dir_path}/media/images/tmp/*.*")
             if filelist:
                 for file in filelist:
-                    os.remove(file)
+                    try:
+                        os.remove(file)
+                    except Exception:
+                        pass
             return redirect('quize737:question_list')
         else:
             context = {'question_form': question_form, 'q_id': 000}
@@ -2929,8 +2935,12 @@ def all_img_for_q_upload(request, id):
         if del_value == 'DelQIMG':  # Если надо удалить картинку вопроса
             # Удаляем файл
             filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/q_img.*")
-            for file in filelist:
-                os.remove(file)
+            if filelist:
+                for file in filelist:
+                    try:
+                        os.remove(file)
+                    except Exception:
+                        pass
             # Удаляем запись в объекте вопроса
             q_instance.question_img = None
             q_instance.save()
@@ -2938,8 +2948,12 @@ def all_img_for_q_upload(request, id):
         else:  # Если надо удалить картинку ответа
             # Удаляем файл
             filelist = glob.glob(f"{dir_path}/media/images/{q_instance.them_name}/{q_instance.id}/a_img.*")
-            for file in filelist:
-                os.remove(file)
+            if filelist:
+                for file in filelist:
+                    try:
+                        os.remove(file)
+                    except Exception:
+                        pass
             # Удаляем запись в объекте вопроса
             q_instance.comment_img = None
             q_instance.save()
