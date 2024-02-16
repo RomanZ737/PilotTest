@@ -36,7 +36,7 @@ class NewQuestionSetForm(forms.ModelForm):
                   'is_for_center', 'is_timelimited', 'question_img', 'comment_img', 'comment_text']
 
         widgets = {
-            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
+            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 3.0, 'min': 0.0}),
             'question': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_1': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
             'option_2': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
@@ -69,7 +69,7 @@ class QuestionSetForm(forms.ModelForm):
                   'q_kind', 'q_weight', 'answer', 'answers', 'ac_type', 'is_active',
                   'is_for_center', 'is_timelimited', 'question_img', 'comment_img', 'comment_text']
         widgets = {
-            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 2.0, 'min': 0.0}),
+            'q_weight': forms.NumberInput(attrs={'size': '4', 'step': 0.5, 'max': 3.0, 'min': 0.0}),
             'answer': forms.NumberInput(attrs={'size': '4', 'step': 1, 'max': 10, 'min': 1}),
             'comment_text': forms.Textarea(attrs={'cols': 80, 'rows': 5}),
         }
