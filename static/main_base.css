@@ -1051,7 +1051,7 @@ div.list-question_inactive {
    for "disabled" effect */
   opacity: 0.3;
   /* background: #CCC; */
-    text-decoration: line-through;
+    /*text-decoration: line-through;*/
     position: relative;
     display: inline-block;
     width: 660px;
