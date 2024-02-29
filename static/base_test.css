@@ -47,7 +47,7 @@ label.question {
     margin-top: 5px;
     margin-bottom: 20px;
     color: black;
-    font-size: 26px;
+    font-size: 22px;
     width: 95%;
     text-align: justify;
     text-justify: inter-word;
@@ -78,7 +78,7 @@ div.option-value {
     text-justify: inter-word;
     padding: 5px;
     color: rgb(209, 209,209);
-    font-size: 25px;
+    font-size: 20px;
 }
 
 div.q_comment {
@@ -373,6 +373,16 @@ img.q_img_src {
     transition: .3s ease;
     cursor: zoom-in;
     max-width: 400px;
+    /*overflow: hidden;*/
+
+}
+
+img.a_img_src {
+    max-height: 150px;
+    /* transition: transform 0.25s ease; */
+    transition: .3s ease;
+    cursor: zoom-in;
+    max-width: 200px;
     /*overflow: hidden;*/
 
 }
