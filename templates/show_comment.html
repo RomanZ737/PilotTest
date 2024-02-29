@@ -18,7 +18,9 @@
                     {% endif %}
                     {% if q_instance.comment_text %}
                         <div class="q_comment">
-                            {{q_instance.comment_text}}
+                            {% autoescape off %}
+                                {{q_instance.comment_text}}
+                            {% endautoescape %}
                         </div>
                     {% endif %}
                     <div class="modal_form_button_block">

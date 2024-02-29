@@ -327,9 +327,14 @@ div.modal-form {
     position: absolute;
     display: block;
     left: 50%;
-    width: 520px;
+    /* width: 520px; */
     top: 50%;
     transform: translate(-50%, -50%);
+    overflow-y: auto;
+    height: auto;
+    width: auto;
+    max-width: 90%;
+    max-height: 90%;
     }
 
 
@@ -363,21 +368,25 @@ div.q_img_block {
 }
 
 img.q_img_src {
-    max-height: 200px;
+    max-height: 400px;
     /* transition: transform 0.25s ease; */
     transition: .3s ease;
     cursor: zoom-in;
-    overflow: hidden;
+    max-width: 400px;
+    /*overflow: hidden;*/
+
 }
 
 input[type=checkbox]:checked ~ label > img {
   /*transform: scale(2); */
   transition: .3s ease;
   cursor: zoom-out;
-  max-height: 400px;
+  max-height: 700px;
+  max-width: 600px;
   /* max-width: 97%; */
   width: auto;
   height: auto;
   /*margin: 0 auto; */
   /* overflow: hidden; */
+  /*transform: translate(-20%, -20%);*/
 }
