@@ -33,14 +33,14 @@ DEBUG = False
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "formatters": {
         "common": {
             "format": '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
             "datefmt": "%d:%m:%Y %H:%M:%S"
         },
         "answers": {
-            "format": '%(asctime)s %(name)-12s %(message)s',
+            "format": '%(asctime)s %(name)-12s; %(message)s',
             "datefmt": "%d:%m:%Y %H:%M:%S"
         },
 
@@ -87,7 +87,7 @@ LOGGING = {
             "propagate": True,
         },
         "PILOT ANSWER": {  # Ответы тестируемых
-            "handlers": ["file_answers", "log_rotate_answers"],
+            "handlers": ["file_answers"],# "log_rotate_answers"],
             "level": "INFO",
             "propagate": True,
         },

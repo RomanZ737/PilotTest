@@ -26,7 +26,7 @@ from django.core.exceptions import ValidationError
 from django.forms import formset_factory, BaseFormSet
 from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
-from django.utils import six
+
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload, \
@@ -522,14 +522,14 @@ def next_question(request):
                                                           user_answer=user_answers_set,
                                                           conclusion=True
                                                           )
-                            loger_pilot_answer.info(f"{request.user.username} "
-                                                    f">>PASS<<{request.user.profile.family_name}\n"
+                            loger_pilot_answer.info(f"{request.user.username}; "
+                                                    f">>PASS<<;{request.user.profile.family_name};"
                                                     f" {request.user.profile.first_name[0]}."
-                                                    f"{request.user.profile.middle_name[0]}.\n"
-                                                    f"Question(ID:{answered_q_instance.id}):\n"
-                                                    f"{answered_q_instance.question}\n"
-                                                    f"Pilot Answers:\n{get_answers(user_answers_set)}\n"
-                                                    f"Correct Answers:\n{get_answers(correct_answers_set)}")
+                                                    f"{request.user.profile.middle_name[0]}.;"
+                                                    f"Question(ID:{answered_q_instance.id}):;"
+                                                    f"{answered_q_instance.question};"
+                                                    f"Pilot Answers:{get_answers(user_answers_set)};"
+                                                    f"Correct Answers:{get_answers(correct_answers_set)};")
                             # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                             user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                                 'correct_q_num', 'score_number')
@@ -559,14 +559,14 @@ def next_question(request):
                                                           conclusion=False
                                                           )
 
-                            loger_pilot_answer.info(f"{request.user.username}\n"
-                                                    f">>FAIL<< {request.user.profile.family_name}"
+                            loger_pilot_answer.info(f"{request.user.username};"
+                                                    f">>FAIL<<;{request.user.profile.family_name}"
                                                     f" {request.user.profile.first_name[0]}."
-                                                    f"{request.user.profile.middle_name[0]}.\n"
-                                                    f"Question(ID:{answered_q_instance.id}):\n"
-                                                    f"{answered_q_instance.question}\n"
-                                                    f"Pilot Answers:\n{get_answers(user_answers_set)}\n"
-                                                    f"Correct Answers:\n{get_answers(correct_answers_set)}")
+                                                    f"{request.user.profile.middle_name[0]}.;"
+                                                    f"Question(ID:{answered_q_instance.id}):;"
+                                                    f"{answered_q_instance.question};"
+                                                    f"Pilot Answers:{get_answers(user_answers_set)};"
+                                                    f"Correct Answers:{get_answers(correct_answers_set)};")
                     else:
                         #  Если вопрос с одним вариантом ответа
                         user_aswer = request.POST.get('user_answer').replace('option_', '')
@@ -581,14 +581,14 @@ def next_question(request):
                                                           user_answer=user_aswer,
                                                           conclusion=True
                                                           )
-                            loger_pilot_answer.info(f"{request.user.username}\n"
-                                                    f">>PASS<< {request.user.profile.family_name}"
+                            loger_pilot_answer.info(f"{request.user.username};"
+                                                    f">>PASS<<;{request.user.profile.family_name}"
                                                     f" {request.user.profile.first_name[0]}."
-                                                    f"{request.user.profile.middle_name[0]}.\n"
-                                                    f"Question(ID:{answered_q_instance.id}):\n"
-                                                    f"{answered_q_instance.question}\n"
-                                                    f"Pilot Answer:\n{full_user_answer}\n"
-                                                    f"Correct Answer:\n{full_correct_answer}")
+                                                    f"{request.user.profile.middle_name[0]}.;"
+                                                    f"Question(ID:{answered_q_instance.id}):;"
+                                                    f"{answered_q_instance.question};"
+                                                    f"Pilot Answer:{full_user_answer};"
+                                                    f"Correct Answer:{full_correct_answer};")
                             # Вынимаем текущее количество правильных ответов и количество баллов пользователя
                             user_result_data = QuizeResults.objects.filter(id=request.POST.get('result_id')).values(
                                 'correct_q_num', 'score_number')
@@ -618,14 +618,14 @@ def next_question(request):
                                                           conclusion=False
                                                           )
 
-                            loger_pilot_answer.info(f"{request.user.username}\n"
-                                                    f">>FAIL<< {request.user.profile.family_name}"
+                            loger_pilot_answer.info(f"{request.user.username};"
+                                                    f">>FAIL<<;{request.user.profile.family_name}"
                                                     f" {request.user.profile.first_name[0]}."
-                                                    f"{request.user.profile.middle_name[0]}.\n"
-                                                    f"Question(ID:{answered_q_instance.id}):\n"
-                                                    f"{answered_q_instance.question}\n"
-                                                    f"Pilot Answer:\n{full_user_answer}\n"
-                                                    f"Correct Answer:\n{full_correct_answer}")
+                                                    f"{request.user.profile.middle_name[0]}.;"
+                                                    f"Question(ID:{answered_q_instance.id}):;"
+                                                    f"{answered_q_instance.question};"
+                                                    f"Pilot Answer:{full_user_answer};"
+                                                    f"Correct Answer:{full_correct_answer};")
                     # # Количество оставшихся у пользователя вопросов
                     # q_amount = QuizeSet.objects.filter(id=int(request.POST.get('tmp_test_id'))).values('q_sequence_num')
 

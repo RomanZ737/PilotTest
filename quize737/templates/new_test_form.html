@@ -381,6 +381,7 @@ function addForm(e){
       them_field.addEventListener('change', ThemSelection);
 
       let numOfqAct = document.getElementById(themID).value
+      q_field.setAttribute('max', `${numOfqAct}`) // Устанавливаем максимально возможное значение поля ввода количества вопросов
       document.getElementById("max_q_" + formNum).innerHTML = ' ' + numOfqAct // Берём объект поля ввода и вносим значение количества вопросов
 
       let delete_field = document.getElementById(`id_questions-${formNum}-DELETE`) // Ищем новое поле с 'Удалить тему'
