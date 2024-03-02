@@ -128,8 +128,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_template_maths',
     'users',
+    'quiz',
     'quize737',
-    'PilotLoad',
     'DBLoad',
     'dbLogs',
 ]

@@ -82,8 +82,6 @@
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
                     <span>|</span>
-                    <a href="{% url 'quize737:pilotload' %}">Load Pilots</a>
-                    <span>|</span>
                     <a href="{% url 'DBLoad:alter_results' %}">DB Alter</a>
                 {% endif %}
 

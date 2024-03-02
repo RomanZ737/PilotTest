@@ -45,6 +45,7 @@ urlpatterns = [
                   path('', include('quize737.urls', namespace='quize737')),
                   path('', include('dbLogs.urls', namespace='dbLogs')),
                   path('DBLoad/', include('DBLoad.urls', namespace='DBLoad')),
+                  path('quiz/', include('quiz.urls', namespace='quiz')),
                   path('profile/', users_views.profile, name='profile'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
                   path('register/', users_views.register, name='register'),
