@@ -1222,15 +1222,8 @@ def question_list_details(request, id):
             #  Возвращаем пользователя в исходный url
             previous_url = request.POST.get('previous_url', '/')
 
-            # TODO: проверить работу на реальном сервере
-            #  Вынимаем чистый хост на для тестового серевере
-            request_host = request.get_host()
-            index = (request.get_host()).find(':')
-            request_host = request_host[:index]
-            if previous_url and urlparse(previous_url).hostname == request_host:
-                return HttpResponseRedirect(previous_url)
-            else:
-                return redirect('quize737:question_list')
+            return HttpResponseRedirect(previous_url)
+
         else:
 
             context = {'question_form': question_form, 'q_id': id, 'q_object': a}
@@ -1277,7 +1270,9 @@ def question_del(request, id):
                                f' {request.user.profile.first_name[0]}.'
                                f'{request.user.profile.middle_name[0]}.')
     QuestionSet.objects.get(id=id).delete()
-    return redirect('quize737:question_list')
+    previous_url = request.META.get('HTTP_REFERER')
+    return HttpResponseRedirect(previous_url)
+    #return redirect('quize737:question_list')
 
 
 # Редактор тем вопросов
