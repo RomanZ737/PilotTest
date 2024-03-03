@@ -11,6 +11,11 @@
                 <p>Вам назначены тесты:</p>
                 {% for test in user_tests %}
             <div class="block_light_up">
+                {% if test.test_name.id in tests_in_prog %}
+                    <div>
+                {% else %}
+                    <div style="padding-bottom: 18px">
+                {% endif %}
                 <a href="{% url 'quize737:start' test.test_name.id %}">
                     <div class="list-test_name">
                         <span class="mark_up">{{test.test_name}}</span>
@@ -34,6 +39,14 @@
                         <span class="mark_up">{{test.date_before | date:"d.m.Y"}}</span>
                     </div>
                 </a>
+                </div>
+                {% if test.test_name.id in tests_in_prog %}
+                <div style="position: relative; left: 5%; color: #6d2126; font-size: 13px; padding-bottom: 18px;">
+                    <span >Незавершённая попытка</span>
+                </div>
+                {% endif %}
+
+
             </div>
 
             {% endfor %}

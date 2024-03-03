@@ -52,9 +52,16 @@
                     {% endif %}
                 {% endfor %}
             </form>
+            <form id="pause_test" action='{% url "quize737:start" %}'>
+            </form>
             <div class="button_answer">
-                <input type="submit" value="Ответить" id="answer_btn" form="question">
-                <span id="wait" style="display: none;">Ответ принят, ожидайте...</span>
+                <div style="display:inline-block;left: 7%; position: relative;">
+                    <input type="submit" value="Ответить" id="answer_btn" form="question">
+                    <span id="wait" style="display: none;">Ответ принят, ожидайте...</span>
+                </div>
+                <div style="display:inline-block;right: -80%; position: relative;">
+                    <input type="submit" value="Прервать Тест" form="pause_test" onclick="return confirm('Тест можно будет продолжить с текущего места. Прервать тест?') || event.preventDefault()">
+                </div>
             </div>
         </div>
     </fieldset>

@@ -19,6 +19,10 @@
 
         {% csrf_token %}
             <input type="hidden" name="question_set" id="question_set" value="{{user_test.test_name.id}}">
+                <div class="block_none_light_up">
+                    <span><strong style="color:#6d2126;text-align: center;width: 100%;display: block;">{{user_mess}}</strong></span>
+                </div>
+                <hr>
             <div class="block_none_light_up">
                 <span class="main_sign">{{test_name.name}}</span>
             </div>

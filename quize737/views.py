@@ -10,6 +10,7 @@ import sys
 import logging
 import common
 
+from static import text
 from django.core.files.storage import FileSystemStorage
 from itertools import chain
 from django.utils.datastructures import MultiValueDictKeyError
@@ -50,6 +51,7 @@ from reportlab.pdfgen import canvas
 
 from common import group_required
 
+
 logger_user_action = logging.getLogger('USER ACTION')
 loger_pilot_answer = logging.getLogger('PILOT ANSWER')
 
@@ -89,6 +91,7 @@ def all_them_q_set():
 # Заглавная страница
 @login_required  # Только для зарегитсрированных пользователей
 def start(request, id=None):
+
     try:
         user_instance = request.user
         if request.method == 'POST':
@@ -325,14 +328,18 @@ def start(request, id=None):
                         user=request.user)  # Весь список тестов пользователя для отображения в боковом меню
                     test_question_sets = TestQuestionsBay.objects.filter(
                         test_id=id)  # Вопросы теста, назначенного пользователю
+                    user_mess = text.USER_MESSAGE_BEFORE_TEST
 
                     context = {'question_set': test_question_sets, 'test_name': test_instance,
                                'user_test': user_test[0],
-                               'user_tests': user_tests, 'in_progress': in_progress, 'tmp_test_id': test_in_progress.id,
-                               'result_id': results_instance.id, 'question_id': id, 'q_num_left': q_num_left}
+                               'user_tests': user_tests, 'in_progress': in_progress,
+                               'tmp_test_id': test_in_progress.id,
+                               'result_id': results_instance.id, 'question_id': id,
+                               'q_num_left': q_num_left, 'user_mess': user_mess}
                     return render(request, 'start_test_ditales.html', context=context)
 
                 except (ObjectDoesNotExist, MultipleObjectsReturned) as err:
+                    user_mess = text.USER_MESSAGE_BEFORE_TEST
                     if err == MultipleObjectsReturned:
                         test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
                         QuizeResults.objects.filter(user_id=request.user,
@@ -353,15 +360,22 @@ def start(request, id=None):
                     test_question_sets = TestQuestionsBay.objects.filter(test_id=id)
                     context = {'question_set': test_question_sets, 'test_name': test_instance,
                                'user_test': user_test[0],
-                               'user_tests': user_tests, 'in_progress': in_progress}
+                               'user_tests': user_tests,
+                               'in_progress': in_progress, 'user_mess': user_mess}
                     return render(request, 'start_test_ditales.html', context=context)
 
 
 
             #  Если пользователь открывает страницу со списком тестов
             else:
+                # проверяем есть ли у пользователя не завершённые тесты
+                tests_in_prog = []
+                tests_objects_in_progress = QuizeSet.objects.filter(user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
+                for id in tests_objects_in_progress:
+                    tests_in_prog.append(id.test_id)
+                #print('TESTS:', tests_in_prog)
                 user_tests = UserTests.objects.filter(user=request.user)
-                context = {'user_tests': user_tests}
+                context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog}
                 return render(request, 'start.html', context=context)
     except Exception as general_error:
         # Формируем письмо администратору
