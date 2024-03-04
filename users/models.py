@@ -73,7 +73,7 @@ class TestExpired(models.Model):
         return f'{self.user.last_name} {self.user.first_name}, Test: {self.test.test_name}, Дата: {self.test.date_before.strftime("%d.%m.%Y %H:%M")}'
 
 
-# Модель закладок редавтора вопросов
+# Модель закладок редактора вопросов
 class QuestionEditorBookMarks(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Модель пользователя')
     question = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, verbose_name='Модель вопроса')
