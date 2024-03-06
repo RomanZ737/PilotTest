@@ -422,7 +422,7 @@ div.list-fio {  /* блок ФИО в таблице */
     position: relative;
     display: inline-block;
     /* left: 15px; */
-    width: 325px;
+    width: 190px;
     word-wrap: break-word;
     text-align: left;
     vertical-align: middle;
@@ -478,3 +478,11 @@ div.test_num_try {
     padding-right: 5px;
     margin: 1px;
     }
+div.test_date {
+    width: 95px;
+    display: inline-block;
+    border-left: 1px solid black;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin: 1px;
+}

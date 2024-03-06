@@ -62,10 +62,10 @@
                     <span ><u>Просроченные тесты:</u></span>
                 </div>
                     {% for test in expired_tests %}
-                    <div class="block_light_up" title='В тесте "{{test.test_name.name}}" {% if test.num_try <= 0 %} исчерпаны попытки {% else %} просрочена дата сдачи {% endif %}'>
+                    <div class="block_light_up" title='В тесте "{{test.test_name.name}}" -> {% if test.num_try <= 0 %} Исчерпаны попытки; {% endif %}{% if test.is_past_due %} Просрочена дата сдачи {% endif %};'>
                         <div class="list-fio">
                             <a href="{% url 'quize737:user_detales' test.user.id %}">{{test.user.profile.family_name}}
-                            {{test.user.profile.first_name}} {{test.user.profile.middle_name}}</a>
+                            {{test.user.profile.first_name.0}}.{{test.user.profile.middle_name.0}}.</a>
                         </div>
                         <div class="list-ac_type">
                             <span class="theme_color">{{test.user.profile.ac_type}}</span>
@@ -81,12 +81,7 @@
                             <span  style="{% if test.num_try <= 0 %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; {% endif %}">Попытки: {{test.num_try}}</span>
                         </div>
                         <div class="test_date">
-                             <span  style="{% if test.date_before|date:'d.m.Y' < now|date:'d.m.Y' %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; {% endif %}" title='Дата до которой выполнить тест'> {{test.date_before | date:"d.m.Y" }}</span>
-                        </div>
-                        <div>
-                            {% if test.date_before|date:'dmY' < now|date:'dmY' %}
-                            HELLLLLO
-                            {% endif %}
+                             <span  style="{% if test.is_past_due %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; {% endif %}" title='Дата до которой выполнить тест'> {{test.date_before | date:"d.m.Y" }}</span>
                         </div>
                     </div>
                     {% endfor %}

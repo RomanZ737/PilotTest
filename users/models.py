@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 from quize737.models import TestConstructor, QuestionSet
 import datetime
+import pytz
 from field_validators.validators import validate_not_zero
 from choices import Position, ACTypeP
 
@@ -55,6 +56,10 @@ class UserTests(models.Model):
 
     class Meta:
         unique_together = ('user', 'test_name')
+
+    @property
+    def is_past_due(self):
+        return datetime.datetime.now(datetime.timezone.utc) > self.date_before
 
     def __str__(self):
         return f'Пилот {self.user.last_name} {self.user.first_name}, --> {self.test_name}, попыток {self.num_try}, закончить до {self.date_before.strftime("%d.%m.%Y %H:%M")}'

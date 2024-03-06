@@ -144,6 +144,8 @@ class QuizeResults(models.Model):
 
 #  Модель конструктора тестов - названия и id тестов
 class TestConstructor(models.Model):
+
+
     name = models.CharField(max_length=255, verbose_name='Название Теста',
                             help_text='Название теста которое будет видно пользователю')
     pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=80,
@@ -156,6 +158,7 @@ class TestConstructor(models.Model):
                                     help_text='Если тест не активен, то он перемещается в архив')
     comment = models.CharField(max_length=255, verbose_name='Комментарий', null=True,
                                help_text='Произвольный комментарий к тесту')
+
 
     def __str__(self):
         return f'{self.name}'
