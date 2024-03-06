@@ -376,16 +376,17 @@ def start(request, id=None):
                 for id in tests_objects_in_progress:
                     tests_in_prog.append(id.test_id)
                 # Проверяем просроченные тесты по дате
-                expired_tests = TestExpired.objects.filter(days_left__lte=0)
+                #expired_tests = TestExpired.objects.filter(days_left__lte=0)
                 # Проверяем просроченные тесты по кол-ву попыток
-                numtry_list = UserTests.objects.filter(num_try__lte=0)
-                total_expired_user_tests = sorted((chain(expired_tests, numtry_list)), key=lambda instance: instance.id,
-                reverse=True,)
+                total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0) | Q(date_before__lt=datetime.date.today())).distinct()
+
 
                 print('TOTAL_LIST: ', total_expired_user_tests)
+                print('date now:', datetime.date.today())
 
                 user_tests = UserTests.objects.filter(user=request.user)
-                context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog, 'expired_tests': total_expired_user_tests}
+                context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog,
+                           'expired_tests': total_expired_user_tests, 'date_now': datetime.datetime.now()}
                 return render(request, 'start.html', context=context)
     except Exception as general_error:
         # Формируем письмо администратору
