@@ -2,12 +2,12 @@
         {% if selected_users%}
             {% for user in selected_users %}
                 {% if user.username != 'roman' %}
-                <div class="block_light_up">
+                <div class="block_light_up" style="border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;">
 
-            <div class="list-fio">
-                <input type="checkbox" name="user_selected" value="{{user.id}}" checked>&nbsp&nbsp
-                <a href="{% url 'quize737:user_detales' user.id %}">{{user.profile.family_name}}
-                    {{user.profile.first_name}} {{user.profile.middle_name}}</a>
+                <div class="list-fio">
+                    <input type="checkbox" name="user_selected" value="{{user.id}}" checked>&nbsp&nbsp
+                    <a href="{% url 'quize737:user_detales' user.id %}">{{user.profile.family_name}}
+                        {{user.profile.first_name}} {{user.profile.middle_name}}</a>
             </div>
 
 
@@ -52,7 +52,7 @@
         {% for user in user_list %}
 
         {% if user.username != 'roman' %}
-        <div class="block_light_up">
+        <div class="block_light_up" style="border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;">
 
             <div class="list-fio">
                 <input type="checkbox" name="user_selected" value="{{user.id}}">&nbsp&nbsp

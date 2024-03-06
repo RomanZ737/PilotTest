@@ -23,7 +23,7 @@
                 <div class="filter_related_users">
                     <form id="position_filter" name="position_filter" method="get">
                         <div class="filter_sign_position"></div>
-                        <select class="position_filter" name="position_filter">
+                        <select class="position_filter" name="position_filter" title="Тип ВС">
                             {% for option in ac_types %}
                             {% if filter_input %}
                             {% if option == filter_input.0 %}
@@ -41,7 +41,7 @@
                             {% endfor %}
                         </select>
                         <div class="filter_sign_position"></div>
-                        <select class="position_filter" name="position_filter">
+                        <select class="position_filter" name="position_filter" title="Квалификация Пилота">
                             {% for option in position_list %}
                             {% if filter_input %}
                             {% if option == filter_input.1 %}
@@ -59,7 +59,7 @@
                             {% endfor %}
                         </select>
                         <div class="filter_sign_group"></div>
-                        <select class="position_filter" name="position_filter">
+                        <select class="position_filter" name="position_filter" title="Группа Пилота">
                             {% for group in group_list %}
                             {% if filter_input %}
                             {% if group.name == filter_input.2 %}
@@ -77,7 +77,7 @@
                             {% endfor %}
                         </select>
                         <div class="filter_sign_group"></div>
-                        <select class="position_filter" name="position_filter">
+                        <select class="position_filter" name="position_filter" title="Активные тесты">
                             {% for test in tests_list %}
                             {% if filter_input %}
                             {% if test.name == filter_input.3 %}

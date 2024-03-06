@@ -1,7 +1,7 @@
 <form id="checkboxes" name="checkboxes">
         {% for user in user_list %}
         {% if user.username != 'roman' %}
-        <div class="block_light_up">
+        <div class="block_light_up" style="border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;">
 
             <div class="list-fio">
                 <input type="checkbox" id="user_selected" name="user_selected" value="{{user.id}}" checked>&nbsp&nbsp

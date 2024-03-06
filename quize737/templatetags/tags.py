@@ -1,5 +1,6 @@
 from django import template
 import random
+import datetime
 from django.contrib.auth.models import User
 
 register = template.Library()
@@ -12,6 +13,7 @@ def dict_to_keys_val(dict):
         array.append(key.id)
     return array
 
+
 @register.filter(name='has_group')
 def has_group(user, group_name):
     str_new = ''.join(group_name).split(',')
@@ -23,6 +25,11 @@ def shuffle(arg):
     aux = list(arg)[:]
     random.shuffle(aux)
     return aux
+
+
+@register.simple_tag(takes_context=True)
+def check_test_date(context, date):
+    return datetime.datetime.now() > date
 
 
 @register.simple_tag(takes_context=True)
@@ -46,7 +53,6 @@ def param_replace(context, **kwargs):
     Based on
     https://stackoverflow.com/questions/22734695/next-and-before-links-for-a-django-paginated-query/22735278#22735278
     """
-
 
     d = context['request'].GET.copy()
     for k, v in kwargs.items():

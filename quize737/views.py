@@ -375,18 +375,11 @@ def start(request, id=None):
                 tests_objects_in_progress = QuizeSet.objects.filter(user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
                 for id in tests_objects_in_progress:
                     tests_in_prog.append(id.test_id)
-                # Проверяем просроченные тесты по дате
-                #expired_tests = TestExpired.objects.filter(days_left__lte=0)
-                # Проверяем просроченные тесты по кол-ву попыток
-                total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0) | Q(date_before__lt=datetime.date.today())).distinct()
-
-
-                print('TOTAL_LIST: ', total_expired_user_tests)
-                print('date now:', datetime.date.today())
-
+                # Проверяем просроченные тесты по кол-ву попыток и по дате
+                total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0) | Q(date_before__lt=datetime.date.today())).order_by('date_before').distinct()
                 user_tests = UserTests.objects.filter(user=request.user)
                 context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog,
-                           'expired_tests': total_expired_user_tests, 'date_now': datetime.datetime.now()}
+                           'expired_tests': total_expired_user_tests}
                 return render(request, 'start.html', context=context)
     except Exception as general_error:
         # Формируем письмо администратору
@@ -1935,6 +1928,7 @@ def user_list(request):
             test_list.append(test)
         group_list.append({'name': 'Все'})  # Добавляем выбор всех групп
         test_list.append({'name': 'Все'})  # Добавляем выбор всех тестов
+        test_list.append({'name': 'Просроченные'})
         position_list = Position.values
         position_list.append('Все')  # Добавляем вариант выбора всех должностей
         ac_types_list = ACTypeP.values  # Список типов ВС для фильтра
@@ -2008,13 +2002,23 @@ def user_list(request):
                 if filter_input[2] != 'Все':
                     group = filter_input[2]
                 if filter_input[3] != 'Все':
-                    test = filter_input[3]
-                    total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
-                                                          profile__position__contains=position,
-                                                          groups__name__contains=group,
-                                                          usertests__test_name__name=test,
-                                                          is_active=True).exclude(
-                        username='roman').distinct().order_by('last_name')
+                    if filter_input[3] == 'Просроченные':
+
+                        total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
+                                                              profile__position__contains=position,
+                                                              groups__name__contains=group,
+                                                              is_active=True,
+                                                              ).exclude(
+                            username='roman').distinct().order_by('last_name')
+                        total_user_list = total_user_list.filter(Q(usertests__num_try__lte=0) | Q(usertests__date_before__lt=datetime.date.today()))
+                    else:
+                        test = filter_input[3]
+                        total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,
+                                                              profile__position__contains=position,
+                                                              groups__name__contains=group,
+                                                              usertests__test_name__name=test,
+                                                              is_active=True).exclude(
+                            username='roman').distinct().order_by('last_name')
                 else:
                     total_user_list = User.objects.filter(profile__ac_type__icontains=ac_type,
                                                           profile__position__icontains=position,

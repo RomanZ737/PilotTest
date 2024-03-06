@@ -1,5 +1,5 @@
 {% extends "main_base.html" %}
-
+{% load tags %}
 {% block content %}
 <fieldset>
     <legend>
@@ -57,7 +57,10 @@
         {% for form in user_tests %}
         <div class="form_set">
             <div class="block_none_light_up">
-                <span>Название: {{ form.test_name }} Кол-во попыток: {{ form.num_try }} Выполнить до: {{form.date_before}}</span><span>{{form.DELETE}} Удалить </span>
+                <span>Название: {{ form.test_name }} <span style="{% if form.num_try.value <= 0 %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; {% endif %}">
+                    Кол-во попыток: {{ form.num_try }}</span>
+                    {% check_test_date form.date_before.value as check_test_valid_date %}
+                    <span style="{% if check_test_valid_date %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; {% endif %}">Выполнить до: {{form.date_before}}</span></span><span>{{form.DELETE}} Удалить </span>
                 <input type="hidden">{{form.test_name.id}}
             </div>
         </div>
