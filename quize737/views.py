@@ -27,6 +27,7 @@ from django.core.exceptions import ValidationError
 from django.forms import formset_factory, BaseFormSet
 from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
+from itertools import chain
 
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -370,12 +371,21 @@ def start(request, id=None):
             else:
                 # проверяем есть ли у пользователя не завершённые тесты
                 tests_in_prog = []
+
                 tests_objects_in_progress = QuizeSet.objects.filter(user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
                 for id in tests_objects_in_progress:
                     tests_in_prog.append(id.test_id)
-                #print('TESTS:', tests_in_prog)
+                # Проверяем просроченные тесты по дате
+                expired_tests = TestExpired.objects.filter(days_left__lte=0)
+                # Проверяем просроченные тесты по кол-ву попыток
+                numtry_list = UserTests.objects.filter(num_try__lte=0)
+                total_expired_user_tests = sorted((chain(expired_tests, numtry_list)), key=lambda instance: instance.id,
+                reverse=True,)
+
+                print('TOTAL_LIST: ', total_expired_user_tests)
+
                 user_tests = UserTests.objects.filter(user=request.user)
-                context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog}
+                context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog, 'expired_tests': total_expired_user_tests}
                 return render(request, 'start.html', context=context)
     except Exception as general_error:
         # Формируем письмо администратору
