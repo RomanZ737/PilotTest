@@ -61,7 +61,7 @@
             </span>
             </div>
             <div>
-                <span class="comment">Максимальный размер файла 2MB</span>
+                <span class="comment">{{comments|get_item:'MAX_PICTURE_FILE_SIZE' }}</span>
             </div>
             <hr/>
 
@@ -176,7 +176,7 @@
             </span>
             </div>
             <div style="padding-bottom: 10px;">
-                <span class="comment">Максимальный размер файла 2MB</span>
+                <span class="comment">{{comments|get_item:'MAX_PICTURE_FILE_SIZE'}}</span>
             </div>
                 <div class="new_question-static_sign">
                     <span>{{question_form.comment_text.label}}:</span>
@@ -190,7 +190,12 @@
             </div>
 
             <div class="block_none_light_up">
-                {{question_form.q_weight.label}}: {{question_form.q_weight}}
+                <div>
+                    {{question_form.q_weight.label}}: {{question_form.q_weight}}
+                </div>
+                <div style="margin-top:-3px;">
+                    <span class="comment">{{comments|get_item:'Q_WEIGHT_COMMENT' }}</span>
+                </div>
             </div>
 
             <div class="block_none_light_up">

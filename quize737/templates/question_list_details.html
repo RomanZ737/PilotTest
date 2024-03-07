@@ -97,7 +97,7 @@
                 </span>
                 {% endif %}
             </div>
-            <span class="comment">Максимальный размер файла 2MB</span>
+            <span class="comment">{{comments|get_item:'MAX_PICTURE_FILE_SIZE' }}</span>
             <hr/>
             <div class="block_none_light_up">
                 <div class="new_question-static_sign">
@@ -182,7 +182,11 @@
             <hr/>
 
                 <p>{{question_form.q_kind.label}}: <input name="q_kind" type="checkbox" id="q_kind" onclick="hideFunc()"></p>
-                <p>{{question_form.q_weight.label}}: {{question_form.q_weight}}</p>
+
+                <div>{{question_form.q_weight.label}}: {{question_form.q_weight}}</div>
+                <div style="margin-top:-3px;">
+                    <span class="comment">{{comments|get_item:'Q_WEIGHT_COMMENT' }}</span>
+                </div>
                 <p id="answer">{{question_form.answer.label}}: <input name="answer" type="number" min="1" max="10" step="1" value="{{question_form.answer.value}}"></p>
                 <p id="answers">{{question_form.answers.label}}: {{question_form.answers}}
 <!--                    <input name="answers" type="text" value="{{question_form.answers.value}}"></p>-->
@@ -222,7 +226,7 @@
                 </span>
                 {% endif %}
             </div>
-            <span class="comment">Максимальный размер файла 2MB</span>
+            <span class="comment">{{comments|get_item:'MAX_PICTURE_FILE_SIZE' }}</span>
             <div class="q_edit_comment">
                 <div class="q_edit_comment_statick_sign">
                     {{question_form.comment_text.label}}:

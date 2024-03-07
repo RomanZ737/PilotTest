@@ -1183,7 +1183,9 @@ def question_list(request):
 @group_required(('KRS', 'Редактор'))
 def new_question(request):
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
-
+    comments = {}  # Статические комментарии
+    comments['Q_WEIGHT_COMMENT'] = text.Q_WEIGHT_COMMENT
+    comments['MAX_PICTURE_FILE_SIZE'] = text.MAX_PICTURE_FILE_SIZE
     if request.method == 'POST':
         question_form = NewQuestionSetForm(request.POST, request.FILES)  # Для форм основанных на модели объекта
         if question_form.is_valid():
@@ -1196,7 +1198,7 @@ def new_question(request):
             instance.question_img = question_form.cleaned_data['question_img']
             instance.comment_img = question_form.cleaned_data['comment_img']
             instance.save()
-            print('path: ', f"{dir_path}/media/images/{instance.them_name.id}/{instance.id}/None/*.*")
+            #print('path: ', f"{dir_path}/media/images/{instance.them_name.id}/{instance.id}/None/*.*")
             filelist = glob.glob(f"{dir_path}/media/images/{instance.them_name.id}/None/*.*")
 
             if filelist:
@@ -1217,12 +1219,12 @@ def new_question(request):
                         pass
             return redirect('quize737:question_list')
         else:
-            context = {'question_form': question_form, 'q_id': 000}
+            context = {'question_form': question_form, 'q_id': 000, 'comments': comments}
             return render(request, 'new_question.html', context=context)
 
     else:
         question_form = NewQuestionSetForm()
-        context = {'question_form': question_form, 'q_id': 000}
+        context = {'question_form': question_form, 'q_id': 000, 'comments': comments}
         return render(request, 'new_question.html', context=context)
 
 
@@ -1230,6 +1232,9 @@ def new_question(request):
 @login_required
 @group_required(('KRS', 'Редактор'))
 def question_list_details(request, id):
+    comments = {} # Статические комментарии
+    comments['Q_WEIGHT_COMMENT'] = text.Q_WEIGHT_COMMENT
+    comments['MAX_PICTURE_FILE_SIZE'] = text.MAX_PICTURE_FILE_SIZE
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
     if request.method == 'POST':
         #   Выясняем id вопроса для его обновления
@@ -1244,7 +1249,7 @@ def question_list_details(request, id):
 
         else:
 
-            context = {'question_form': question_form, 'q_id': id, 'q_object': a}
+            context = {'question_form': question_form, 'q_id': id, 'q_object': a, 'comments': comments}
             return render(request, 'question_list_details.html', context=context)
 
     elif 'q_switch_id' in request.GET:
@@ -1259,7 +1264,7 @@ def question_list_details(request, id):
         # Сохраняем ссылку, с которой пришёл пользователь
         previous_url = request.GET.get('previous_url')
         context = {'question_form': question_form, 'q_id': id,
-                   'previous_url': previous_url, 'q_object': q_object}
+                   'previous_url': previous_url, 'q_object': q_object, 'comments': comments}
         return render(request, 'question_list_details.html', context=context)
 
 
@@ -1274,7 +1279,7 @@ def question_list_details(request, id):
         # Сохраняем ссылку, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
         context = {'question_form': question_form, 'q_id': result[0]['id'],
-                   'previous_url': previous_url, 'q_object': q_object}
+                   'previous_url': previous_url, 'q_object': q_object, 'comments': comments}
         return render(request, 'question_list_details.html', context=context)
 
 
@@ -1906,6 +1911,21 @@ def user_list(request):
     else:
         # Если в запросе были отмечены пользователи (user_select)
         selected_user_list = []  # Список пользователей, которые были отмечены
+        # Пользователи у которых просрочена дата теста
+        user_test_out_of_try = {} # User_ID:Test_Name
+        user_test_out_of_date = {} # User_ID:Test_Name
+        total_user_expire_tests = []
+        # Формируем словарь с просроченными по попыткам тестами
+        for test in UserTests.objects.filter(num_try__lte=0):
+            user_test_out_of_try[test.user.id] = test.test_name.name
+        # Формируем словарь с просроченными по дате тестами
+        for test in UserTests.objects.filter(date_before__lt=datetime.date.today()):
+            user_test_out_of_date[test.user.id] = test.test_name.name
+        # Добавляем инфу о просроченных тестав в один список
+        total_user_expire_tests.append(user_test_out_of_try)
+        total_user_expire_tests.append(user_test_out_of_date)
+
+        #print('TOTAL:', total_user_expire_tests)
 
         if 'user_selected' in request.GET.keys():
             selected_users_ids = request.GET.getlist('user_selected')
@@ -1968,7 +1988,7 @@ def user_list(request):
                     context = {'no_search_results': no_search_result, 'results': results,
                                'position_list': position_list, 'group_list': group_list, 'ac_types': ac_types_list,
                                'user_search_input': user_search_input, 'selected_users': selected_user_list,
-                               'user_list': selected_user_list}
+                               'user_list': selected_user_list, 'expire_tests': total_user_expire_tests}
                     return render(request, 'user_list.html', context=context)
                 if not total_user_list:
                     no_search_result = True
@@ -1977,7 +1997,7 @@ def user_list(request):
                                'position_list': position_list, 'group_list': group_list,
                                'assign_test_list': assign_test_list, 'ac_types': ac_types_list, 'tests_list': test_list,
                                'user_search_input': user_search_input, 'selected_users': selected_user_list,
-                               'user_list': selected_user_list}
+                               'user_list': selected_user_list, 'expire_tests': total_user_expire_tests}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
@@ -1988,7 +2008,7 @@ def user_list(request):
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
                                'user_test_dict': user_test_dict, 'user_num': total_user_number,
                                'ac_types': ac_types_list, 'user_search_input': user_search_input,
-                               'selected_users': selected_user_list}
+                               'selected_users': selected_user_list, 'expire_tests': total_user_expire_tests}
                     return render(request, 'user_list.html', context=context)
             else:
                 ac_type = ''
@@ -2031,7 +2051,7 @@ def user_list(request):
                     context = {'no_search_results': no_search_result, 'results': results, 'filter_input': filter_input,
                                'position_list': position_list, 'group_list': group_list, 'tests_list': test_list,
                                'ac_types': ac_types_list, 'selected_users': selected_user_list,
-                               'user_list': selected_user_list}
+                               'user_list': selected_user_list, 'expire_tests': total_user_expire_tests}
                     return render(request, 'user_list.html', context=context)
                 else:
                     total_user_number = len(total_user_list)
@@ -2042,7 +2062,7 @@ def user_list(request):
                                'position_list': position_list, 'filter_input': filter_input,
                                'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
                                'user_num': total_user_number, 'ac_types': ac_types_list,
-                               'selected_users': selected_user_list}
+                               'selected_users': selected_user_list, 'expire_tests': total_user_expire_tests}
                     return render(request, 'user_list.html', context=context)
 
         else:
@@ -2057,7 +2077,8 @@ def user_list(request):
 
             context = {'user_list': users, 'no_search_results': no_search_result, 'position_list': position_list,
                        'group_list': group_list, 'tests_list': test_list, 'user_test_dict': user_test_dict,
-                       'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list}
+                       'user_num': total_user_number, 'ac_types': ac_types_list, 'selected_users': selected_user_list,
+                       'expire_tests': total_user_expire_tests}
             return render(request, 'user_list.html', context=context)
 
 
@@ -2368,10 +2389,10 @@ def edit_user(request, id):
             request_host = request.get_host()
             index = (request.get_host()).find(':')
             request_host = request_host[:index]
-            if previous_url and urlparse(previous_url).hostname == request_host:
-                return HttpResponseRedirect(previous_url)
-            else:
-                return redirect('quize737:user_list')
+            # if previous_url and urlparse(previous_url).hostname == request_host:
+            return HttpResponseRedirect(previous_url)
+            # else:
+            #     return redirect('quize737:user_list')
 
         else:
             form_user = EditUserForm(request.POST, instance=user_obj)
@@ -2632,7 +2653,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-
+        print('REF:', request)
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)

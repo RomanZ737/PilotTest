@@ -1,8 +1,10 @@
+
 <form id="checkboxes" name="checkboxes">
         {% if selected_users%}
             {% for user in selected_users %}
                 {% if user.username != 'roman' %}
-                <div class="block_light_up" style="border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;">
+                <div class="block_light_up" title="{% if expire_tests.0|get_item:user.id or expire_tests.1|get_item:user.id %}{% if expire_tests.0|get_item:user.id %}Исчерпано количество попыток в тесте; {% endif %} {% if expire_tests.1|get_item:user.id %} Просрочена дата сдачи теста;{% endif %}{% endif %}"
+                     style="{% if expire_tests.0|get_item:user.id or expire_tests.1|get_item:user.id %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;{% endif %}">
 
                 <div class="list-fio">
                     <input type="checkbox" name="user_selected" value="{{user.id}}" checked>&nbsp&nbsp
@@ -52,7 +54,8 @@
         {% for user in user_list %}
 
         {% if user.username != 'roman' %}
-        <div class="block_light_up" style="border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;">
+        <div class="block_light_up" title="{% if expire_tests.0|get_item:user.id or expire_tests.1|get_item:user.id %}{% if expire_tests.0|get_item:user.id %}Исчерпано количество попыток в тесте; {% endif %} {% if expire_tests.1|get_item:user.id %} Просрочена дата сдачи теста;{% endif %}{% endif %}"
+             style="{% if expire_tests.0|get_item:user.id or expire_tests.1|get_item:user.id %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px;{% endif %}">
 
             <div class="list-fio">
                 <input type="checkbox" name="user_selected" value="{{user.id}}">&nbsp&nbsp
