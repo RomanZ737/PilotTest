@@ -5,6 +5,10 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, User
 from .models import UserTests, GroupsDescription
 from django.contrib.admin.widgets import AdminDateWidget
 from django.core.exceptions import ValidationError
+import datetime
+from django.db.models import Q, F
+from django.core.exceptions import ObjectDoesNotExist
+from users.models import UserTests
 
 import users.models
 
@@ -50,8 +54,8 @@ class UserRegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
         widgets = {
-            #'username': forms.Textarea(attrs={'style': 'font-size: 15px;', 'cols': 20, 'rows': 1}),
-            #'email': forms.Textarea(attrs={'style': 'font-size: 10px;', 'cols': 15, 'rows': 1}),
+            # 'username': forms.Textarea(attrs={'style': 'font-size: 15px;', 'cols': 20, 'rows': 1}),
+            # 'email': forms.Textarea(attrs={'style': 'font-size: 10px;', 'cols': 15, 'rows': 1}),
         }
 
 
@@ -112,12 +116,34 @@ MONTH_CHOICES = {
 
 # Форма теста для пользователя
 class TestsForUser(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.init = kwargs.get('initial')
+        self.min_num = 1
+        super(TestsForUser, self).__init__(*args, **kwargs)
+        #print('IDDD: ', self.init['id'])
+        try:
+            if self.init['num_try'] <= 0:
+                try:
+                    UserTests.objects.get((Q(num_try__lte=0) &
+                                           Q(user__quizeresults__in_progress=True) &
+                                           Q(results_id=F('user__quizeresults__id'))))
+                    self.min_num = 0
+                except ObjectDoesNotExist:
+                    pass
+        except Exception:
+            pass
+        self.fields['num_try'].widget = forms.NumberInput(attrs={'step': 1, 'min': self.min_num, 'size': '5'})
+
+
+
+        # print("TEST_id: ", self.id)
+
     class Meta:
         model = UserTests
         fields = {'test_name', 'num_try', 'date_before'}
         widgets = {
             'date_before': forms.SelectDateWidget(months=MONTH_CHOICES),
-            'num_try': forms.NumberInput(attrs={'step': 1, 'min': 1, 'size': '5'})
+            #'num_try': forms.NumberInput(attrs={'step': 1, 'min': 1, 'size': '5'})
         }
         error_messages = {'num_try': {'required': "Поле количества вопросов не может быть пустым"},
                           'test_name': {'required': "Поле 'Название теста' не может быть пустым"}}

@@ -57,14 +57,16 @@
         {% for form in user_tests %}
         <div class="form_set">
             <div class="block_none_light_up">
-                {{form.id}}
-                one: {{form.num_try.value}}
-                two: {{form.instance.id}}
-                {% check_test_num_try 1 2  as check_test_valid_date %}
-                <span>Название: {{ form.test_name }} <span style="{% if check_test_valid_date %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; {% endif %}">
+                {% check_test_num_try form.num_try.value form.test_name.value  as check_test_valid_num_try %}
+                <span>Название: {{ form.test_name }} <span style="{% if check_test_valid_num_try %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; {% endif %}">
                     Кол-во попыток: {{ form.num_try }}</span>
                     {% check_test_date form.date_before.value as check_test_valid_date %}
                     <span style="{% if check_test_valid_date %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; {% endif %}">Выполнить до: {{form.date_before}}</span></span><span>{{form.DELETE}} Удалить </span>
+                {% if not check_test_valid_num_try and form.num_try.value <= 0 %}
+                                <div style="position: relative; left: 360px; color: #6d2126; font-size: 13px; margin-top: -1px;width: 65px;">
+                                    <span >в процессе</span>
+                                </div>
+                            {%endif%}
                 <input type="hidden">{{form.test_name.id}}
             </div>
         </div>

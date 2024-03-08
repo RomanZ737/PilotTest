@@ -1929,11 +1929,19 @@ def user_list(request):
         user_test_out_of_try = {} # User_ID:Test_Name
         user_test_out_of_date = {} # User_ID:Test_Name
         total_user_expire_tests = []
+
+        # total_expired_user_tests = (UserTests.objects.filter((Q(num_try__lte=0) &
+        #                                                       Q(user__quizeresults__in_progress=False) &
+        #                                                       Q(results_id=F('user__quizeresults__id'))) |
+        #                                                      Q(date_before__lt=datetime.date.today()))
+        #                             .order_by('date_before').distinct())
         # Формируем словарь с просроченными по попыткам тестами
-        for test in UserTests.objects.filter(num_try__lte=0):
+        for test in UserTests.objects.filter(Q(num_try__lte=0) &
+                                             Q(user__quizeresults__in_progress=False) &
+                                             Q(results_id=F('user__quizeresults__id'))).distinct():
             user_test_out_of_try[test.user.id] = test.test_name.name
         # Формируем словарь с просроченными по дате тестами
-        for test in UserTests.objects.filter(date_before__lt=datetime.date.today()):
+        for test in UserTests.objects.filter(date_before__lt=datetime.date.today()).distinct():
             user_test_out_of_date[test.user.id] = test.test_name.name
         # Добавляем инфу о просроченных тестав в один список
         total_user_expire_tests.append(user_test_out_of_try)
@@ -2668,7 +2676,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-        print('TEST_IDDDD: ', tests_for_user_form)
+
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)
