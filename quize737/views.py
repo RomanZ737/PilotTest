@@ -29,7 +29,7 @@ from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
 from itertools import chain
 
-from django.db.models import Q
+from django.db.models import Q, F
 from django.shortcuts import render, redirect
 from .models import QuestionSet, Thems, TestQuestionsBay, TestConstructor, QuizeSet, QuizeResults, FileUpload, \
     AnswersResults
@@ -285,6 +285,9 @@ def start(request, id=None):
                     try_spent=user_test.num_try_initial - user_test.num_try
                 )
 
+                # Прописываем ID результатов выполнения теста в тест пользователя, что бы привязаться к конкретной попытке.
+                user_test.results_id = result_obj.id
+                user_test.save()
                 #  Создаём словарь с вариантами ответов на вопрос
                 option_dict = {}
                 for option_num in range(1, 11):
@@ -382,12 +385,12 @@ def start(request, id=None):
                 #test_num_try_expire = test_num_try_expire.filter(user__quizeresults__in_progress=False)
                 #total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0)).order_by('date_before').distinct()
                 #total_expired_user_tests = list(chain(test_date_expire, test_num_try_expire))
-                unic_results_id = QuizeResults.objects.all().values
+
                 total_expired_user_tests = (UserTests.objects.filter((Q(num_try__lte=0) &
-                                                                      Q(user__quizeresults__in_progress=False)) |
+                                                                      Q(user__quizeresults__in_progress=False) &
+                                                                      Q(results_id=F('user__quizeresults__id'))) |
                                                                       Q(date_before__lt=datetime.date.today()))
                                                                     .order_by('date_before').distinct())
-                #total_expired_user_tests = total_expired_user_tests.order_by('date_before').distinct()
                 user_tests = UserTests.objects.filter(user=request.user)
                 context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog,
                            'expired_tests': total_expired_user_tests}
@@ -2637,7 +2640,8 @@ def user_detales(request, id):
                             send_email(request, email_msg)
 
             # Загружаем новые данные в форму
-            user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before')
+            user_tests = UserTests.objects.filter(user=id).values('test_name', 'num_try', 'date_before', 'id')
+
             tests_for_user_form = UserTestForm(initial=user_tests)
             context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'test_and_data_saved': True,
                        'user_id': id, 'previous_url': previous_url}
@@ -2664,7 +2668,7 @@ def user_detales(request, id):
         tests_for_user_form = UserTestForm(initial=user_tests)
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
-        print('REF:', request)
+        print('TEST_IDDDD: ', tests_for_user_form)
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
                    'previous_url': previous_url}
         return render(request, 'user_ditales.html', context=context)

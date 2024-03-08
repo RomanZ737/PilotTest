@@ -62,7 +62,7 @@
                     <span ><u>Просроченные тесты:</u></span>
                 </div>
                     {% for test in expired_tests %}
-                    <div class="block_light_up" title='В тесте "{{test.test_name.name}}" -> {% if test.num_try <= 0 %} Исчерпаны попытки; {% endif %}{% if test.is_past_due %} Просрочена дата сдачи;{% endif %}'>
+                    <div class="block_light_up" title='В тесте "{{test.test_name.name}}" -> {% if test.is_num_try %} Исчерпаны попытки; {% endif %}{% if test.is_past_due %} Просрочена дата сдачи;{% endif %}'>
                         <div class="list-fio">
                             <a href="{% url 'quize737:user_detales' test.user.id %}">{{test.user.profile.family_name}}
                             {{test.user.profile.first_name.0}}.{{test.user.profile.middle_name.0}}.</a>
@@ -78,12 +78,19 @@
                             <span>{{test.test_name.name}}</span>
                         </div>
                         <div class="test_num_try">
-                            <span  style="{% if test.num_try <= 0 %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; {% endif %}">Попытки: {{test.num_try}}</span>
+
+                            <span  style="{% if test.is_num_try %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; {% endif %}">Попытки: {{test.num_try}}</span>
+
                         </div>
                         <div class="test_date">
                              <span  style="{% if test.is_past_due %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; {% endif %}" title='Дата до которой выполнить тест'> {{test.date_before | date:"d.m.Y" }}</span>
                         </div>
                     </div>
+                    {% if not test.is_num_try and test.num_try <= 0 %}
+                                <div style="position: relative; left: 520px; color: #6d2126; font-size: 13px; margin-top: -13px;width: 65px;">
+                                    <span >в процессе</span>
+                                </div>
+                            {%endif%}
                     {% endfor %}
                 {% endif %}
             {% endif %}

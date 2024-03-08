@@ -5,7 +5,8 @@ import datetime
 import pytz
 from field_validators.validators import validate_not_zero
 from choices import Position, ACTypeP
-
+from django.db.models import Q, F
+from django.core.exceptions import ObjectDoesNotExist
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -53,14 +54,26 @@ class UserTests(models.Model):
     num_try = models.IntegerField(default=3, validators=[validate_not_zero], verbose_name='Количество попыток')
     date_before = models.DateTimeField(default=(datetime.datetime.now() + datetime.timedelta(days=30)).date(),
                                        verbose_name='Дата до которой необходимо выполнить тест')
-    results_id = models.IntegerField(verbose_name='Общая оценка', null=True, help_text='Привязывает выполнение теста к текущим результатам, что бы мжно было фильтровать исчерпанные попытки')
+    results_id = models.IntegerField(verbose_name='Общая оценка', null=True,
+                                     help_text='Привязывает выполнение теста к текущим результатам, что бы мжно было фильтровать исчерпанные попытки')
 
     class Meta:
         unique_together = ('user', 'test_name')
 
     @property
-    def is_past_due(self):
+    def is_past_due(self):  # Проверяем дату теста
         return datetime.datetime.now(datetime.timezone.utc) > self.date_before
+
+    @property
+    def is_num_try(self):  # Если попытки исчерпаны, проверяем если попытка в процессе выполнения
+        if self.num_try <= 0:
+            try:
+                UserTests.objects.get(( Q(num_try__lte=0) &
+                                        Q(user__quizeresults__in_progress=False) &
+                                        Q(results_id=F('user__quizeresults__id'))), id=self.id)
+                return True
+            except ObjectDoesNotExist:
+                return False
 
     def __str__(self):
         return f'Пилот {self.user.last_name} {self.user.first_name}, --> {self.test_name}, попыток {self.num_try}, закончить до {self.date_before.strftime("%d.%m.%Y %H:%M")}'

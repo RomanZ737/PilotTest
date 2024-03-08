@@ -1,6 +1,9 @@
 from django import template
 import random
 import datetime
+from django.db.models import Q, F
+from django.core.exceptions import ObjectDoesNotExist
+from users.models import UserTests
 from django.contrib.auth.models import User
 
 register = template.Library()
@@ -30,6 +33,20 @@ def shuffle(arg):
 @register.simple_tag(takes_context=True)
 def check_test_date(context, date):
     return datetime.datetime.now() > date
+
+
+@register.simple_tag(takes_context=True)
+def check_test_num_try(context, one, two):
+    print('one: ', one)
+    print('one: ', two)
+    if one <= 0:
+        try:
+            UserTests.objects.get((Q(num_try__lte=0) &
+                                   Q(user__quizeresults__in_progress=False) &
+                                   Q(results_id=F('user__quizeresults__id'))), id=two)
+            return True
+        except ObjectDoesNotExist:
+            return False
 
 
 @register.simple_tag(takes_context=True)
