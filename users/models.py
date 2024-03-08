@@ -53,6 +53,7 @@ class UserTests(models.Model):
     num_try = models.IntegerField(default=3, validators=[validate_not_zero], verbose_name='Количество попыток')
     date_before = models.DateTimeField(default=(datetime.datetime.now() + datetime.timedelta(days=30)).date(),
                                        verbose_name='Дата до которой необходимо выполнить тест')
+    results_id = models.IntegerField(verbose_name='Общая оценка', null=True, help_text='Привязывает выполнение теста к текущим результатам, что бы мжно было фильтровать исчерпанные попытки')
 
     class Meta:
         unique_together = ('user', 'test_name')

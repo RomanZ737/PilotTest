@@ -375,8 +375,19 @@ def start(request, id=None):
                 tests_objects_in_progress = QuizeSet.objects.filter(user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
                 for id in tests_objects_in_progress:
                     tests_in_prog.append(id.test_id)
-                # Проверяем просроченные тесты по кол-ву попыток и по дате
-                total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0) | Q(date_before__lt=datetime.date.today())).order_by('date_before').distinct()
+                # Проверяем просроченные тесты по дате
+                #test_date_expire = UserTests.objects.filter(date_before__lt=datetime.date.today())
+                # Проверяем просроченные тесты по кол-ву попыток
+                #test_num_try_expire = UserTests.objects.filter(num_try__lte=0)
+                #test_num_try_expire = test_num_try_expire.filter(user__quizeresults__in_progress=False)
+                #total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0)).order_by('date_before').distinct()
+                #total_expired_user_tests = list(chain(test_date_expire, test_num_try_expire))
+                unic_results_id = QuizeResults.objects.all().values
+                total_expired_user_tests = (UserTests.objects.filter((Q(num_try__lte=0) &
+                                                                      Q(user__quizeresults__in_progress=False)) |
+                                                                      Q(date_before__lt=datetime.date.today()))
+                                                                    .order_by('date_before').distinct())
+                #total_expired_user_tests = total_expired_user_tests.order_by('date_before').distinct()
                 user_tests = UserTests.objects.filter(user=request.user)
                 context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog,
                            'expired_tests': total_expired_user_tests}
