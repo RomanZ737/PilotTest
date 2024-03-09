@@ -1117,7 +1117,7 @@ div.q_edit_comment {
 }
 
 div.q_edit_comment_statick_sign {
-    display: inline-block;
+    /* display: inline-block; */
     height: 100%;
     vertical-align: top;
 }
