@@ -240,6 +240,7 @@
 
         <form method="post" action="{% url 'quize737:question_del' q_id %}" id="del_question_form">
             {% csrf_token %}
+            <input type="hidden" name="previous_url" value="{{ previous_url }}">
         </form>
         <form method='get' action='{% url "quize737:question_list" %}' id="back_to_list">
         </form>

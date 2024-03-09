@@ -1307,7 +1307,8 @@ def question_del(request, id):
                                f' {request.user.profile.first_name[0]}.'
                                f'{request.user.profile.middle_name[0]}.')
     QuestionSet.objects.get(id=id).delete()
-    previous_url = request.META.get('HTTP_REFERER')
+    #print('URL_:', request.POST.get('previous_url'))
+    previous_url = request.POST.get('previous_url')
     return HttpResponseRedirect(previous_url)
     #return redirect('quize737:question_list')
 
