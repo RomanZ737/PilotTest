@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
+import quize737.models as models
 
 def validate_not_zero(value):
     if value == 0:
@@ -21,6 +21,6 @@ def file_size(value):
 
 # Валидатор для формы NewTestFormName - проверят уникальность имени теста
 def similar_test_name(value):
-    test_name = TestConstructor.objects.filter(name=value)
+    test_name = models.TestConstructor.objects.filter(name=value)
     if len(test_name) > 0:
         raise ValidationError('Тест с таким именем уже существует')
