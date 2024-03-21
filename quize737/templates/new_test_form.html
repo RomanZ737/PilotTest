@@ -42,9 +42,9 @@
             </p>
             <div id="set_mark_full_block">
                 <hr/>
-                <span>Оценка 3: <input style="pointer-events: none;" type="text" size="3" id='min_score_three_value' name="min_score_three_value" value="{{test_name_form.pass_score.value}}"> - {{test_name_form.mark_four}} % <span class="comment">(включитльно)</span></span>
+                <span>Оценка 3: <input style="pointer-events: none;" type="text" size="4" id='min_score_three_value' name="min_score_three_value" value="{{test_name_form.pass_score.value}}"> - {{test_name_form.mark_four}} % <span class="comment">(включитльно)</span></span>
                 <br>
-                <span>Оценка 4: <input type="text" size="3" id='min_score_four_value' name='min_score_four_value' value="{{test_name_form.mark_four.value|add:1}}"> - {{test_name_form.mark_five}} % <span class="comment">(включитльно)</span></span>
+                <span>Оценка 4: <input type="number" size="4" id='min_score_four_value' name='min_score_four_value' value="{{test_name_form.mark_four.value|add:1}}"> - {{test_name_form.mark_five}} % <span class="comment">(включитльно)</span></span>
 
             </div>
             <hr/>
@@ -123,31 +123,35 @@
 <!--Функции опционала теста-->
 <script>
     //Логика работы CheckBox выставление оценки
-let setMarkOpt = document.getElementById("id_test_name-set_mark") //Минимальное значение процента для тройки
-let minScoreValue = document.getElementById("id_test_name-pass_score")
+let setMarkOpt = document.getElementById("id_test_name-set_mark") //Checkbox выставления оценки
+let minScoreValue = $("#id_test_name-pass_score") //Минимальный проходной процент
 let minThreeMark = $("#min_score_three_value") //Минимальный процент для тройки
 let maxThreeMark = $("#id_test_name-mark_four") //Максимальный процент для тройки
 let minFourMark =  $("#min_score_four_value") //Минимальный процент для четвёрки
 let maxFourMark = $("#id_test_name-mark_five") //Максимальный процент для четвёрки
 
 
-minScoreValue.addEventListener('change', ChangeMarkValues); // Вешаем listener на изменения минимального процент правильных ответов
+minScoreValue.on('change', ChangeMarkValues); // Вешаем listener на изменения минимального процент правильных ответов
 setMarkOpt.addEventListener('change', SetMarkFunc); // Вешаем listener на объект
-
-
+maxThreeMark.on('change', SetMaxThreeMarkFunc); // Вешаем listener на объект
+minFourMark.on('change', SetMinFourMarkFunc); // Вешаем listener на объект
+// maxFourMark.addEventListener('change', SetMaxFourMarkFunc); // Вешаем listener на объект
 
 if (setMarkOpt.checked === true) {
     $("#set_mark_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
-    maxThreeMark.attr("min", Number(minScoreValue.value) + 1) //Выставляем ограничения по значениям в поле
+    maxThreeMark.attr("min", Number(minScoreValue.val()) + 1) //Выставляем ограничения по значениям в поле
     maxFourMark.attr("max", 99) //Выставляем ограничения по значениям в поле
 }
 
 
-
+//Функция меняет значения процентов для оценки при изменении минимального процента прохождения
 function SetMarkFunc (event) {
     if (setMarkOpt.checked === true) {
+        let new_val = minThreeMark.val()
+         //console.log(new_val)
         $("#set_mark_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
         $("#set_mark_full_block").attr("style", "display: block")
+        minScoreValue.val(new_val)
     } else {
         $("#set_mark_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
         $("#set_mark_full_block").attr("style", "display: none")
@@ -155,16 +159,53 @@ function SetMarkFunc (event) {
 }
 
 function ChangeMarkValues (event) { //Меняем значения минимальных процентов для оценок
-    //console.log(event.target.value)
     let new_num = Number(event.target.value)
+    if (setMarkOpt.checked === true) {
 
-    minThreeMark.val(new_num)
+        if (new_num < 89) {
+            if (maxFourMark.val() < 99 || minThreeMark.val() > new_num) {
+                minThreeMark.val(new_num)
 
-    maxThreeMark.val(new_num + 6)
-    maxThreeMark.attr("min", new_num + 1) //Выставляем ограничения по значениям в поле
+                maxThreeMark.val(new_num + 6)
+                maxThreeMark.attr("min", new_num + 1) //Выставляем ограничения по значениям в поле
 
-    minFourMark.val(new_num + 7)
-    maxFourMark.val(new_num + 11)
+                minFourMark.val(new_num + 7)
+                maxFourMark.val(new_num + 11)
+            } else {
+                event.target.value = minThreeMark.val()
+            }
+    } else {
+            event.target.value = 88
+            minThreeMark.val(88)
+            maxThreeMark.val(94)
+            minFourMark.val(95)
+            maxFourMark.val(99)
+            maxThreeMark.attr("min", 89) //Выставляем ограничения по значениям в поле
+        }
+    } else {
+        if (new_num > 100) {
+            event.target.value = 100
+        }
+    }
+}
+
+function SetMaxThreeMarkFunc (event) {  //Изменение значения максимально процента для тройки
+
+    let new_value = Number(event.target.value)
+
+    if (Number(minFourMark.val()) === Number(maxFourMark.val()) - 1 && (new_value - 1) === (Number(minFourMark.val()) -1)) {
+        event.target.value = Number(minFourMark.val()) - 1
+    } else {
+        minFourMark.val(new_value + 1)
+    }
+}
+function SetMinFourMarkFunc(event) { //Изменение значения минимального процента для четвёрки
+    let new_value = Number(event.target.value)
+    if (Number(minFourMark.val()) === Number(maxFourMark.val()) - 1 && (new_value - 1) === (Number(maxFourMark.val()) -1)) {
+        event.target.value = new_value - 1
+    } else {
+        maxThreeMark.val(new_value - 1)
+    }
 }
 
 </script>
