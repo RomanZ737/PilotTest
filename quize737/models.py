@@ -138,6 +138,7 @@ class QuizeResults(models.Model):
     total_mark = models.IntegerField(default=0, verbose_name='оценка', null=True,
                                      help_text='Итоговая оценка')
 
+
     class Meta:
         ordering = ['-date_end']
 
