@@ -5,9 +5,10 @@ from django.contrib.auth.models import User
 import pytz
 from django.utils.timezone import now
 from choices import ACTypeQ
-from field_validators.validators import file_size
+from field_validators.validators import file_size, similar_test_name
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+import config
 
 
 # Модель тем вопросов
@@ -34,7 +35,7 @@ def a_img_path(instance, filename):
 # Вся база вопросов по всем темам
 class QuestionSet(models.Model):
 
-    def clean(self): # Валидатор поля ПРАВИЛЬНОГО ответа на вопрос
+    def clean(self):  # Валидатор поля ПРАВИЛЬНОГО ответа на вопрос
         if self.answer is None and self.answers is None:
             raise ValidationError('Поле ответа не может быть пустым')
         if self.answer is None and self.answers == 'None':
@@ -144,13 +145,18 @@ class QuizeResults(models.Model):
 
 #  Модель конструктора тестов - названия и id тестов
 class TestConstructor(models.Model):
-
-
-    name = models.CharField(max_length=255, verbose_name='Название Теста',
+    name = models.CharField(max_length=255, validators=[similar_test_name], default='Новый Тест', verbose_name='Название Теста',
                             help_text='Название теста которое будет видно пользователю')
-    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=80,
+    pass_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=config.test_pass_score_default,
                                      verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
+    set_mark = models.BooleanField(verbose_name='Выставлять оценку за тест', default=True, help_text='Высчислять оценку за тест на основании набранных пользователем баллов')
+    mark_four = models.IntegerField(default=config.test_pass_score_default + 6,
+                                    verbose_name='Количество процентов для четвёрки',
+                                    help_text='Минимальный процент правильных ответов для получения оценки четыре за тест')
+    mark_five = models.IntegerField(default=config.test_pass_score_default + 15,
+                                    verbose_name='Количество процентов для четвёрки',
+                                    help_text='Минимальный процент правильных ответов для получения оценки четыре за тест')
     training = models.BooleanField(verbose_name='Тренировочный тест', default=False)
     ac_type = models.CharField(max_length=255, verbose_name='Тип ВС')
     email_to_send = models.TextField(verbose_name='email адреса для рассылки результатов', null=True)
@@ -158,7 +164,8 @@ class TestConstructor(models.Model):
                                     help_text='Если тест не активен, то он перемещается в архив')
     comment = models.CharField(max_length=255, verbose_name='Комментарий', null=True,
                                help_text='Произвольный комментарий к тесту')
-
+    for_user_comment = models.CharField(max_length=255, verbose_name='Комментарий к тесту для пользователя', null=True,
+                               help_text='Произвольный комментарий к тесту для пользователя, будет показан пользователю перед началом теста')
 
     def __str__(self):
         return f'{self.name}'

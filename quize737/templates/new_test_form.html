@@ -37,8 +37,13 @@
                 <input type="hidden" name="ac_type" value="{{ac_type}}">
                 <span>{{test_name_form.training}} Тренировка <span id="training_comment" class="comment">(Письмо KRS не отправляется, результат не записывается)</span></span>
             </p>
-            <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%</p>
-
+            <p>Минимальное количество правильных ответов {{test_name_form.pass_score}}%
+                <span>{{test_name_form.set_mark}} Выставлять оценку <span id="set_mark_comment" class="comment">(Выставлять оценку по пятибалльной системе)</span></span>
+            </p>
+            <div>
+                <hr/>
+                <span>Оценка 3: <input type="text" size="4" name='min_score_value' value="{{test_name_form.pass_score.value}}"> - {{test_name_form.mark_four}} % </span>
+            </div>
             <hr/>
 
             <div id="email_select_panel">

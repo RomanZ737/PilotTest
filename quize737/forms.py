@@ -82,19 +82,30 @@ def similar_test_name(value):
         raise ValidationError('Тест с таким именем уже существует')
 
 
-# Форма для имени создаваемого и теста
-class NewTestFormName(forms.Form):
+# Форма для имени и параметров создаваемого и теста
+# class NewTestFormName(forms.Form):
+#
+#     def __init__(self, *args, **kwargs):
+#         super(NewTestFormName, self).__init__(*args, **kwargs)
+#         self.fields['name'].validators = [similar_test_name]
+#
+#     name = forms.CharField(max_length=25, initial='Новый Тест')
+#     pass_score = forms.IntegerField(widget=forms.NumberInput(attrs={'size': '4',
+#                                                                                 'max': '100',  # For maximum number
+#                                                                                 'min': '0',  # For minimum number
+#                                                                                 }))
+#     training = forms.BooleanField(initial=False, required=False)
 
-    def __init__(self, *args, **kwargs):
-        super(NewTestFormName, self).__init__(*args, **kwargs)
-        self.fields['name'].validators = [similar_test_name]
-
-    name = forms.CharField(max_length=25, initial='Новый Тест')
-    pass_score = forms.IntegerField(initial=80, widget=forms.NumberInput(attrs={'size': '4',
-                                                                                'max': '100',  # For maximum number
-                                                                                'min': '0',  # For minimum number
-                                                                                }))
-    training = forms.BooleanField(initial=False, required=False)
+class NewTestFormName(forms.ModelForm):
+    class Meta:
+        model = TestConstructor
+        fields = ['name', 'pass_score', 'set_mark', 'mark_four', 'mark_five', 'training',
+                  'ac_type', 'email_to_send', 'is_active', 'comment', 'for_user_comment']
+        widgets = {
+            "pass_score": NumberInput(attrs={'size': '4', 'min': 0, 'max': 100}),
+            "mark_four": NumberInput(attrs={'size': '4', 'max': 100}),
+            "mark_five": NumberInput(attrs={'size': '4', 'max': 100}),
+        }
 
 
 # Форма для вопросов создаваемого теста

@@ -17,3 +17,10 @@ def file_size(value):
         raise ValidationError('Превышен максимальный размер файла 2MB')
     else:
         return value
+
+
+# Валидатор для формы NewTestFormName - проверят уникальность имени теста
+def similar_test_name(value):
+    test_name = TestConstructor.objects.filter(name=value)
+    if len(test_name) > 0:
+        raise ValidationError('Тест с таким именем уже существует')
