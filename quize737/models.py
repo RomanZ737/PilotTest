@@ -135,6 +135,8 @@ class QuizeResults(models.Model):
                                      help_text='Итоговый результат, True - пользоваетль сдал тест или False - если пользоваетль тест не сдал')
     in_progress = models.BooleanField(verbose_name='Тест не завершён', default=True,
                                       help_text='Если тест не завершён, то результат не показывается в общем списке')
+    total_mark = models.IntegerField(default=0, verbose_name='оценка', null=True,
+                                     help_text='Итоговая оценка')
 
     class Meta:
         ordering = ['-date_end']
