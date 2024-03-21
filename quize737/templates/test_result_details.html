@@ -126,47 +126,42 @@
                 {% endif %}
 
             {% endfor %}
-            <div id="button_block" class="list-other_field_non_inline">
-                <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
-            </div>
-            <br>
-            <div id="answers" style="display: none;" >
+            {% if request.user|has_group:'krs' or user.is_superuser %}
+                <div id="button_block" class="list-other_field_non_inline">
+                    <input type="submit" id="hide_show_butt" value="Показать ответы" onclick="show_answers()">
+                </div>
+                <br>
+                <div id="answers" style="display: none;" >
+                        {% for question in answers%}
+                        <fieldset>
+                            <legend>
+                                {% if question.conclusion == True%}
+                                    <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
+                                {% else %}
+                                    <span class="negative">НЕВЕРНЫЙ ОТВЕТ</span>
+                                {% endif %}
+                            </legend>
+                            <div class="result_answers_question">{{question.question}}</div>
 
+                            {% for answer in question.answers %}
+                                {% if answer.valid == True %}
+                                    <div class="result_answers_correct">{{answer.option}}</div>
+                                {% else %}
+                                    <div class="result_answers_wrong">{{answer.option}}</div>
+                                {% endif %}
+                            {% endfor %}
+                            <br>
+                            <div class="result_answers_question">Ответ Тестируемого:</div>
+                            {% for user_answer in question.user_answer%}
+                                <div class="result_answers_user_answer">{{user_answer}}</div>
+                            {% endfor %}
 
-                    {% for question in answers%}
-                    <fieldset>
-                        <legend>
-                            {% if question.conclusion == True%}
-                                <span class="positive">ПРАВИЛЬНЫЙ ОТВЕТ</span>
-                            {% else %}
-                                <span class="negative">НЕВЕРНЫЙ ОТВЕТ</span>
-                            {% endif %}
-                        </legend>
-                        <div class="result_answers_question">{{question.question}}</div>
-
-                        {% for answer in question.answers %}
-                            {% if answer.valid == True %}
-                                <div class="result_answers_correct">{{answer.option}}</div>
-                            {% else %}
-                                <div class="result_answers_wrong">{{answer.option}}</div>
-                            {% endif %}
-                        {% endfor %}
+                            </fieldset>
                         <br>
-                        <div class="result_answers_question">Ответ Тестируемого:</div>
-                        {% for user_answer in question.user_answer%}
-                            <div class="result_answers_user_answer">{{user_answer}}</div>
+                        <br>
                         {% endfor %}
-
-                        </fieldset>
-                    <br>
-                    <br>
-                    {% endfor %}
-
-
-            </div>
-
-<!--            <form id="go_back" method='get' action='{% url "quize737:tests_results_list" %}'>-->
-<!--            </form>-->
+                </div>
+            {% endif %}
             <form id="download_test" action="{% url 'quize737:download_test_result' id %}">
             </form>
             <form id="go-back" method='get' action='{% url "quize737:go_back_button" %}'>
@@ -175,11 +170,12 @@
 
             <div class="list-other_field">
                 <input type="submit" value="Вернуться" form="go-back">
-                <span style="color: black;"> | </span>
-                <input type="submit" value="Распечатать" onclick="window.print()">
-                <span style="color: black;"> | </span>
-                <input type="submit" value="Скачать" form="download_test">
-
+                {% if request.user|has_group:'krs' or user.is_superuser %}
+                    <span style="color: black;"> | </span>
+                    <input type="submit" value="Распечатать" onclick="window.print()">
+                    <span style="color: black;"> | </span>
+                    <input type="submit" value="Скачать" form="download_test">
+                {% endif %}
             </div>
         </div>
     </fieldset>

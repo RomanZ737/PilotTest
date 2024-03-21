@@ -952,7 +952,7 @@ def next_question(request):
 
 
 @login_required
-@group_required('KRS')
+#@group_required('KRS')
 # Все результаты тестов
 def tests_results_list(request):
     groups = Group.objects.all().values()
@@ -1027,7 +1027,12 @@ def tests_results_list(request):
 
 
     else:
-        results_list = QuizeResults.objects.filter(in_progress=False).order_by('-date_end')
+        # Групы для полного списка тестов:
+        groups = ['KRS', 'ПИ Штатные 737']
+        if request.user.groups.filter(name__in=groups).exists() | request.user.is_superuser:
+            results_list = QuizeResults.objects.filter(in_progress=False).order_by('-date_end')
+        else:
+            results_list = QuizeResults.objects.filter(in_progress=False, user_id__username=request.user.username).order_by('-date_end')
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)
@@ -1037,7 +1042,7 @@ def tests_results_list(request):
 
 
 @login_required
-@group_required('KRS')
+#@group_required('KRS')
 # Детали результатов теста
 def test_result_details(request, id):
     answer_results = []

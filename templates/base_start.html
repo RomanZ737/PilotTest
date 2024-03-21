@@ -33,10 +33,8 @@
                             <a href="{% url 'password_change' %}">Профиль</a>
                             <span>|</span>
 
-                            {% if request.user|has_group:'krs' or user.is_superuser %}
-                                <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
-                                <span>|</span>
-                            {% endif %}
+                            <a href="{% url 'quize737:tests_results_list' %}">Отчёты</a>
+                            <span>|</span>
 
                             {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
                                 <a href="{% url 'quize737:question_list' %}">База вопросов</a>

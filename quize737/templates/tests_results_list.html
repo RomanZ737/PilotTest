@@ -9,83 +9,86 @@
 <fieldset>
     <legend>Результаты тестирования</legend>
         <div class="block-list">
-            <div class="block_none_light_up">
-                <div class="search-form">
-                    <form id="user_search" action="{% url 'quize737:tests_results_list' %}" method="get">
-                        <input type="text" name="user_search" placeholder="Поиск пилота..." value="{{user_search_input}}">
-                        <input type="submit" value="Искать">
-                    </form>
-                </div>
-                <div class="filter-form">
-                    <div class="filter_related_results">
-                        <form id="position_filter" action="{% url 'quize737:tests_results_list' %}" method="get">
-                            <div class="filter_sign_position"></div>
-                            <select class="position_filter" name="filter">
-                        {% for option in position_list %}
-                            {% if filter_input %}
-                                    {% if option == filter_input.0 %}
-                                        <option value="{{option}}" selected>{{option}}</option>
-                                    {% else %}
-                                        <option value="{{option}}">{{option}}</option>
-                                    {% endif %}
-                                {% else %}
-                                    {% if option == "Все" %}
-                                        <option value="{{option}}" selected>{{option}}</option>
-                                    {% else %}
-                                        <option value="{{option}}">{{option}}</option>
-                                    {% endif %}
-                                {% endif %}
-                        {% endfor %}
-                    </select>
-                            <div class="filter_sign_group"></div>
-                            <select class="position_filter" name="filter">
-                        {% for group in group_list %}
-                                {% if filter_input %}
-                                    {% if group.name == filter_input.1 %}
-                                        <option value="{{group.name}}" selected>{{group.name}}</option>
-                                    {% else %}
-                                        <option value="{{group.name}}">{{group.name}}</option>
-                                    {% endif %}
-                                {% else %}
-                                    {% if group.name == "Все" %}
-                                        <option value="{{group.name}}" selected>{{group.name}}</option>
-                                    {% else %}
-                                        <option value="{{group.name}}">{{group.name}}</option>
-                                    {% endif %}
-                                {% endif %}
-                        {% endfor %}
-                    </select>
-                            <div class="filter_sign_result"></div>
-                            <select class="position_filter" name="filter">
-                        {% for result in results_list_options %}
-                            {% if filter_input %}
-                                    {% if result == filter_input.2 %}
-                                        <option value="{{result}}" selected>{{result}}</option>
-                                    {% else %}
-                                        <option value="{{result}}">{{result}}</option>
-                                    {% endif %}
-                                {% else %}
-                                    {% if result == "Все" %}
-                                        <option value="{{result}}" selected>{{result}}</option>
-                                    {% else %}
-                                        <option value="{{result}}">{{result}}</option>
-                                    {% endif %}
-                                {% endif %}
-                        {% endfor %}
-                    </select>
+            {% if request.user|has_group:'krs,ПИ Штатные 737' or user.is_superuser %}
+                <div class="block_none_light_up">
+                    <div class="search-form">
+                        <form id="user_search" action="{% url 'quize737:tests_results_list' %}" method="get">
+                            <input type="text" name="user_search" placeholder="Поиск пилота..." value="{{user_search_input}}">
+                            <input type="submit" value="Искать">
                         </form>
                     </div>
-                    <div style="display: inline-block;">
-                        <form id="reset_filter" action="{% url 'quize737:tests_results_list' %}" method="get">
-                    </form>
-                    </div>
-                    <div class="button_block">
-                        <input class="submit_filter" type="submit" value="Фильтр" form="position_filter">
-                        <span style="color: black">|</span>
-                        <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">
+                    <div class="filter-form">
+                        <div class="filter_related_results">
+                            <form id="position_filter" action="{% url 'quize737:tests_results_list' %}" method="get">
+                                <div class="filter_sign_position"></div>
+                                <select class="position_filter" name="filter">
+                            {% for option in position_list %}
+                                {% if filter_input %}
+                                        {% if option == filter_input.0 %}
+                                            <option value="{{option}}" selected>{{option}}</option>
+                                        {% else %}
+                                            <option value="{{option}}">{{option}}</option>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if option == "Все" %}
+                                            <option value="{{option}}" selected>{{option}}</option>
+                                        {% else %}
+                                            <option value="{{option}}">{{option}}</option>
+                                        {% endif %}
+                                    {% endif %}
+                            {% endfor %}
+                        </select>
+                                <div class="filter_sign_group"></div>
+                                <select class="position_filter" name="filter">
+                            {% for group in group_list %}
+                                    {% if filter_input %}
+                                        {% if group.name == filter_input.1 %}
+                                            <option value="{{group.name}}" selected>{{group.name}}</option>
+                                        {% else %}
+                                            <option value="{{group.name}}">{{group.name}}</option>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if group.name == "Все" %}
+                                            <option value="{{group.name}}" selected>{{group.name}}</option>
+                                        {% else %}
+                                            <option value="{{group.name}}">{{group.name}}</option>
+                                        {% endif %}
+                                    {% endif %}
+                            {% endfor %}
+                        </select>
+                                <div class="filter_sign_result"></div>
+                                <select class="position_filter" name="filter">
+                            {% for result in results_list_options %}
+                                {% if filter_input %}
+                                        {% if result == filter_input.2 %}
+                                            <option value="{{result}}" selected>{{result}}</option>
+                                        {% else %}
+                                            <option value="{{result}}">{{result}}</option>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if result == "Все" %}
+                                            <option value="{{result}}" selected>{{result}}</option>
+                                        {% else %}
+                                            <option value="{{result}}">{{result}}</option>
+                                        {% endif %}
+                                    {% endif %}
+                            {% endfor %}
+                        </select>
+                            </form>
+                        </div>
+                        <div style="display: inline-block;">
+                            <form id="reset_filter" action="{% url 'quize737:tests_results_list' %}" method="get">
+                        </form>
+                        </div>
+                        <div class="button_block">
+                            <input class="submit_filter" type="submit" value="Фильтр" form="position_filter">
+                            <span style="color: black">|</span>
+                            <input class="submit_filter" type="submit" value="Сбросить Фильтр" form="reset_filter">
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
+
             {% if no_search_results %}
                 <div>
                     <span style="color: rgb(209, 209,209);">{{results}}</span>
@@ -110,9 +113,10 @@
                                         <span class="negative">ТЕСТ НЕ СДАН</span>
                                     {% endif %}
                             </div>
-
-                            <a href="{% url 'quize737:download_test_result' id=i.id %}">
-                            <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px">Скачать</a>
+                            {% if request.user|has_group:'krs' or user.is_superuser %}
+                                <a href="{% url 'quize737:download_test_result' id=i.id %}">
+                                <img src="{% static 'download.png' %}" alt="Скачать" style="alignment: left;vertical-align:middle; width: 17px; padding-right: 5px">Скачать</a>
+                            {% endif %}
                         </div>
                 {% endfor %}
                         <br>

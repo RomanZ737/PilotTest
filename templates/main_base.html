@@ -31,10 +31,10 @@
                         <span>|</span>
                         <span><a href="{% url 'password_change' %}">Профиль</a></span>
                         <span>|</span>
-                            {% if request.user|has_group:'krs' or user.is_superuser %}
+
                                 <span><a href="{% url 'quize737:tests_results_list' %}">Отчёты</a></span>
                                 <span>|</span>
-                            {% endif %}
+
                             {% if request.user|has_group:'krs,Редактор' or user.is_superuser %}
                                 <span><a href="{% url 'quize737:question_list' %}">База вопросов</a></span>
                                 <span>|</span>
