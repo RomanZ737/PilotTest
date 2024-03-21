@@ -161,7 +161,6 @@ function SetMarkFunc (event) {
 function ChangeMarkValues (event) { //Меняем значения минимальных процентов для оценок
     let new_num = Number(event.target.value)
     if (setMarkOpt.checked === true) {
-
         if (new_num < 89) {
             if (maxFourMark.val() < 99 || minThreeMark.val() > new_num) {
                 minThreeMark.val(new_num)
