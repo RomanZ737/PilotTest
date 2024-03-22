@@ -158,12 +158,12 @@
 
 <script>
     //Логика работы CheckBox выставление оценки
-let setMarkOpt = document.getElementById("id_test_name-set_mark") //Checkbox выставления оценки
-let minScoreValue = $("#id_test_name-pass_score") //Минимальный проходной процент
+let setMarkOpt = document.getElementById("id_set_mark") //Checkbox выставления оценки
+let minScoreValue = $("#id_pass_score") //Минимальный проходной процент
 let minThreeMark = $("#id_test_name-min_score_three_value") //Минимальный процент для тройки
-let maxThreeMark = $("#id_test_name-mark_four") //Максимальный процент для тройки
+let maxThreeMark = $("#id_mark_four") //Максимальный процент для тройки
 let minFourMark =  $("#id_test_name-min_score_four_value") //Минимальный процент для четвёрки
-let maxFourMark = $("#id_test_name-mark_five") //Максимальный процент для четвёрки
+let maxFourMark = $("#id_mark_five") //Максимальный процент для четвёрки
 
 
 minScoreValue.on('change', ChangeMarkValues); // Вешаем listener на изменения минимального процент правильных ответов
@@ -311,7 +311,7 @@ totalQNum.value = 0; //Ставим изначальное значение ко
 //Подсчёт количества вопросов при открытии теста
 //Выбираем все элементы input type=number, кроме 'pass score',
 //подсчитываем количество вопросов и развешиваем listener
-$(':input[type="number"]').not('#id_test_name-pass_score, #id_test_name-min_score_three_value, #id_test_name-mark_four, #id_test_name-min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
+$(':input[type="number"]').not('#id_pass_score, #id_test_name-min_score_three_value, #id_mark_four, #id_test_name-min_score_four_value, #id_mark_five').each(function(index, element) {
   let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
   let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
 
@@ -415,7 +415,7 @@ function ThemSelectorsDel(select_id, valueOfSelect){
 function mainQCount() {
   totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
   totalQNum.innerHTML = totalQNum.value;
-  $(':input[type="number"]').not('#id_test_name-pass_score, #id_test_name-min_score_three_value, #id_test_name-mark_four, #id_test_name-min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
+  $(':input[type="number"]').not('#id_pass_score, #id_test_name-min_score_three_value, #id_mark_four, #id_test_name-min_score_four_value, #id_mark_five').each(function(index, element) {
     let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
     let delMarker = document.getElementById("id_questions-" + idNum + "-DELETE") // CheckBox поля "Удалить тему"
 
