@@ -52,7 +52,6 @@ from reportlab.pdfgen import canvas
 
 from common import group_required
 
-
 logger_user_action = logging.getLogger('USER ACTION')
 loger_pilot_answer = logging.getLogger('PILOT ANSWER')
 
@@ -92,7 +91,6 @@ def all_them_q_set():
 # Заглавная страница
 @login_required  # Только для зарегитсрированных пользователей
 def start(request, id=None):
-
     try:
         user_instance = request.user
         if request.method == 'POST':
@@ -375,22 +373,23 @@ def start(request, id=None):
                 # проверяем есть ли у пользователя не завершённые тесты
                 tests_in_prog = []
 
-                tests_objects_in_progress = QuizeSet.objects.filter(user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
+                tests_objects_in_progress = QuizeSet.objects.filter(
+                    user_under_test=request.user.username)  # Объект сформированного пользователю теста (когда пользователь нажимает кнопку "Начать тестирование")
                 for id in tests_objects_in_progress:
                     tests_in_prog.append(id.test_id)
                 # Проверяем просроченные тесты по дате
-                #test_date_expire = UserTests.objects.filter(date_before__lt=datetime.date.today())
+                # test_date_expire = UserTests.objects.filter(date_before__lt=datetime.date.today())
                 # Проверяем просроченные тесты по кол-ву попыток
-                #test_num_try_expire = UserTests.objects.filter(num_try__lte=0)
-                #test_num_try_expire = test_num_try_expire.filter(user__quizeresults__in_progress=False)
-                #total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0)).order_by('date_before').distinct()
-                #total_expired_user_tests = list(chain(test_date_expire, test_num_try_expire))
+                # test_num_try_expire = UserTests.objects.filter(num_try__lte=0)
+                # test_num_try_expire = test_num_try_expire.filter(user__quizeresults__in_progress=False)
+                # total_expired_user_tests = UserTests.objects.filter(Q(num_try__lte=0)).order_by('date_before').distinct()
+                # total_expired_user_tests = list(chain(test_date_expire, test_num_try_expire))
 
                 total_expired_user_tests = (UserTests.objects.filter((Q(num_try__lte=0) &
                                                                       Q(user__quizeresults__in_progress=False) &
                                                                       Q(results_id=F('user__quizeresults__id'))) |
-                                                                      Q(date_before__lt=datetime.date.today()))
-                                                                    .order_by('date_before').distinct())
+                                                                     Q(date_before__lt=datetime.date.today()))
+                                            .order_by('date_before').distinct())
                 user_tests = UserTests.objects.filter(user=request.user)
                 context = {'user_tests': user_tests, 'tests_in_prog': tests_in_prog,
                            'expired_tests': total_expired_user_tests}
@@ -952,7 +951,7 @@ def next_question(request):
 
 
 @login_required
-#@group_required('KRS')
+# @group_required('KRS')
 # Все результаты тестов
 def tests_results_list(request):
     groups = Group.objects.all().values()
@@ -1032,7 +1031,8 @@ def tests_results_list(request):
         if request.user.groups.filter(name__in=groups).exists() | request.user.is_superuser:
             results_list = QuizeResults.objects.filter(in_progress=False).order_by('-date_end')
         else:
-            results_list = QuizeResults.objects.filter(in_progress=False, user_id__username=request.user.username).order_by('-date_end')
+            results_list = QuizeResults.objects.filter(in_progress=False,
+                                                       user_id__username=request.user.username).order_by('-date_end')
         paginator = Paginator(results_list, 10)
         page_number = request.GET.get('page', 1)
         results_list_pages = paginator.page(page_number)
@@ -1042,7 +1042,7 @@ def tests_results_list(request):
 
 
 @login_required
-#@group_required('KRS')
+# @group_required('KRS')
 # Детали результатов теста
 def test_result_details(request, id):
     answer_results = []
@@ -1217,7 +1217,7 @@ def new_question(request):
             instance.question_img = question_form.cleaned_data['question_img']
             instance.comment_img = question_form.cleaned_data['comment_img']
             instance.save()
-            #print('path: ', f"{dir_path}/media/images/{instance.them_name.id}/{instance.id}/None/*.*")
+            # print('path: ', f"{dir_path}/media/images/{instance.them_name.id}/{instance.id}/None/*.*")
             filelist = glob.glob(f"{dir_path}/media/images/{instance.them_name.id}/None/*.*")
 
             if filelist:
@@ -1251,7 +1251,7 @@ def new_question(request):
 @login_required
 @group_required(('KRS', 'Редактор'))
 def question_list_details(request, id):
-    comments = {} # Статические комментарии
+    comments = {}  # Статические комментарии
     comments['Q_WEIGHT_COMMENT'] = text.Q_WEIGHT_COMMENT
     comments['MAX_PICTURE_FILE_SIZE'] = text.MAX_PICTURE_FILE_SIZE
     #  Если пользователь нажал 'сохранить', выполняем проверку и сохраняем форму
@@ -1312,10 +1312,10 @@ def question_del(request, id):
                                f' {request.user.profile.first_name[0]}.'
                                f'{request.user.profile.middle_name[0]}.')
     QuestionSet.objects.get(id=id).delete()
-    #print('URL_:', request.POST.get('previous_url'))
+    # print('URL_:', request.POST.get('previous_url'))
     previous_url = request.POST.get('previous_url')
     return HttpResponseRedirect(previous_url)
-    #return redirect('quize737:question_list')
+    # return redirect('quize737:question_list')
 
 
 # Редактор тем вопросов
@@ -1666,7 +1666,10 @@ def create_new_test(request):
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
-
+        # if request.POST.get('test_name-comment'):
+        comment = request.POST.get('test_name-comment')
+        # if request.POST.get('test_name-for_user_comment'):
+        for_user_comment = request.POST.get('test_name-for_user_comment')
         ac_type = request.POST.get('ac_type')  # Вынимаем Тип ВС
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)},
@@ -1687,14 +1690,18 @@ def create_new_test(request):
                                                               ac_type=ac_type,
                                                               set_mark=True,
                                                               mark_four=mark_four,
-                                                              mark_five=mark_five
+                                                              mark_five=mark_five,
+                                                              comment=comment,
+                                                              for_user_comment=for_user_comment
                                                               )
                 else:
                     new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
                                                               pass_score=test_name_form.data['test_name-pass_score'],
                                                               training=True,
                                                               ac_type=ac_type,
-                                                              set_mark=False
+                                                              set_mark=False,
+                                                              comment=comment,
+                                                              for_user_comment=for_user_comment
                                                               )
                 logger_user_action.warning(f'<b>Создан Тест: </b>{test_name_form.data["test_name-name"]}\n\n'
                                            f'<b>User:</b> {request.user.profile.family_name}'
@@ -1740,7 +1747,9 @@ def create_new_test(request):
                                                               ac_type=ac_type,
                                                               set_mark=True,
                                                               mark_four=mark_four,
-                                                              mark_five=mark_five
+                                                              mark_five=mark_five,
+                                                              comment=comment,
+                                                              for_user_comment=for_user_comment
                                                               )
                 else:
                     new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
@@ -1748,7 +1757,10 @@ def create_new_test(request):
                                                               training=False,
                                                               ac_type=ac_type,
                                                               email_to_send=', '.join(emails),
-                                                              set_mark=False)
+                                                              set_mark=False,
+                                                              comment=comment,
+                                                              for_user_comment=for_user_comment
+                                                              )
                 logger_user_action.warning(f'<b>Создан Тест: </b>{test_name_form.data["test_name-name"]}\n\n'
                                            f'<b>User:</b> {request.user.profile.family_name}'
                                            f' {request.user.profile.first_name[0]}.'
@@ -1800,7 +1812,8 @@ def test_details(request, id):
         'last_name')
     # Вынимаем объект теста
     test_instance = TestConstructor.objects.filter(id=id).values('name', 'id', 'pass_score', 'training', 'ac_type',
-                                                                 'email_to_send')
+                                                                 'email_to_send', 'set_mark', 'mark_four',
+                                                                 'mark_five', 'comment', 'for_user_comment')
     ac_type = test_instance[0]['ac_type']
 
     #  Выбранные адреса email для рассылки
@@ -1959,8 +1972,8 @@ def user_list(request):
         # Если в запросе были отмечены пользователи (user_select)
         selected_user_list = []  # Список пользователей, которые были отмечены
         # Пользователи у которых просрочена дата теста
-        user_test_out_of_try = {} # User_ID:Test_Name
-        user_test_out_of_date = {} # User_ID:Test_Name
+        user_test_out_of_try = {}  # User_ID:Test_Name
+        user_test_out_of_date = {}  # User_ID:Test_Name
         total_user_expire_tests = []
 
         # total_expired_user_tests = (UserTests.objects.filter((Q(num_try__lte=0) &
@@ -1980,7 +1993,7 @@ def user_list(request):
         total_user_expire_tests.append(user_test_out_of_try)
         total_user_expire_tests.append(user_test_out_of_date)
 
-        #print('TOTAL:', total_user_expire_tests)
+        # print('TOTAL:', total_user_expire_tests)
 
         if 'user_selected' in request.GET.keys():
             selected_users_ids = request.GET.getlist('user_selected')
@@ -2085,7 +2098,8 @@ def user_list(request):
                                                               is_active=True,
                                                               ).exclude(
                             username='roman').distinct().order_by('last_name')
-                        total_user_list = total_user_list.filter(Q(usertests__num_try__lte=0) | Q(usertests__date_before__lt=datetime.date.today()))
+                        total_user_list = total_user_list.filter(
+                            Q(usertests__num_try__lte=0) | Q(usertests__date_before__lt=datetime.date.today()))
                     else:
                         test = filter_input[3]
                         total_user_list = User.objects.filter(profile__ac_type__contains=ac_type,

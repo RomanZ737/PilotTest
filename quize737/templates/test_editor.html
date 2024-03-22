@@ -25,15 +25,15 @@
         {% else %}
             {% for test in tests_names %}
                 <div class="block_light_up">
-                    <div class="list-test_name">
-                        <a href="{{test.id}}"><span style="color: black;"></span> {{test.name}}</a>
+                    <div class="list-test_name" title="{{test.comment}}">
+                        <a href="{{test.id}}" ><span style="color: black;"></span> {{test.name}}</a>
                     </div>
 
-                    <div class="test_ac-type">
+                    <div class="test_ac-type" title="Тип ВС">
                         {{test.ac_type}}
                     </div>
 
-                    <div class="test_total_q_num">
+                    <div class="test_total_q_num" title="Количество вопросов в тесте">
                         <span>Вопросов:
                             {% if total_q_num|get_item:test.name > 100 and total_q_num|get_item:test.name < 150 %}
                                 <span style="color: rgb(204, 198, 22);">{{total_q_num|get_item:test.name}}</span></span>
@@ -44,23 +44,23 @@
                             {% endif %}
                     </div>
 
-                    <div class="test_total_users">
+                    <div class="test_total_users" title="Количество пилотов, которым назначен тест">
                         <a href="/user_list/?position_filter=Все&position_filter=Все&position_filter=Все&position_filter={{test.name}}">Назначен: {{users|get_item:test.name}}</a>
                     </div>
 
-                    <div class="test_them_list">
+                    <div class="test_them_list" title='{{total_them|get_item:test.name|join:"; "}}'>
                         <span>{{total_them|get_item:test.name|join:"; "|truncatewords:5}}</span>
                     </div>
 
                     <div class="test_training">
                         {% if test.training %}
-                            <span class="theme_color">Трен.</span>
+                            <span class="theme_color" title="Тренировочный тест - результат не фиксируется">Трен.</span>
                         {% else %}
                             <span></span>
                         {% endif %}
                     </div>
 
-                    <div class="list-delete">
+                    <div class="list-delete" title='Удалить тест "{{test.name}}"'>
                         <a href="{% url 'quize737:del_test' test.id %}" onclick="return confirm('Удалить Тест: {{test.name}}?') || event.preventDefault()">Удалить</a>
                     </div>
                 </div>

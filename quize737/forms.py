@@ -105,19 +105,25 @@ class NewTestFormName(forms.ModelForm):
             "pass_score": NumberInput(attrs={'size': '4', 'min': 0, 'max': 100}),
             "mark_four": NumberInput(attrs={'size': '4', 'max': 98}),
             "mark_five": NumberInput(attrs={'size': '4', 'max': 99}),
+            'comment': Textarea(attrs={'rows': 4, 'style': 'font-size: 18',
+                                       'placeholder': 'Служебная информация (напр.: Вопросы по ситсемам ВС, 4 вопроса '
+                                                      'из каждой темы)'}),
+            'for_user_comment': Textarea(attrs={'rows': 4, 'style': 'font-size: 18',
+                                                'placeholder': 'Информация для Пилота, сдающего тест'}),
         }
 
     def __init__(self, *args, **kwargs):
         super(NewTestFormName, self).__init__(*args, **kwargs)
-        #self.fields['set_mark'].required = False
-        #self.fields['mark_four'].required = False
-        #self.fields['mark_five'].required = False
-        #self.fields['training'].required = False
+        # self.fields['set_mark'].required = False
+        # self.fields['mark_four'].required = False
+        # self.fields['mark_five'].required = False
+        # self.fields['training'].required = False
         self.fields['ac_type'].required = False
         self.fields['email_to_send'].required = False
         self.fields['is_active'].required = False
         self.fields['comment'].required = False
         self.fields['for_user_comment'].required = False
+
 
 # Форма для вопросов создаваемого теста
 class NewTestFormQuestions(forms.ModelForm):

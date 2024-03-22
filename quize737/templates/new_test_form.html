@@ -113,6 +113,19 @@
             <input id="add-form" type="button" value="+ Добавить тему">
             <br>
             <br>
+            <hr/>
+            <div>
+                <span>Коментарий для КРС (необязательно)</span>
+                <br>
+                {{test_name_form.comment}}
+            </div>
+            <br>
+            <div>
+                <span>Коментарий для Пилота, сдающего тест (необязательно)</span>
+                <br>
+                {{test_name_form.for_user_comment}}
+            </div>
+            <br>
         </form>
         <form method='get' id="go_back" action='{% url "quize737:new_test_ac_type" %}'></form>
         <input type="submit" value="Сохранить" form="question_form"><span style="color: black;"> | </span><input
