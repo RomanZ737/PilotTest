@@ -135,6 +135,7 @@ minScoreValue.on('change', ChangeMarkValues); // Вешаем listener на из
 setMarkOpt.addEventListener('change', SetMarkFunc); // Вешаем listener на объект
 maxThreeMark.on('change', SetMaxThreeMarkFunc); // Вешаем listener на объект
 minFourMark.on('change', SetMinFourMarkFunc); // Вешаем listener на объект
+maxFourMark.on('change', SetMaxFourMarkFunc); // Вешаем listener на объект
 // maxFourMark.addEventListener('change', SetMaxFourMarkFunc); // Вешаем listener на объект
 
 if (setMarkOpt.checked === true) {
@@ -142,7 +143,6 @@ if (setMarkOpt.checked === true) {
     maxThreeMark.attr("min", Number(minScoreValue.val()) + 1) //Выставляем ограничения по значениям в поле
     maxFourMark.attr("max", 99) //Выставляем ограничения по значениям в поле
 }
-
 
 //Функция меняет значения процентов для оценки при изменении минимального процента прохождения
 function SetMarkFunc (event) {
@@ -189,21 +189,59 @@ function ChangeMarkValues (event) { //Меняем значения минима
 }
 
 function SetMaxThreeMarkFunc (event) {  //Изменение значения максимально процента для тройки
+    if (event.originalEvent) {  //Проверяем пользователь или код изменил состояние
+        let new_value = Number(event.target.value)
 
-    let new_value = Number(event.target.value)
-
-    if (Number(minFourMark.val()) === Number(maxFourMark.val()) - 1 && (new_value - 1) === (Number(minFourMark.val()) -1)) {
-        event.target.value = Number(minFourMark.val()) - 1
-    } else {
-        minFourMark.val(new_value + 1)
+        if (new_value > Number(minScoreValue.val()) && new_value <= 97) {
+            minFourMark.val(new_value + 1)
+            if (Number(minFourMark.val()) >= Number(maxFourMark.val()) - 1) {
+                maxFourMark.val(new_value + 2)
+            }
+        } else {
+            if (new_value > 97) {
+                event.target.value = 97
+                minFourMark.val(98)
+            } else {
+                event.target.value = Number(minScoreValue.val()) + 1
+                minFourMark.val(Number(minScoreValue.val()) + 2)
+            }
+        }
     }
 }
 function SetMinFourMarkFunc(event) { //Изменение значения минимального процента для четвёрки
-    let new_value = Number(event.target.value)
-    if (Number(minFourMark.val()) === Number(maxFourMark.val()) - 1 && (new_value - 1) === (Number(maxFourMark.val()) -1)) {
-        event.target.value = new_value - 1
-    } else {
-        maxThreeMark.val(new_value - 1)
+    if (event.originalEvent) { //Проверяем пользователь или код изменил состояние
+        let new_value = Number(event.target.value)
+        if (new_value >= (Number(minScoreValue.val()) + 2) && new_value <= 98) {
+            maxThreeMark.val(new_value - 1)
+            if (new_value >= Number(maxFourMark.val())) {
+                maxFourMark.val(new_value + 1)
+            }
+        } else {
+            if (new_value > 98) {
+                event.target.value = 98
+                maxFourMark.val(99)
+                maxThreeMark.val(97)
+            } else {
+                event.target.value = Number(minScoreValue.val()) + 2
+                maxThreeMark.val(Number(minScoreValue.val()) + 1)
+            }
+        }
+    }
+}
+
+function SetMaxFourMarkFunc(event) {
+    if (event.originalEvent) { //Проверяем пользователь или код изменил состояние
+        let new_value = Number(event.target.value)
+        if ( new_value > 99) {
+            event.target.value = 99
+        } else if (new_value < (Number(minScoreValue.val()) + 3)) {
+            event.target.value = Number(minScoreValue.val()) + 3
+            minFourMark.val(Number(minScoreValue.val()) + 2)
+            maxThreeMark.val(Number(minScoreValue.val()) + 1)
+        } else if (new_value <= Number(minFourMark.val())) {
+            minFourMark.val(new_value - 1)
+            maxThreeMark.val(new_value -2)
+        }
     }
 }
 
@@ -257,7 +295,7 @@ $(':input[type="number"]').not('#id_test_name-pass_score, #min_score_three_value
   let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
   let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
 
-  if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
+  if (selectElemNum !== '5') {  //Если значение поля выбора темы НЕ "Все темы"
     totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
     totalQNum.innerHTML = totalQNum.value;
 
@@ -306,13 +344,13 @@ function ThemFocus(event) {
 function mainQCount() {
   totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
   totalQNum.innerHTML = totalQNum.value;
-  $(':input[type="number"]').not(':input[name="test_name-pass_score"]').each(function(index, element) {
+  $(':input[type="number"]').not('#id_test_name-pass_score, #min_score_three_value, #id_test_name-mark_four, #min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
     let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
     let delMarker = document.getElementById("id_questions-" + idNum + "-DELETE") // CheckBox поля "Удалить тему"
 
-    if ( delMarker.checked != true) {
+    if ( delMarker.checked !== true) {
       let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
-      if (selectElemNum != '5') {  //Если значение поля выбора темы НЕ "Все темы"
+      if (selectElemNum !== '5') {  //Если значение поля выбора темы НЕ "Все темы"
         let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
         totalQNum.value = parseInt(totalQNum.value) + parseInt(element.value); //Переводим значения в цифры и складываем
         totalQNum.innerHTML = totalQNum.value;
@@ -342,7 +380,7 @@ function mainQCount() {
   $("#total_q_num").animate( {
     fontSize: "19px",
   }, 130 );
-};
+}
 //Функция отслеживает изменение поля количества вопросов
 function QNumChanged() {
   event.preventDefault();
@@ -354,7 +392,7 @@ $(':input[type="checkbox"][name^=questions-][name$=-DELETE]').each(function(inde
   element.addEventListener('input', markToDelete); // Вешаем listener на объект input
   //Если какая-то тема была отмечена к удалению при загрузке страницы (возврат из-за ошибки ввода пользователя)
   let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
-  if (element.checked == true) {
+  if (element.checked === true) {
     $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
   } else {
     $("#for_crossout_" + idNum).removeClass();
@@ -365,7 +403,7 @@ function markToDelete(event) {
 
   let idNum = event.target.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
 
-  if (event.target.checked == true) {
+  if (event.target.checked === true) {
 
     $("#for_crossout_" + idNum).addClass("crossed_out_inactive");
   } else {
