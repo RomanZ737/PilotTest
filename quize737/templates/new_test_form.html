@@ -42,10 +42,18 @@
             </p>
             <div id="set_mark_full_block">
                 <hr/>
-                <span>Оценка 3: <input style="pointer-events: none;" type="text" size="4" id='min_score_three_value' name="min_score_three_value" value="{{test_name_form.pass_score.value}}"> - {{test_name_form.mark_four}} % <span class="comment">(включитльно)</span></span>
-                <br>
-                <span>Оценка 4: <input type="number" size="4" id='min_score_four_value' name='min_score_four_value' value="{{test_name_form.mark_four.value|add:1}}"> - {{test_name_form.mark_five}} % <span class="comment">(включитльно)</span></span>
-
+                <div class="test_marks">
+                    <span>Оценка 2: Менее </span><span id="test_fail_mark" style="color: rgb(209, 209,209);font-size: 15px;">{{test_name_form.pass_score.value}}</span>
+                </div>
+                <div class="test_marks">
+                    <span>Оценка 3: <input style="pointer-events: none;" type="text" size="4" id='id_test_name-min_score_three_value' name="min_score_three_value" value="{{test_name_form.pass_score.value}}"> - {{test_name_form.mark_four}} % <span class="comment">(включитльно)</span></span>
+                </div>
+                <div class="test_marks">
+                    <span>Оценка 4: <input type="number" size="4" id='id_test_name-min_score_four_value' name='min_score_four_value' value="{{test_name_form.mark_four.value|add:1}}"> - {{test_name_form.mark_five}} % <span class="comment">(включитльно)</span></span>
+                </div>
+                <div class="test_marks">
+                    <span>Оценка 5: Более </span><span id="excellent_test_pass" style="color: rgb(209, 209,209);font-size: 15px;">{{test_name_form.mark_five.value}}</span>
+                </div>
             </div>
             <hr/>
 
@@ -125,9 +133,9 @@
     //Логика работы CheckBox выставление оценки
 let setMarkOpt = document.getElementById("id_test_name-set_mark") //Checkbox выставления оценки
 let minScoreValue = $("#id_test_name-pass_score") //Минимальный проходной процент
-let minThreeMark = $("#min_score_three_value") //Минимальный процент для тройки
+let minThreeMark = $("#id_test_name-min_score_three_value") //Минимальный процент для тройки
 let maxThreeMark = $("#id_test_name-mark_four") //Максимальный процент для тройки
-let minFourMark =  $("#min_score_four_value") //Минимальный процент для четвёрки
+let minFourMark =  $("#id_test_name-min_score_four_value") //Минимальный процент для четвёрки
 let maxFourMark = $("#id_test_name-mark_five") //Максимальный процент для четвёрки
 
 
@@ -152,6 +160,7 @@ function SetMarkFunc (event) {
         $("#set_mark_comment").attr("style", "color: rgba(209, 209,209); font-size: 18px;");
         $("#set_mark_full_block").attr("style", "display: block")
         minScoreValue.val(new_val)
+        $("#test_fail_mark").html(new_val)
     } else {
         $("#set_mark_comment").attr("style", "color: rgba(209, 209,209, 0.4); font-size: 15px;");
         $("#set_mark_full_block").attr("style", "display: none")
@@ -160,6 +169,7 @@ function SetMarkFunc (event) {
 
 function ChangeMarkValues (event) { //Меняем значения минимальных процентов для оценок
     let new_num = Number(event.target.value)
+    $("#test_fail_mark").html(new_num)
     if (setMarkOpt.checked === true) {
         if (new_num < 89) {
             if (maxFourMark.val() < 99 || minThreeMark.val() > new_num) {
@@ -170,20 +180,26 @@ function ChangeMarkValues (event) { //Меняем значения минима
 
                 minFourMark.val(new_num + 7)
                 maxFourMark.val(new_num + 11)
+                $("#excellent_test_pass").html(new_num + 11)
+
             } else {
                 event.target.value = minThreeMark.val()
+
             }
     } else {
+
             event.target.value = 88
             minThreeMark.val(88)
             maxThreeMark.val(94)
             minFourMark.val(95)
             maxFourMark.val(99)
+            $("#excellent_test_pass").html(99)
             maxThreeMark.attr("min", 89) //Выставляем ограничения по значениям в поле
         }
     } else {
         if (new_num > 100) {
             event.target.value = 100
+
         }
     }
 }
@@ -196,6 +212,7 @@ function SetMaxThreeMarkFunc (event) {  //Изменение значения м
             minFourMark.val(new_value + 1)
             if (Number(minFourMark.val()) >= Number(maxFourMark.val()) - 1) {
                 maxFourMark.val(new_value + 2)
+                $("#excellent_test_pass").html(new_value + 2)
             }
         } else {
             if (new_value > 97) {
@@ -215,11 +232,13 @@ function SetMinFourMarkFunc(event) { //Изменение значения ми�
             maxThreeMark.val(new_value - 1)
             if (new_value >= Number(maxFourMark.val())) {
                 maxFourMark.val(new_value + 1)
+                $("#excellent_test_pass").html(new_value + 1)
             }
         } else {
             if (new_value > 98) {
                 event.target.value = 98
                 maxFourMark.val(99)
+                $("#excellent_test_pass").html(99)
                 maxThreeMark.val(97)
             } else {
                 event.target.value = Number(minScoreValue.val()) + 2
@@ -234,16 +253,21 @@ function SetMaxFourMarkFunc(event) {
         let new_value = Number(event.target.value)
         if ( new_value > 99) {
             event.target.value = 99
+            $("#excellent_test_pass").html(99)
         } else if (new_value < (Number(minScoreValue.val()) + 3)) {
             event.target.value = Number(minScoreValue.val()) + 3
+            $("#excellent_test_pass").html(Number(minScoreValue.val()) + 3)
             minFourMark.val(Number(minScoreValue.val()) + 2)
             maxThreeMark.val(Number(minScoreValue.val()) + 1)
         } else if (new_value <= Number(minFourMark.val())) {
             minFourMark.val(new_value - 1)
             maxThreeMark.val(new_value -2)
+        } else {
+            $("#excellent_test_pass").html(new_value)
         }
     }
 }
+
 
 </script>
 
@@ -290,7 +314,7 @@ totalQNum.value = 0; //Ставим изначальное значение ко
 //Подсчёт количества вопросов при открытии теста
 //Выбираем все элементы input type=number, кроме 'pass score',
 //подсчитываем количество вопросов и развешиваем listener
-$(':input[type="number"]').not('#id_test_name-pass_score, #min_score_three_value, #id_test_name-mark_four, #min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
+$(':input[type="number"]').not('#id_test_name-pass_score, #id_test_name-min_score_three_value, #id_test_name-mark_four, #id_test_name-min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
 
   let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
   let selectElemNum = document.getElementById("id_questions-" + idNum + "-theme").value; //Находим select с индексом idNum и берём его значение
@@ -344,7 +368,7 @@ function ThemFocus(event) {
 function mainQCount() {
   totalQNum.value = 0; //Ставим изначальное значение количества вопросов 0
   totalQNum.innerHTML = totalQNum.value;
-  $(':input[type="number"]').not('#id_test_name-pass_score, #min_score_three_value, #id_test_name-mark_four, #min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
+  $(':input[type="number"]').not('#id_test_name-pass_score, #id_test_name-min_score_three_value, #id_test_name-mark_four, #id_test_name-min_score_four_value, #id_test_name-mark_five').each(function(index, element) {
     let idNum = element.id.match(numberPattern)[0] //Вынимаем номер элемента в фабрике форм
     let delMarker = document.getElementById("id_questions-" + idNum + "-DELETE") // CheckBox поля "Удалить тему"
 

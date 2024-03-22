@@ -103,10 +103,21 @@ class NewTestFormName(forms.ModelForm):
                   'ac_type', 'email_to_send', 'is_active', 'comment', 'for_user_comment']
         widgets = {
             "pass_score": NumberInput(attrs={'size': '4', 'min': 0, 'max': 100}),
-            "mark_four": NumberInput(attrs={'size': '4', 'max': 100}),
-            "mark_five": NumberInput(attrs={'size': '4', 'max': 100}),
+            "mark_four": NumberInput(attrs={'size': '4', 'max': 98}),
+            "mark_five": NumberInput(attrs={'size': '4', 'max': 99}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super(NewTestFormName, self).__init__(*args, **kwargs)
+        #self.fields['set_mark'].required = False
+        #self.fields['mark_four'].required = False
+        #self.fields['mark_five'].required = False
+        #self.fields['training'].required = False
+        self.fields['ac_type'].required = False
+        self.fields['email_to_send'].required = False
+        self.fields['is_active'].required = False
+        self.fields['comment'].required = False
+        self.fields['for_user_comment'].required = False
 
 # Форма для вопросов создаваемого теста
 class NewTestFormQuestions(forms.ModelForm):

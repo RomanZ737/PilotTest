@@ -1666,6 +1666,7 @@ def create_new_test(request):
                                       formset=BaseArticleFormSet, can_delete=True)  # Extra - количество строк формы
 
     if request.method == 'POST':
+
         ac_type = request.POST.get('ac_type')  # Вынимаем Тип ВС
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)},
@@ -1677,11 +1678,24 @@ def create_new_test(request):
         if 'test_name-training' in test_name_form.data.keys():
             if test_q_set.is_valid() and test_name_form.is_valid():
                 # Создаём объект теста
-                new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
-                                                          pass_score=test_name_form.data['test_name-pass_score'],
-                                                          training=True,
-                                                          ac_type=ac_type,
-                                                          )
+                if 'test_name-set_mark' in test_name_form.data.keys():
+                    mark_four = request.POST.get('test_name-mark_four')
+                    mark_five = request.POST.get('test_name-mark_five')
+                    new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                              pass_score=test_name_form.data['test_name-pass_score'],
+                                                              training=True,
+                                                              ac_type=ac_type,
+                                                              set_mark=True,
+                                                              mark_four=mark_four,
+                                                              mark_five=mark_five
+                                                              )
+                else:
+                    new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                              pass_score=test_name_form.data['test_name-pass_score'],
+                                                              training=True,
+                                                              ac_type=ac_type,
+                                                              set_mark=False
+                                                              )
                 logger_user_action.warning(f'<b>Создан Тест: </b>{test_name_form.data["test_name-name"]}\n\n'
                                            f'<b>User:</b> {request.user.profile.family_name}'
                                            f' {request.user.profile.first_name[0]}.'
@@ -1717,11 +1731,24 @@ def create_new_test(request):
             if test_q_set.is_valid() and test_name_form.is_valid() and 'krs_email' in request.POST:
                 # Создаём объект теста
                 emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
-                new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
-                                                          pass_score=test_name_form.data['test_name-pass_score'],
-                                                          training=False,
-                                                          ac_type=ac_type,
-                                                          email_to_send=', '.join(emails))
+                if 'test_name-set_mark' in test_name_form.data.keys():
+                    mark_four = request.POST.get('test_name-mark_four')
+                    mark_five = request.POST.get('test_name-mark_five')
+                    new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                              pass_score=test_name_form.data['test_name-pass_score'],
+                                                              training=True,
+                                                              ac_type=ac_type,
+                                                              set_mark=True,
+                                                              mark_four=mark_four,
+                                                              mark_five=mark_five
+                                                              )
+                else:
+                    new_test = TestConstructor.objects.create(name=test_name_form.data['test_name-name'],
+                                                              pass_score=test_name_form.data['test_name-pass_score'],
+                                                              training=False,
+                                                              ac_type=ac_type,
+                                                              email_to_send=', '.join(emails),
+                                                              set_mark=False)
                 logger_user_action.warning(f'<b>Создан Тест: </b>{test_name_form.data["test_name-name"]}\n\n'
                                            f'<b>User:</b> {request.user.profile.family_name}'
                                            f' {request.user.profile.first_name[0]}.'
