@@ -108,8 +108,30 @@
                     <span>Общий результат: </span>
                 </div>
                 <div class="list-other_field">
-                    <span class="mark_up">{{i.total_result}}%</span>
+                    {% if i.total_result >= i.pass_score %}
+                        <span class="results_dynamic_sign" style="color: rgb(148, 192, 74);">{{i.total_result}}%</span>
+                    {% else %}
+                        <span class="results_dynamic_sign" style="color: rgb(142, 23, 11);">{{i.total_result}}%</span>
+                    {% endif%}
                 </div>
+            </div>
+            <div class="block_light_up">
+                <div class="list-other_field">
+                    <span>Общая оценка: </span>
+                </div>
+                {% if i.total_mark %}
+                <div class="list-other_field">
+                    {% if i.total_mark == 3 %}
+                        <span class="results_dynamic_sign" style="color: rgb(217,162,36);">{{i.total_mark}}</span>
+                    {% elif  i.total_mark == 4 %}
+                        <span class="results_dynamic_sign" style="color: rgb(184,224,41);">{{i.total_mark}}</span>
+                    {% elif  i.total_mark == 5 %}
+                        <span class="results_dynamic_sign" style="color: rgb(23, 255, 247);">{{i.total_mark}}</span>
+                    {% elif  i.total_mark == 2 %}
+                        <span class="results_dynamic_sign" style="color: rgb(142, 23, 11);">{{i.total_mark}}</span>
+                    {% endif%}
+                </div>
+                {% endif %}
             </div>
 
             <br>

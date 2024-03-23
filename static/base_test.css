@@ -216,6 +216,19 @@ div.results_static_sign {
     margin-top: 5px;
 }
 
+span.results_dynamic_sign{
+    font-size: 22px;
+    /*position: relative; */
+    display: inline-block;
+    /*left: 5%;
+    word-wrap: break-word;
+    text-align: left;
+    vertical-align: middle;
+    margin-bottom: 5px;
+    margin-top: 5px; */
+    color: rgb(209, 209,209);
+}
+
 div.results_dynamic_sign{
     font-size: 22px;
     /*position: relative; */

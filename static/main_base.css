@@ -1125,3 +1125,7 @@ div.q_edit_comment_statick_sign {
 div.test_marks {
     margin-top: 14px;
 }
+
+span.results_dynamic_sign {
+    font-size: 22px;
+}

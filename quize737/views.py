@@ -56,38 +56,6 @@ logger_user_action = logging.getLogger('USER ACTION')
 loger_pilot_answer = logging.getLogger('PILOT ANSWER')
 
 
-# Декоратор проверки группы пользователя для доступа
-# def group_required(group, login_url=None, raise_exception=False):
-#     """
-#     Decorator for views that checks whether a user has a group permission,
-#     redirecting to the log-in page if necessary.
-#     If the raise_exception parameter is given the PermissionDenied exception
-#     is raised.
-#     """
-#
-#     def check_perms(user):
-#         if isinstance(group, six.string_types):
-#             groups = (group,)
-#         else:
-#             groups = group
-#         # First check if the user has the permission (even anon users)
-#
-#         if user.groups.filter(name__in=groups).exists() | user.is_superuser:
-#             return True
-#         # In case the 403 handler should be called raise the exception
-#         if raise_exception:
-#             raise PermissionDenied
-#         # As the last resort, show the login form
-#         return False
-#
-#     return user_passes_test(check_perms, login_url=login_url)
-
-
-# Формироваине теста с вопросами из всех тем
-def all_them_q_set():
-    pass
-
-
 # Заглавная страница
 @login_required  # Только для зарегитсрированных пользователей
 def start(request, id=None):
@@ -736,7 +704,8 @@ def next_question(request):
                         #  Вынимаем объект теста, назначенного конкретному пользователю
                         user_test_instance = UserTests.objects.get(user=request.user,
                                                                    test_name=quiz_set_instance.test_id)
-
+                        #  Вынимаем объект оригинального теста
+                        original_test_inst = TestConstructor.objects.get(pk=user_test_instance.test_name.id)
                         # Вынимаем количество максимально возможных баллов
                         max_score_num = float(quiz_set_instance.max_score_amount)
                         # Вынимаем количество набранных баллов
@@ -755,6 +724,20 @@ def next_question(request):
                         results_instance.in_progress = False
                         #  Записываем в отчёт о тесте: результат сдачи,
                         results_instance.total_result = total_result
+                        #  Выясняем нужно ли выставлять оценку пользователю
+                        if original_test_inst.set_mark:
+                            #  Вынимаем максимум процентов для тройки
+                            max_three = original_test_inst.mark_four
+                            #  Вынимаем максимум процентов для четвёрки
+                            max_four = original_test_inst.mark_five
+                            if total_result < min_pass_score:
+                                results_instance.total_mark = 2
+                            elif min_pass_score <= total_result <= max_three:
+                                results_instance.total_mark = 3
+                            elif max_three < total_result <= max_four:
+                                results_instance.total_mark = 4
+                            else:
+                                results_instance.total_mark = 5
                         #  Сохраняем данные
                         results_instance.save()
 
@@ -765,6 +748,7 @@ def next_question(request):
                         quize_name = results_instance.quize_name
                         ac_type = results_instance.user_id.profile.get_ac_type_display
                         timestamp = results_instance.timestamp
+                        total_mark = results_instance.total_mark
 
                         #  Формируем результаты ответов на тест
                         answer_results = []
@@ -917,7 +901,7 @@ def next_question(request):
                                    'total_num_q': total_num_q, 'quize_name': quize_name,
                                    'correct_q_num': correct_q_num, 'total_result': total_result,
                                    'conclusion': conclusion, 'answers': answer_results,
-                                   'min_pass_score': min_pass_score}
+                                   'min_pass_score': min_pass_score, 'total_mark': total_mark}
 
                         return render(request, 'results.html', context=context)
 
@@ -1850,16 +1834,23 @@ def test_details(request, id):
         test_name_form = NewTestFormName(request.POST)
         test_q_set = QuestionFormSet(request.POST, request.FILES,
                                      form_kwargs={'thems_selection': tuple(thems_selection)}, prefix="questions")
+
+        a.name = test_name_form.data.get('name')
+        a.pass_score = test_name_form.data.get('pass_score')
+        a.comment = test_name_form.data.get('comment')
+        a.for_user_comment = test_name_form.data.get('for_user_comment')
+        if test_name_form.data.get('set_mark') == 'on':
+            a.set_mark = True
+            a.mark_four = test_name_form.data.get('mark_four')
+            a.mark_five = test_name_form.data.get('mark_five')
+        else:
+            a.set_mark = False
+        a.save()
         # Если выбран параметр тренировочного теста
         if test_name_form.data.get('training') == 'on':
             if test_q_set.is_valid():
                 TestQuestionsBay.objects.filter(test_id=id).delete()
-                # emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
-                # a.email_to_send = ', '.join(emails)
-                training = True
-                a.name = test_name_form.data.get('name')
-                a.pass_score = test_name_form.data.get('pass_score')
-                a.training = training
+                a.training = True
                 a.save()
                 for question in test_q_set.cleaned_data:
                     if not question['DELETE']:
@@ -1881,12 +1872,6 @@ def test_details(request, id):
                         for value in error.values():
                             form_errors.append(value)
                 errors_non_form = test_q_set.non_form_errors
-                # email_error = ''  # Ошибка с заполнением email адресов
-                # checked_emailes = ''  # Список email адресов для отсылки уведомлений
-                # if 'krs_email' not in request.POST:
-                #     email_error = 'Необходимо выбрать хотя бы один Email адрес для рассылки уведомлений'
-                # else:
-                #     checked_emailes = request.POST.getlist('krs_email')
                 context = {'target_them_num': target_them_num, 'test_name_form': test_name_form,
                            'test_q_set': test_q_set, 'non_form_errors': errors_non_form,
                            'form_errors': form_errors, 'test_id': id, 'ac_type': test_instance[0]['ac_type'],
@@ -1898,10 +1883,7 @@ def test_details(request, id):
                 TestQuestionsBay.objects.filter(test_id=id).delete()
                 emails = request.POST.getlist('krs_email')  # Вынимаем выбраные email адреса для рассылки
                 a.email_to_send = ', '.join(emails)
-                training = False
-                a.name = test_name_form.data.get('name')
-                a.pass_score = test_name_form.data.get('pass_score')
-                a.training = training
+                a.training = False
                 a.save()
                 for question in test_q_set.cleaned_data:
                     if not question['DELETE']:
