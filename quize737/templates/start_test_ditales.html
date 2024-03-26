@@ -24,7 +24,11 @@
                 </div>
                 <hr>
             <div class="block_none_light_up">
-                <span class="main_sign">{{test_name.name}}</span>
+                <span class="main_sign">"{{test_name.name}}"
+                {% if for_user_comment %}
+                    : {{for_user_comment}}
+                {% endif %}
+                </span>
             </div>
             <div class="block_none_light_up">
                 <div class="list-text_numtry">

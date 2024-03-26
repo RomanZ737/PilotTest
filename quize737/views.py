@@ -289,7 +289,7 @@ def start(request, id=None):
                     test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
                     user_test = UserTests.objects.filter(test_name=id,
                                                          user=request.user)  # Объект теста назначенного пользователю
-
+                    test_mess_for_user = user_test.test_name.for_user_comment #  Вынимаем сообщение для пользователя
                     results_instance = QuizeResults.objects.get(user_id=request.user,
                                                                 quize_name=test_instance.name,
                                                                 in_progress=True)  # Сформированный результат выполнения теста
@@ -305,7 +305,7 @@ def start(request, id=None):
                                'user_tests': user_tests, 'in_progress': in_progress,
                                'tmp_test_id': test_in_progress.id,
                                'result_id': results_instance.id, 'question_id': id,
-                               'q_num_left': q_num_left, 'user_mess': user_mess}
+                               'q_num_left': q_num_left, 'user_mess': user_mess, 'for_user_comment': test_mess_for_user}
                     return render(request, 'start_test_ditales.html', context=context)
 
                 except (ObjectDoesNotExist, MultipleObjectsReturned) as err:
@@ -323,7 +323,7 @@ def start(request, id=None):
                         user_test.save()
 
                     in_progress = False
-                    user_test = UserTests.objects.filter(test_name=id)  # Выбраный пользователем тест
+                    user_test = UserTests.objects.filter(test_name=id, user=request.user)  # Выбраный пользователем тест
                     user_tests = UserTests.objects.filter(
                         user=request.user)  # Весь список тестов пользователя для отображения
                     test_instance = TestConstructor.objects.get(id=id)
@@ -331,7 +331,8 @@ def start(request, id=None):
                     context = {'question_set': test_question_sets, 'test_name': test_instance,
                                'user_test': user_test[0],
                                'user_tests': user_tests,
-                               'in_progress': in_progress, 'user_mess': user_mess}
+                               'in_progress': in_progress, 'user_mess': user_mess,
+                               'for_user_comment': test_instance.for_user_comment}
                     return render(request, 'start_test_ditales.html', context=context)
 
 
