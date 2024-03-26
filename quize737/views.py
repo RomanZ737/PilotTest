@@ -739,6 +739,8 @@ def next_question(request):
                                 results_instance.total_mark = 4
                             else:
                                 results_instance.total_mark = 5
+                            results_instance.mark_four = max_three
+                            results_instance.mark_five = max_four
                         #  Сохраняем данные
                         results_instance.save()
 

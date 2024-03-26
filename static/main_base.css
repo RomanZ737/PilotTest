@@ -1129,3 +1129,47 @@ div.test_marks {
 span.results_dynamic_sign {
     font-size: 22px;
 }
+
+.tooltip-toggle {
+  border: none;
+  /*background-color: #83b3d3;*/
+  padding: 0;
+  margin: 0;
+  display: block;
+}
+
+.tooltip-toggle:hover .tooltip-icon {
+  color:#68a2ca;
+}
+
+.tooltip-text {
+  /*font-family: "PT Sans", sans-serif;*/
+  background-color: #333333;
+  color: #FFFFFF;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  text-transform: none;
+  padding: 20px 18px 18px 22px;
+  border-radius: 10px;
+  width: 256px;
+  position: absolute; /* Позиционирование элемента */
+  bottom: 100%; /* Расположение элемента относительно нижнего края */
+  left: 50%; /* Расположение элемента относительно левого края */
+  z-index: 1; /* Настройка наложения элемента */
+  transform: translateX(-50%); /* Сдвиг элемента по горизонтали */
+  display: none; /* Скрываем элемент по умолчанию */
+}
+
+.tooltip-toggle:hover + .tooltip-text,
+.tooltip-toggle:focus + .tooltip-text {
+  display: block;
+}
+
+.tooltip {
+  position: absolute;
+  margin-top: 2px;
+  margin-left: 5px;
+  width: 25px;
+  height: 25px;
+}

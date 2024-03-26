@@ -1,8 +1,9 @@
 <!-- Детали конкретного отчёта -->
 
 {% extends "main_base.html" %}
-
 {% block content %}
+{% load static %}
+{% load django_template_maths %}
 
 <div class="result_list">
     <fieldset>
@@ -90,10 +91,6 @@
                 </div>
             </div>
 
-<!--            <div class="block_none_light_up">-->
-<!--                Количество баллов: <span class="mark_up">{{i.score_number}}</span>-->
-<!--            </div>-->
-
             <div class="block_light_up">
                 <div class="list-other_field">
                 Минимально-необходимое количество баллов:
@@ -119,7 +116,20 @@
                 {% if i.total_mark %}
                     <div class="block_light_up">
                         <div class="list-other_field">
-                            <span>Общая оценка: </span>
+                            <span>Общая оценка:
+                                <span class="tooltip">
+                                    <img src="{% static 'info.png' %}" class="tooltip-toggle" alt="" style="vertical-align:middle; width: 17px; padding-right: 5px">
+                                    <span class="tooltip-text">
+                                        Оценка 2: Менее {{i.pass_score}} <br>
+                                        Оценка 3: {{i.pass_score}} - {{i.mark_four}}% (включительно) <br>
+                                        Оценка 4: {{i.mark_four|add:1}} - {{i.mark_five}}% (включительно) <br>
+                                        Оценка 5: Более {{i.mark_five}}% <br>
+                                    </span>
+                                </span>
+                            </span>
+
+
+
                         </div>
                         <div class="list-other_field">
                             {% if i.total_mark == 3 %}
