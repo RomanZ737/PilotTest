@@ -137,7 +137,12 @@ class QuizeResults(models.Model):
                                       help_text='Если тест не завершён, то результат не показывается в общем списке')
     total_mark = models.IntegerField(default=0, verbose_name='оценка', null=True,
                                      help_text='Итоговая оценка')
-
+    mark_four = models.IntegerField(null=True,
+                                    verbose_name='Количество процентов для четвёрки',
+                                    help_text='Минимальный процент правильных ответов для получения оценки четыре за тест')
+    mark_five = models.IntegerField(null=True,
+                                    verbose_name='Количество процентов для четвёрки',
+                                    help_text='Минимальный процент правильных ответов для получения оценки четыре за тест')
 
     class Meta:
         ordering = ['-date_end']
