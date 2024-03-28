@@ -159,7 +159,7 @@ class TestConstructor(models.Model):
                                      verbose_name='Количество правильных ответов',
                                      help_text='Минимальный процент правильных ответов для прохождения теста')
     set_mark = models.BooleanField(verbose_name='Выставлять оценку за тест', default=True, help_text='Высчислять оценку за тест на основании набранных пользователем баллов')
-    mark_four = models.IntegerField(default=config.test_pass_score_default + 6,
+    mark_four = models.IntegerField(default=config.test_pass_score_default + 5,
                                     verbose_name='Количество процентов для четвёрки',
                                     help_text='Минимальный процент правильных ответов для получения оценки четыре за тест')
     mark_five = models.IntegerField(default=config.test_pass_score_default + 15,
