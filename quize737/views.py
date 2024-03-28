@@ -159,7 +159,7 @@ def start(request, id=None):
                     if q_set['theme'] == 5:
                         for theme in Thems.objects.all():
                             if theme.name != 'Все темы':
-                                quiz_set = QuestionSet.objects.filter(Q(them_name=theme.name), (
+                                quiz_set = QuestionSet.objects.filter(Q(them_name=theme.id), (
                                         Q(ac_type=test_instance[0].ac_type) | Q(ac_type='ANY')), is_active=True)
                                 if quiz_set.count() < int(q_set[
                                                               'q_num']):  # если в сете не оказалось достаточно вопросов по соответствующей теме, то делаем случайную выборку по недостающему числу вопросов
