@@ -289,7 +289,8 @@ def start(request, id=None):
                     test_instance = TestConstructor.objects.get(id=id)  # Объект теста (изначальный, общий)
                     user_test = UserTests.objects.filter(test_name=id,
                                                          user=request.user)  # Объект теста назначенного пользователю
-                    test_mess_for_user = user_test.test_name.for_user_comment #  Вынимаем сообщение для пользователя
+                    test_mess_for_user = ""
+                    #test_mess_for_user = user_test.test_name.for_user_comment #  Вынимаем сообщение для пользователя
                     results_instance = QuizeResults.objects.get(user_id=request.user,
                                                                 quize_name=test_instance.name,
                                                                 in_progress=True)  # Сформированный результат выполнения теста
