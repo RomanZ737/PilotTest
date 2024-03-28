@@ -727,6 +727,8 @@ def next_question(request):
                         #  Записываем в отчёт о тесте: результат сдачи,
                         results_instance.total_result = total_result
                         #  Выясняем нужно ли выставлять оценку пользователю
+                        max_three = ''
+                        max_four = ''
                         if original_test_inst.set_mark:
                             #  Вынимаем максимум процентов для тройки
                             max_three = original_test_inst.mark_four
@@ -854,6 +856,7 @@ def next_question(request):
                             conclusion = False
                             results_instance.conclusion = conclusion
                             results_instance.date_end = datetime.datetime.utcnow()
+
                             #  Сохраняем данные
                             results_instance.save()
                             # Вынимаем количество оставшихся попыток
@@ -905,7 +908,8 @@ def next_question(request):
                                    'total_num_q': total_num_q, 'quize_name': quize_name,
                                    'correct_q_num': correct_q_num, 'total_result': total_result,
                                    'conclusion': conclusion, 'answers': answer_results,
-                                   'min_pass_score': min_pass_score, 'total_mark': total_mark}
+                                   'min_pass_score': min_pass_score, 'total_mark': total_mark,
+                                   'max_three': max_three, 'max_four': max_four}
 
                         return render(request, 'results.html', context=context)
 
@@ -2707,11 +2711,12 @@ def user_detales(request, id):
     else:
         user_tests = UserTests.objects.filter(user=id).values('id', 'test_name', 'num_try', 'date_before')
         tests_for_user_form = UserTestForm(initial=user_tests)
+        user_name = user_object.username
         #  Вынимаем и сохраняем адрес страницы, с которой пришёл пользователь
         previous_url = request.META.get('HTTP_REFERER')
 
         context = {'user_profile': user_profile[0], 'user_tests': tests_for_user_form, 'user_id': id,
-                   'previous_url': previous_url}
+                   'previous_url': previous_url, 'user_name': user_name}
         return render(request, 'user_ditales.html', context=context)
 
 

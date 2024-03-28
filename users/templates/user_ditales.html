@@ -57,7 +57,7 @@
         {% for form in user_tests %}
         <div class="form_set">
             <div class="block_none_light_up">
-                {% check_test_num_try form.num_try.value form.test_name.value  as check_test_valid_num_try %}
+                {% check_test_num_try form.num_try.value form.test_name.value user_name as check_test_valid_num_try %}
                 <span>Название: {{ form.test_name }} <span style="{% if check_test_valid_num_try %} border: 2px solid #aa272f; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; {% endif %}">
                     Кол-во попыток: {{ form.num_try }}</span>
                     {% check_test_date form.date_before.value as check_test_valid_date %}

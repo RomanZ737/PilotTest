@@ -36,12 +36,14 @@ def check_test_date(context, date):
 
 
 @register.simple_tag(takes_context=True)
-def check_test_num_try(context, num_try, test_name):
+def check_test_num_try(context, num_try, test_name, user):
+    print('USER:', user)
     if int(num_try) <= 0:
         try:
             UserTests.objects.get((Q(num_try__lte=0) &
                                    Q(user__quizeresults__in_progress=False) &
-                                   Q(results_id=F('user__quizeresults__id'))), test_name__id=test_name)
+                                   Q(results_id=F('user__quizeresults__id'))), test_name__id=test_name,
+                                  user__username=user)
             return True
         except ObjectDoesNotExist:
             return False

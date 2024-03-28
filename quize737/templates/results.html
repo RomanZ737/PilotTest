@@ -47,7 +47,18 @@
         </div>
         {% if total_mark %}
         <div class="block_light_up">
-            <div class="results_static_sign">Общая оценка:</div>
+            <div class="results_static_sign">Общая оценка:
+
+                <span class="tooltip">
+                                    <img src="{% static 'info.png' %}" class="tooltip-toggle" alt="" style="vertical-align:middle; width: 17px; padding-right: 5px">
+                                    <span class="tooltip-text">
+                                        Оценка 2: Менее {{min_pass_score}} <br>
+                                        Оценка 3: {{min_pass_score}} - {{max_three}}% (включительно) <br>
+                                        Оценка 4: {{max_three|add:1}} - {{max_four}}% (включительно) <br>
+                                        Оценка 5: Более {{max_four}}% <br>
+                                    </span>
+                </span>
+            </div>
             {% if total_mark == 3 %}
                         <span class="results_dynamic_sign" style="color: rgb(217,162,36);">{{total_mark}}</span>
                     {% elif  total_mark == 4 %}
