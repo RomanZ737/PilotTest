@@ -3,7 +3,17 @@
         display: none;
     }
     section {
-    margin-left: 5px;
-    margin-top: 10px;
+        margin-left: 5px;
+        margin-top: 10px;
+    }
+}
+
+@media screen and (max-width: 600px) and (orientation: landscape) {
+    aside {
+        display: none;
+    }
+    section {
+        margin-left: 185px;
+        margin-top: 10px;
     }
 }
