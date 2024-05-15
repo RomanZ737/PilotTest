@@ -29,7 +29,7 @@ secret_key = config('secret_key', default='')
 SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 LOGGING = {
     "version": 1,
