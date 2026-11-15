@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from loggers.my_loggers import TelegramMsgLog
 from pathlib import Path
-from decouple import config  # позволяет скрывать критическую информацию (пароли, логины, ip)
+from decouple import config, Csv  # позволяет скрывать критическую информацию (пароли, логины, ip)
 # from quize737.common import DKIMBackend
 
 import common
@@ -25,11 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-secret_key = config('secret_key', default='')
-SECRET_KEY = secret_key
+SECRET_KEY = config('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+log_dir = os.path.join(BASE_DIR, 'log')
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
 LOGGING = {
     "version": 1,
@@ -137,13 +140,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'PilotTest.urls'
@@ -251,3 +255,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+# Домены, для которых разрешены POST-запросы (из .env)
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv(), default='')

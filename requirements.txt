@@ -21,3 +21,4 @@ telebot==0.0.5
 tzdata==2022.7
 urllib3==1.26.14
 whitenoise==6.4.0
+gunicorn==21.2.0
