@@ -386,7 +386,10 @@ def start(request, id=None):
                   f'<p style="font-size: 18px;">{contence_of_mess}</p><br>' \
                   f'<a href="mailto:{request.user.email}">Ответить</a>'
         email_msg = {'subject': subject, 'message': message, 'to': to}
-        common.send_email(request, email_msg)
+        try:
+            common.send_email(request, email_msg)
+        except Exception:
+            logging.getLogger('PILOT ERROR').exception('send_email to admin failed')
         # Отправляем пользователя на заглавную страницу
         return HttpResponseRedirect('/')
 
@@ -838,7 +841,11 @@ def next_question(request):
                                 email_list = user_test_instance.test_name.email_to_send.split()
 
                                 email_msg = {'subject': subject, 'message': message, 'to': email_list}
-                                common.send_email(request, email_msg)
+                                try:
+                                    common.send_email(request, email_msg)
+                                except Exception:
+                                    # Сбой почты не должен мешать завершению теста и удалению назначения
+                                    logging.getLogger('PILOT ERROR').exception('send_email to KRS failed')
 
                             else:  # Если тест тренировочный, удаляем результаты теста
                                 results_instance.delete()
@@ -937,7 +944,10 @@ def next_question(request):
                   f'<p style="font-size: 18px;">{contence_of_mess}</p><br>' \
                   f'<a href="mailto:{request.user.email}">Ответить</a>'
         email_msg = {'subject': subject, 'message': message, 'to': to}
-        common.send_email(request, email_msg)
+        try:
+            common.send_email(request, email_msg)
+        except Exception:
+            logging.getLogger('PILOT ERROR').exception('send_email to admin failed')
         # Отправляем пользователя на заглавную страницу
         return HttpResponseRedirect('/')
 
