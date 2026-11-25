@@ -75,10 +75,12 @@ def send_email(request, email_msg):
     # note that we needed to peel the <> off the msgid for use in the html.
 
     # Now add the related image to the html part.
-    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    with open(dir_path + '/PilotTest/static/letter_logo.png', 'rb') as img:
-        msg.get_payload()[1].add_related(img.read(), 'image', 'jpg',
-                                         cid=logo_cid)
+    dir_path = os.path.dirname(os.path.abspath(__file__))
+    logo_path = os.path.join(dir_path, 'PilotTest', 'static', 'letter_logo.png')
+    if os.path.exists(logo_path):
+        with open(logo_path, 'rb') as img:
+            msg.get_payload()[1].add_related(img.read(), 'image', 'jpg',
+                                             cid=logo_cid)
 
     # Send the mail
     context = ssl.create_default_context()
